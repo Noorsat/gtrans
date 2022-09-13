@@ -1,22 +1,23 @@
-const express = require("express")
-const mongoose = require("mongoose")
+import express from 'express';
+import bodyParser from 'body-parser';
+import mongoose from 'mongoose';
+import cors from 'cors';
+import ordersRoutes from './routes/orders.js'
+import requestsRoutes from './routes/requests.js'
 
-const PORT = 3000;
+const app = express()
 
-const app = express(5000, () => console.log("App has been started on port " + PORT))
+app.use('/orders', ordersRoutes)
+app.use('/requests', requestsRoutes)
+app.use(bodyParser.json({limit:"30mb", extended: true}))
+app.use(bodyParser.urlencoded({limit:"30mb", extended: true}))
+app.use(cors())
 
-async function start(){
-    try{
-        await mongoose.connect("mongodb+srv://user:qwerty123@cluster0.bfy5yoo.mongodb.net/?retryWrites=true&w=majority", {
-            useNewUrlParser: true, 
-            useUnifiedTopology: true 
-        }).then(() => app.listen(5000, () => console.log("SErver launched")))
-    }catch(e){
-        console.log("Server Error", e.message)
-        process.exit(1)
-    }
-}
+mongoose.connect("mongodb+srv://user:qwerty123@cluster0.bfy5yoo.mongodb.net/?retryWrites=true&w=majority", {
+    useNewUrlParser: true, 
+    useUnifiedTopology: true 
+}).then(() => app.listen(5100, () => console.log("Server launched")))
 
-start()
+    
 
 
