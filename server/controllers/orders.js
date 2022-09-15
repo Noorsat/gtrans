@@ -22,3 +22,16 @@ export const createOrder = async (req, res) => {
         res.status(409).json({message: error.message})
     }
 }
+
+export const updateOrder = async (req, res) => {
+    const newOrder = req.body;
+
+    const order = await Order.findById(req.params.id);
+
+    if (!order) return res.status(404).json({message: "Order not found..."})
+
+    const updatedOrder = await Order.findByIdAndUpdate(req.params.id, newOrder) 
+
+    res.send(updatedOrder)
+
+}

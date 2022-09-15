@@ -7,11 +7,13 @@ import requestsRoutes from './routes/requests.js'
 
 const app = express()
 
-app.use('/orders', ordersRoutes)
-app.use('/requests', requestsRoutes)
+
+app.use(cors())
 app.use(bodyParser.json({limit:"30mb", extended: true}))
 app.use(bodyParser.urlencoded({limit:"30mb", extended: true}))
-app.use(cors())
+app.use('/orders', ordersRoutes)
+app.use('/requests', requestsRoutes)
+
 
 mongoose.connect("mongodb+srv://user:qwerty123@cluster0.bfy5yoo.mongodb.net/?retryWrites=true&w=majority", {
     useNewUrlParser: true, 
