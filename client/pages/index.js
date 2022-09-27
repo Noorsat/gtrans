@@ -7,26 +7,41 @@ import moment from 'moment'
 import {createRequest} from '../http/request';
 import InputMask from 'react-input-mask';
 import styles from './../styles/Home.module.css';
+import { useRouter } from 'next/router';
+import jwt_decode from 'jwt-decode'
 
 export default function Home() {
   const [orders, setOrders] = useState();
   const [requestModal, setRequestModal] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState();
   const [request, setRequest] = useState();
+  const [user, setUser] = useState();
+  const router = useRouter();
  
   useEffect(() => {
     getOrders().then((res) => {
       setOrders(res.data)
     })
+    const user = JSON.parse(localStorage.getItem("user"))
+    if (user){
+        var decoded = jwt_decode(user?.token);
+        setUser(decoded);
+    }
   }, [])
 
   const openRequestHandler = (item) => {
-    setSelectedOrderId(item?._id)
-    setRequestModal(true)
+    if (user){
+      setSelectedOrderId(item?._id)
+      setRequestModal(true)
+    }else{
+      router.push("/login")
+    }
   }
 
+  console.log(user)
+
   const requestCreateHandler = () => {
-    const body = {...request, orderID: selectedOrderId}
+    const body = {...request, orderID: selectedOrderId, company: user?.companyName, phoneNumber: user?.phoneNumber}
     createRequest(body).then((res) => {
       if (res?.status === 201){
         setRequestModal(false)
@@ -76,17 +91,17 @@ export default function Home() {
       key: 'count',
     },
     {
-      title:"Преодложить цену",
+      title:"Предложить цену",
       dataIndex: 'request',
       key: 'request',
-      render: (e, item) => <Button type='primary' onClick={() => openRequestHandler(item)}>Преодложить цену</Button>
+      render: (e, item) => <Button type='primary' onClick={() => openRequestHandler(item)}>Предложить цену</Button>
     },
   ]
-  
+
   return ( 
         <div>
           <Table dataSource={orders} columns={columns} />
-          <Modal title="Преодложить цену" open={requestModal}
+          <Modal title="Предложить цену" open={requestModal} onCancel={() => setRequestModal(false)}
             footer={[
               <Button onClick={() => setRequestModal(false)}>
                 Назад
@@ -96,8 +111,8 @@ export default function Home() {
               </Button>
             ]}
           >
-            <Input placeholder='Компания' className='mb-3' onChange={(e) => setRequest({...request, company: e.target.value})}/>
-            <InputMask mask="+7 (999) 999-99-99" className={`mb-3 w-100 ${styles.phone__input}`} onChange={(e) => setRequest({...request, phoneNumber: e.target.value})} placeholder="Контакты (номер телефона)"/>
+            <Input placeholder='Компания' className='mb-3' value={user?.companyName} disabled/>
+            <Input className={`mb-3 w-100 ${styles.phone__input}`} value={user?.phoneNumber} disabled/>
             <div className='d-flex align-items-center mb-3 gap-2'>
               <Input placeholder='Цена'  onChange={(e) => setRequest({...request, price: e.target.value})}/>
               <div>

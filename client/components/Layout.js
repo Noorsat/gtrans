@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, {useState, useEffect,Component } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'antd/dist/antd.css';
 import {BsFacebook} from 'react-icons/bs';
@@ -6,9 +6,15 @@ import {AiFillInstagram} from 'react-icons/ai';
 import Link from 'next/link'
 
 
-export default class Layout extends Component {
-  render () {
-    const { children } = this.props
+const Layout = ({children}) => {
+    const [user, setUser] = useState()
+
+    useEffect(() => {
+      const user = JSON.parse(localStorage.getItem("user"));
+      console.log(user)
+      setUser(user);
+    }, [children])
+
     return (
       <div className='layout'>
         <div className='container'>
@@ -48,18 +54,29 @@ export default class Layout extends Component {
         </div>
         </div>
         <div className='position-relative border-bottom border-top pt-3 pb-3'>
-          <div className='container d-flex position-relative'>
-            <div className='d-flex justify-content-center w-100 gap-3'>
-              <Link href="/">Заказы</Link>
+          <div className='container d-flex justify-content-between'>
+            <div className='d-flex justify-content-center ms-auto me-auto gap-3'>
+              <div style={{marginLeft:150}}>
+                <Link href="/">Заказы</Link>
+              </div>
               <Link href="/request">Заказать доставку</Link>
             </div>
-            <div className='position-absolute end-0'>
-              <Link href="/my-orders">Мой заказы</Link>
+            <div className='d-flex'>
+                <div className='me-3'>
+                  <Link href="/my-orders">Мой заказы</Link>
+                </div>
+                {
+                  user ? 
+                  <Link href="/account">Мой аккаунт</Link> 
+                  :
+                  <Link href="/login">Логин</Link> 
+                }
             </div>
           </div>
         </div>
         {children}
       </div>
     );
-  }
 }
+
+export default Layout;

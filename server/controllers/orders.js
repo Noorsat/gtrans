@@ -33,5 +33,43 @@ export const updateOrder = async (req, res) => {
     const updatedOrder = await Order.findByIdAndUpdate(req.params.id, newOrder) 
 
     res.send(updatedOrder)
+}
 
+export const addRequest = async (req, res) => {
+    const order = await Order.findById(req.params.id);
+
+    if (!order) return res.status(404).json({message: "Order not found..."})
+
+    const newOrder = req.body;
+
+    const updatedOrder = await Order.findByIdAndUpdate(req.params.id, {
+        $push:{
+            acceptedRequest: newOrder
+        }
+    })
+
+    res.send(updatedOrder)
+}
+
+export const changeStatusRequest = async (req, res ) => {
+    const order = await Order.findById(req.params.id);
+
+    if (!order) return res.status(404).json({message: "Order not found..."})
+
+    const newOrder = req.body;
+
+    console.log(newOrder)
+
+    const updatedOrder = await Order.findByIdAndUpdate(
+        req.params.id,
+        { $set: { "acceptedRequest.$[elem].status" : newOrder.status } },
+        {
+          multi: true,
+          arrayFilters: [ { "elem.requestId":newOrder.requestId } ]
+        }
+    )
+
+    console.log(updatedOrder)
+
+    res.send(updatedOrder)
 }

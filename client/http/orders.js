@@ -11,5 +11,11 @@ export const createOrder = async (body) => {
 }
 
 export const acceptRequest = async (body, id) => {
-    const response = await axios.put("http://localhost:5100/orders/"+id, body)
+    const response = await axios.put("http://localhost:5100/orders/add/request/"+id, body)
+    return response;
 } 
+
+export const changeStatusRequest = async (body, id) => {
+    const response = await axios.put("http://localhost:5100/orders/status/request/"+id, body)
+    return response
+}

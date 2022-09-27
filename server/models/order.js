@@ -8,12 +8,15 @@ const orderSchema = mongoose.Schema({
     volume: Number,
     count: Number,
     transportDate:Date,
-    acceptedRequest: {
-        company:String,
-        price: Number,
-        requestId : String,
-        comment: String
-    }
+    accountId:String,
+    acceptedRequest: [{
+        requestId: String,
+        company: String,
+        price:Number,
+        phoneNumber: String,
+        comment:String,
+        status: Number 
+    }]
 })
 
 const Order = mongoose.model("OrderSchema", orderSchema)

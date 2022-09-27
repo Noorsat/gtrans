@@ -3,30 +3,38 @@ import {useState, useEffect} from 'react';
 import {createOrder, getOrders} from './../../http/orders';
 import {styles} from './../../styles/Request.module.css';
 import moment from 'moment';
+import jwt_decode from 'jwt-decode'
+import { useRouter } from 'next/router';
 
 
 const Request = () => {
     const { Option } = Select;
 
+    const router = useRouter();
     const [order, setOrder] = useState();
+    const [user, setUser] = useState();
     const [orders, setOrders] = useState();
 
     useEffect(() => {
         getOrders().then((res) => {
             setOrders(res.data)
         })
+        const user = JSON.parse(localStorage.getItem("user"))
+        if (user){
+            var decoded = jwt_decode(user?.token);
+            setUser(decoded);
+        }else{
+          router.push("/login")
+        }
     }, [])
-
-    const onChange = (value) => {
-        console.log(`selected ${value}`);
-      };
       
       const onSearch = (value) => {
         console.log('search:', value);
       };
 
       const createOrderHandler = () => {
-        createOrder(order).then((res) => {
+        const body = {...order, accountId : user?._id}
+        createOrder(body).then((res) => {
           if (res?.status === 201){
             notification["success"]({
               message:'Ваш заказ создан',
@@ -34,6 +42,7 @@ const Request = () => {
           }
         })
      }
+
 
      const columns = [
         {
@@ -76,14 +85,16 @@ const Request = () => {
           title:"Цена",
           dataIndex: 'request',
           key: 'request',
+          render: (e, item) => item?.acceptedRequest?.filter(request => request.status === 3)[0]?.price
         },
         {
           title:"Перевозчик",
           dataIndex: 'company',
           key: 'company',
+          render: (e, item) => item?.acceptedRequest?.filter(request => request.status === 3)[0]?.company
         },
       ]
-
+      
     return (
         <div>
             <div className="mt-5 text-center">
@@ -91,41 +102,26 @@ const Request = () => {
             </div>
             <Form className='w-50 ms-auto me-auto'>
                 <div className='d-flex gap-3 mb-3'>
-                <Select
-                    showSearch
+                <Input
                     className='w-100'
                     placeholder="Откуда"
-                    onChange={(e) => setOrder({...order, pointA: e})}
-                    onSearch={onSearch}
-                    filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())}
-                >
-                    <Option value="Nur-Sultan">Nur-Sultan</Option>
-                    <Option value="Almaty">Almaty</Option>
-                </Select>
-                <Select
-                    showSearch
+                    onChange={(e) => setOrder({...order, pointA: e.target.value})}
+                    value={order?.pointA}
+                />
+                <Input
                     className='w-100'
                     placeholder="Куда"
-                    onChange={(e) => setOrder({...order, pointB: e})}
-                    onSearch={onSearch}
-                    filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())}
-                >
-                    <Option value="Nur-Sultan">Nur-Sultan</Option>
-                    <Option value="Almaty">Almaty</Option>
-                </Select>
+                    onChange={(e) => setOrder({...order, pointB: e.target.value})}
+                    value={order?.pointB}
+                />
                 </div>
                 <div className='mb-3'>
-                    <Select
-                        showSearch
+                    <Input
                         className='w-100'
                         placeholder="Наименование груза"
-                        onChange={(e) => setOrder({...order, type: e})}
-                        onSearch={onSearch}
-                        filterOption={(input, option) => option.children.toLowerCase().includes(input.toLowerCase())}
-                    >
-                        <Option value="Nur-Sultan">Nur-Sultan</Option>
-                        <Option value="Almaty">Almaty</Option>
-                    </Select>
+                        onChange={(e) => setOrder({...order, type: e.target.value})}
+                        value={order?.type}
+                    />
                 </div>
                 <div className='d-flex gap-3 mb-3'>
                     <DatePicker className='w-100' onChange={(e) => setOrder({...order, transportDate: e})}/>
@@ -137,10 +133,10 @@ const Request = () => {
             </Form>
             <h4 className={`text-center mt-3 styles.orders__done}`} style={{color:"gold"}}>Выполненные заказы</h4>
             {
-                (order?.pointA && order?.pointB && !order?.type) && <Table dataSource={orders?.filter(item => item.pointA === order?.pointA && item.pointB === order?.pointB)} columns={columns} className="w-75 ms-auto me-auto mt-4" pagination={false}/>
+              (order?.pointA && order?.pointB && !order?.type) && <Table dataSource={orders?.filter(item => item.pointA === order?.pointA && item.pointB === order?.pointB)?.filter(item => item?.acceptedRequest?.some(i => i.status === 3))} columns={columns} className="w-75 ms-auto me-auto mt-4" pagination={false}/>
             }
-                {
-                (order?.pointA && order?.pointB && order?.type) && <Table dataSource={orders?.filter(item => item.pointA === order?.pointA && item.pointB === order?.pointB && item?.type == order?.type)} columns={columns} className="w-75 ms-auto me-auto mt-4" pagination={false}/>
+            {
+              (order?.pointA && order?.pointB && order?.type) && <Table dataSource={orders?.filter(item => item.pointA === order?.pointA && item.pointB === order?.pointB && item?.type == order?.type)?.filter(item => item?.acceptedRequest?.some(i => i.status === 3))} columns={columns} className="w-75 ms-auto me-auto mt-4" pagination={false}/>
             }
         </div>
     )
