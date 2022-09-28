@@ -19,7 +19,7 @@ app.use('/requests', requestsRoutes)
 app.use("/user", userRoutes)
 
 
-mongoose.connect("mongodb+srv://user:qwerty123@cluster0.bfy5yoo.mongodb.net/?retryWrites=true&w=majority", {
+mongoose.connect("mongodb://195.49.215.39:27017/?retryWrites=true&w=majority", {
     useNewUrlParser: true, 
     useUnifiedTopology: true 
 }).then(() => app.listen(5100, () => console.log("Server launched")))
