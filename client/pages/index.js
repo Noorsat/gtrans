@@ -38,8 +38,6 @@ export default function Home() {
     }
   }
 
-  console.log(user)
-
   const requestCreateHandler = () => {
     const body = {...request, orderID: selectedOrderId, company: user?.companyName, phoneNumber: user?.phoneNumber}
     createRequest(body).then((res) => {
@@ -100,7 +98,7 @@ export default function Home() {
 
   return ( 
         <div>
-          <Table dataSource={orders} columns={columns} />
+          <Table dataSource={orders} columns={columns} scroll={{x:800}} title={() => "Все заказы"} className="border-top border-md-none" />
           <Modal title="Предложить цену" open={requestModal} onCancel={() => setRequestModal(false)}
             footer={[
               <Button onClick={() => setRequestModal(false)}>

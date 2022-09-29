@@ -52,12 +52,9 @@ const Register = () => {
       return (
         <Form
           name="basic"
+          className="mt-5 pt-5 w-50 ms-auto me-auto"
           labelCol={{
-            span: 8,
-          }}
-          className="mt-5 pt-5"
-          wrapperCol={{
-            span: 8,
+            span:6
           }}
           initialValues={{
             remember: true,
@@ -148,10 +145,6 @@ const Register = () => {
           </Form.Item>
 
           <Form.Item
-            wrapperCol={{
-              offset: 8,
-              span: 16,
-            }}
             style={{marginBottom:12}}
           >
 
@@ -161,10 +154,6 @@ const Register = () => {
           </Form.Item>
 
         <Form.Item
-            wrapperCol={{
-            offset: 8,
-            span: 16,
-            }}
             style={{marginBottom:12}}
         >
             <Link href={"/login"}>Логин</Link>

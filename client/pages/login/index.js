@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import {useState, useEffect} from 'react';
 import { login } from '../../http/auth';
 
+
 const Login = () => {
     const [user, setUser] = useState();
     const router = useRouter();
@@ -28,13 +29,7 @@ const Login = () => {
       return (
         <Form
           name="basic"
-          labelCol={{
-            span: 8,
-          }}
-          className="mt-5 pt-5"
-          wrapperCol={{
-            span: 8,
-          }}
+          className="mt-5 pt-5 w-50 ms-auto me-auto"
           initialValues={{
             remember: true,
           }}
@@ -45,6 +40,7 @@ const Login = () => {
           <Form.Item
             label="Email"
             name="email"
+            labelCol={{span:3}}
             rules={[
               {
                 required: true,
@@ -58,6 +54,7 @@ const Login = () => {
           <Form.Item
             label="Пароль"
             name="password"
+            labelCol={{span:3}}
             rules={[
               {
                 required: true,
@@ -67,33 +64,21 @@ const Login = () => {
           >
             <Input.Password onChange={(e) => setUser({...user, password: e.target.value})} value={user?.password}/>
           </Form.Item>
-          
-        
         <Form.Item
             name="remember"
             valuePropName="checked"
-            wrapperCol={{
-            offset: 8,
-            span: 16,
-            }}
             style={{marginBottom:"12px!important"}}
         >
             <Checkbox>Запомнить меня</Checkbox>
         </Form.Item>
         <Form.Item
-            wrapperCol={{
-            offset: 8,
-            span: 16,
-            }}
+          
             style={{marginBottom:12}}
         >
             <Link href={"/register"}>Регистрация</Link>
         </Form.Item>
           <Form.Item
-            wrapperCol={{
-              offset: 8,
-              span: 16,
-            }}
+            
           >
             <Button type="primary" htmlType="submit">
                 Войти

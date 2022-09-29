@@ -1,7 +1,7 @@
 import { Button, DatePicker, Form, Input, Select, Table, notification} from 'antd';
 import {useState, useEffect} from 'react';
 import {createOrder, getOrders} from './../../http/orders';
-import {styles} from './../../styles/Request.module.css';
+import styles from './../../styles/Request.module.css';
 import moment from 'moment';
 import jwt_decode from 'jwt-decode'
 import { useRouter } from 'next/router';
@@ -100,7 +100,7 @@ const Request = () => {
             <div className="mt-5 text-center">
                 <h4>Заказать доставку</h4>
             </div>
-            <Form className='w-50 ms-auto me-auto'>
+            <Form className='w-md-50  w-75 ms-auto me-auto'>
                 <div className='d-flex gap-3 mb-3'>
                 <Input
                     className='w-100'
@@ -123,11 +123,11 @@ const Request = () => {
                         value={order?.type}
                     />
                 </div>
-                <div className='d-flex gap-3 mb-3'>
-                    <DatePicker className='w-100' onChange={(e) => setOrder({...order, transportDate: e})}/>
-                    <Input placeholder='Вес (кг)' className='w-100' onChange={(e) => setOrder({...order, weight:e.target.value})}/>
-                    <Input placeholder='Объемы (м3)' className='w-100' onChange={(e) => setOrder({...order, volume: e.target.value})}/>
-                    <Input placeholder='Кол-во' className='w-100' onChange={(e) => setOrder({...order, count: e.target.value})}/>
+                <div className='d-block gap-3 mb-3 d-md-flex'>
+                    <DatePicker className='w-100 mb-3 mb-md-0' onChange={(e) => setOrder({...order, transportDate: e})} placeholder="Дата перевозки"/>
+                    <Input placeholder='Вес (кг)' className='w-100 mb-3 mb-md-0 ' onChange={(e) => setOrder({...order, weight:e.target.value})}/>
+                    <Input placeholder='Объемы (м3)' className='w-100  mb-3 mb-md-0' onChange={(e) => setOrder({...order, volume: e.target.value})}/>
+                    <Input placeholder='Кол-во' className='w-100 mb-3 mb-md-0' onChange={(e) => setOrder({...order, count: e.target.value})}/>
                 </div>
                 <Button type='primary' className='w-100' onClick={createOrderHandler}>Создать заявку</Button>
             </Form>

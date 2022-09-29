@@ -222,7 +222,7 @@ const MyOrders = ( ) => {
       ]
     return (
         <div>
-            <Table dataSource={orders?.filter(order => order?.accountId === user?._id)} columns={columns}  title={() => `Мой заказы`} />
+            <Table dataSource={orders?.filter(order => order?.accountId === user?._id)} columns={columns}  title={() => `Мой заказы`} scroll={{x:800}} />
             <Modal title="Посмотреть заявки" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}
               width={850}
               footer={
