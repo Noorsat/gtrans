@@ -49,7 +49,6 @@ const Header = ({user}) => {
         <div className='d-md-none d-flex pt-3 pb-3 justify-content-between align-items-center'>
           <div className='logo'>
             <img src="./logo.svg" width={80}/>
-            
           </div>
           <div>
              <TemporaryDrawer user={user}/>
