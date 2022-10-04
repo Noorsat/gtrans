@@ -52,7 +52,7 @@ export default function TemporaryDrawer({user}) {
           <ListItem disablePadding>
             <Link href="/my-orders">
                 <div className={styles.link}>
-                    Мой заказы
+                    Мои заказы
                 </div> 
             </Link>
           </ListItem>

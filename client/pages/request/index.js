@@ -61,12 +61,6 @@ const Request = () => {
           key: 'type',
         },
         {
-          title:"Дата перевозки",
-          dataIndex: 'transportDate',
-          key: 'transportDate',
-          render: (e, item) => moment(e).format("DD.MM.YYYY")
-        },
-        {
           title:"Вес (кг)",
           dataIndex: 'weight',
           key: 'weight',
@@ -77,7 +71,7 @@ const Request = () => {
           key: 'volume',
         },
         {
-          title:"Кол-во",
+          title:'Комментарии',
           dataIndex: 'count',
           key: 'count',
         },
@@ -124,10 +118,9 @@ const Request = () => {
                     />
                 </div>
                 <div className='d-block gap-3 mb-3 d-md-flex'>
-                    <DatePicker className='w-100 mb-3 mb-md-0' onChange={(e) => setOrder({...order, transportDate: e})} placeholder="Дата перевозки"/>
                     <Input placeholder='Вес (кг)' className='w-100 mb-3 mb-md-0 ' onChange={(e) => setOrder({...order, weight:e.target.value})}/>
                     <Input placeholder='Объемы (м3)' className='w-100  mb-3 mb-md-0' onChange={(e) => setOrder({...order, volume: e.target.value})}/>
-                    <Input placeholder='Кол-во' className='w-100 mb-3 mb-md-0' onChange={(e) => setOrder({...order, count: e.target.value})}/>
+                    <Input placeholder='Комментарии' className='w-100 mb-3 mb-md-0' onChange={(e) => setOrder({...order, count: e.target.value})}/>
                 </div>
                 <Button type='primary' className='w-100' onClick={createOrderHandler}>Создать заявку</Button>
             </Form>

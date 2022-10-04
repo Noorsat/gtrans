@@ -114,12 +114,6 @@ const MyOrders = ( ) => {
           key: 'type',
         },
         {
-          title:"Дата перевозки",
-          dataIndex: 'transportDate',
-          key: 'transportDate',
-          render: (e, item) => moment(e).format("DD.MM.YYYY")
-        },
-        {
           title:"Вес (кг)",
           dataIndex: 'weight',
           key: 'weight',

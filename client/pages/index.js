@@ -68,12 +68,6 @@ export default function Home() {
       key: 'type',
     },
     {
-      title:"Дата перевозки",
-      dataIndex: 'transportDate',
-      key: 'transportDate',
-      render: (e, item) => moment(e).format("DD.MM.YYYY")
-    },
-    {
       title:"Вес (кг)",
       dataIndex: 'weight',
       key: 'weight',
@@ -84,7 +78,7 @@ export default function Home() {
       key: 'volume',
     },
     {
-      title:"Кол-во",
+      title:"Комментарии",
       dataIndex: 'count',
       key: 'count',
     },

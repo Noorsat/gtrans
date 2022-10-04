@@ -59,7 +59,7 @@ const Header = ({user}) => {
           <div className='container d-flex justify-content-between'>
             <div className='d-flex justify-content-center ms-auto me-auto gap-3'>
               <div style={{marginLeft:150}}>
-                <Link href="/">Заказы</Link>
+                <Link href="/">Главная</Link>
               </div>
               <Link href="/request">Заказать доставку</Link>
             </div>
@@ -69,9 +69,9 @@ const Header = ({user}) => {
                 </div>
                 {
                   user ? 
-                  <Link href="/account">Мой аккаунт</Link> 
+                  <Link href="/account">Кабинет</Link> 
                   :
-                  <Link href="/login">Логин</Link> 
+                  <Link href="/login">Кабинет</Link> 
                 }
             </div>
           </div>
