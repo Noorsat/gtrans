@@ -39,6 +39,8 @@ const Request = () => {
             notification["success"]({
               message:'Ваш заказ создан',
             })
+            setOrder({})
+            router.push("/")
           }
         })
      }
@@ -122,7 +124,7 @@ const Request = () => {
                     <Input placeholder='Объемы (м3)' className='w-100  mb-3 mb-md-0' onChange={(e) => setOrder({...order, volume: e.target.value})}/>
                     <Input placeholder='Комментарии' className='w-100 mb-3 mb-md-0' onChange={(e) => setOrder({...order, count: e.target.value})}/>
                 </div>
-                <Button type='primary' className='w-100' onClick={createOrderHandler}>Создать заявку</Button>
+                <Button type='primary' className='w-100' onClick={createOrderHandler} disabled={!order?.pointA || !order?.pointB || !order?.type || !order?.weight || !order?.volume || !order?.count}>Создать заявку</Button>
             </Form>
             <h4 className={`text-center mt-3 styles.orders__done}`} style={{color:"gold"}}>Выполненные заказы</h4>
             {

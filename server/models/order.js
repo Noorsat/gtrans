@@ -4,9 +4,9 @@ const orderSchema = mongoose.Schema({
     pointA:String,
     pointB: String,
     type: String,
-    weight:Number,
-    volume: Number,
-    count: Number,
+    weight:String,
+    volume: String,
+    count: String,
     transportDate:Date,
     accountId:String,
     acceptedRequest: [{

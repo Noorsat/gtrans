@@ -59,6 +59,12 @@ export default function Home() {
       width:10
     },
     {
+      title:"Дата создания",
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      render: (e, item) => <>{moment(e).format("DD.MM.YYYY HH:mm:ss")}</>
+    },
+    {
       title:"Откуда",
       dataIndex: 'pointA',
       key: 'pointA',
