@@ -17,8 +17,7 @@ const orderSchema = mongoose.Schema({
         comment:String,
         status: Number 
     }]
-})
-
+}, {timestamps: true })
 const Order = mongoose.model("OrderSchema", orderSchema)
 
 export default Order;

@@ -6,7 +6,7 @@ const requestSchema = mongoose.Schema({
     price:Number,
     phoneNumber: String,
     comment:String,
-})
+}, {timestamps: true })
 
 const Request = mongoose.model("RequestSchema", requestSchema)
 

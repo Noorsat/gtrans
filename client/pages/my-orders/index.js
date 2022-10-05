@@ -99,6 +99,12 @@ const MyOrders = ( ) => {
 
     const columns = [
         {
+          title:"ID",
+          dataIndex: '_id',
+          key: '_id',
+          width:10
+        },
+        {
           title:"Откуда",
           dataIndex: 'pointA',
           key: 'pointA',

@@ -28,7 +28,7 @@ const userSchema = new Schema({
         type:Number,
         default:0
     }
-})
+}, {timestamps: true })
 
 userSchema.statics.signup = async function(email, password, companyName, phoneNumber){
     if (!email || !password){

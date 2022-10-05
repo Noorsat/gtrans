@@ -61,13 +61,13 @@ export default function TemporaryDrawer({user}) {
                 user ? 
                 <Link href="/account">
                     <div className={styles.link}>
-                        Мой аккаунт
+                      Кабинет
                     </div>
                 </Link> 
                 :
                 <Link href="/login">
                     <div className={styles.link}>
-                        Логин
+                        Кабинет
                     </div>
                 </Link> 
             }
