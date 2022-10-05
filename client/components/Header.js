@@ -65,7 +65,7 @@ const Header = ({user}) => {
             </div>
             <div className='d-flex'>
                 <div className='me-3'>
-                  <Link href="/my-orders">Мой заказы</Link>
+                  <Link href="/my-orders">Мои заказы</Link>
                 </div>
                 {
                   user ? 
