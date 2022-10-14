@@ -2,14 +2,14 @@ import User from './../models/user.js'
 import jwt from 'jsonwebtoken'
 import Order from '../models/order.js'
 
-const createToken = (_id, companyName, phoneNumber, email) => {
-    return jwt.sign({_id, companyName, phoneNumber, email}, process.env.SECRET, {expiresIn: '3d'})
+const createToken = (_id, companyName, phoneNumber, email, secret) => {
+    return jwt.sign({_id, companyName, phoneNumber, email}, secret ? secret : process.env.SECRET, {expiresIn: '3d'})
 }
 
 export const loginUser = async (req, res) => {
     const {email, password} = req.body;
     try{
-        const user = await User.login(email, password)
+        const user = await User.login(email.toLowerCase(), password)
 
         const token = createToken(user._id, user.companyName, user.phoneNumber, user.email);
 
@@ -24,7 +24,7 @@ export const signupUser = async (req, res) => {
     const {email, password, companyName, phoneNumber} = req.body;
 
     try{
-        const user = await User.signup(email, password, companyName, phoneNumber)
+        const user = await User.signup(email.toLowerCase(), password, companyName, phoneNumber)
 
         const token = createToken(user._id, user.companyName, user.phoneNumber);
 
@@ -37,7 +37,7 @@ export const signupUser = async (req, res) => {
 export const likeAdd = async (req, res) => {
     const user = await User.findById(req.params.id)
 
-    if (!user) return res.status(404).json({meesage:"User not found..."})
+    if (!user) return res.status(404).json({meesage:"Пользователь не найден..."})
 
     const updatedUser = await User.findByIdAndUpdate(
         req.params.id,
@@ -54,7 +54,7 @@ export const likeAdd = async (req, res) => {
 export const unlikeAdd = async (req, res) => {
     const user = await User.findById(req.params.id)
 
-    if (!user) return res.status(404).json({meesage:"User not found..."})
+    if (!user) return res.status(404).json({meesage:"Пользователь не найден..."})
 
     const updatedUser = await User.findByIdAndUpdate(
         req.params.id,
@@ -64,4 +64,39 @@ export const unlikeAdd = async (req, res) => {
     )
 
     res.send(updatedUser)
+}
+
+export const forgotPassword = async (req, res) => {
+    const {email, password, companyName, phoneNumber} = req.body;
+
+    try{
+        const oldUser = await User.findOne({email})
+        if (!oldUser){
+            return res.status(404).json({message: "Пользователь не существует!"})
+        }
+        const secret = process.env.SECRET + oldUser?.password;
+        const token = createToken(oldUser._id, oldUser.companyName, oldUser.phoneNumber, oldUser.email, secret);
+        const link = `https://backend.gtrans.kz/user/reset-password/${oldUser?._id}/${token}`
+        res.status(200).json({
+            id: oldUser?._id,
+            token:token
+        })
+    }catch(error){
+    }
+}
+
+export const resetPassword = async (req, res) => {
+    const {id, token} = req.params;
+
+    const oldUser = await User.findOne({_id:id})
+    if (!oldUser){
+        return res.status(404).json({message: "Пользователь не существует!"})
+    }
+    const secret = process.env.SECRET + oldUser?.password; 
+    try{
+        const verify = jwt.verify(token, secret);
+        res.status(200).send("Verified")
+    } catch (e){
+        res.status(401).send("Not Verified")
+    }
 }

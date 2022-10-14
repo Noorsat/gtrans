@@ -130,7 +130,7 @@ const MyOrders = ( ) => {
           key: 'volume',
         },
         {
-          title:"Кол-во",
+          title:"Комментарии",
           dataIndex: 'count',
           key: 'count',
         },
