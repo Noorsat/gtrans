@@ -1,6 +1,8 @@
 import User from './../models/user.js'
-import jwt from 'jsonwebtoken'
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 import Order from '../models/order.js'
+import nodemailer from 'nodemailer';
 
 const createToken = (_id, companyName, phoneNumber, email, secret) => {
     return jwt.sign({_id, companyName, phoneNumber, email}, secret ? secret : process.env.SECRET, {expiresIn: '3d'})
@@ -76,7 +78,30 @@ export const forgotPassword = async (req, res) => {
         }
         const secret = process.env.SECRET + oldUser?.password;
         const token = createToken(oldUser._id, oldUser.companyName, oldUser.phoneNumber, oldUser.email, secret);
-        const link = `https://backend.gtrans.kz/user/reset-password/${oldUser?._id}/${token}`
+        const link = `https://frontend.gtrans.kz/reset/${oldUser?._id}/${token}`
+        var transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+              user: 'itsnursat@gmail.com',
+              pass: 'pdlfyedtkldiqrik'
+            }
+          });
+          
+          var mailOptions = {
+            from: 'itsnursat@gmail.com',
+            to: email,
+            subject: 'Восстанавление пароля по сайту GTrans',
+            text: `Перейдите по ссылке и восстановите пароль от сайта GTrans!
+                ${link}   
+            `
+          };
+          transporter.sendMail(mailOptions, function(error, info){
+            if (error) {
+              console.log(error);
+            } else {
+              console.log('Email sent: ' + info.response);
+            }
+          });
         res.status(200).json({
             id: oldUser?._id,
             token:token
@@ -95,7 +120,36 @@ export const resetPassword = async (req, res) => {
     const secret = process.env.SECRET + oldUser?.password; 
     try{
         const verify = jwt.verify(token, secret);
-        res.status(200).send("Verified")
+        res.json({status:verify})
+    } catch (e){
+        res.status(401).send("Not Verified")
+    }
+}
+
+export const resetPasswordPost = async (req, res) => {
+    const {id, token} = req.params;
+    const { password } = req.body;
+
+    const oldUser = await User.findOne({_id:id})
+    if (!oldUser){
+        return res.status(404).json({message: "Пользователь не существует!"})
+    }
+    const secret = process.env.SECRET + oldUser?.password; 
+    try{
+        const verify = jwt.verify(token, secret);
+        const encryptedPassword = await bcrypt.hash(password, 10); 
+        const user = await User.updateOne(
+            {
+                _id:id,
+            },
+            {
+                $set:{
+                    password:encryptedPassword
+                }
+            }
+        )
+        res.json({status:"Password Updated!"})
+        //res.render("index", {email:verify.email})
     } catch (e){
         res.status(401).send("Not Verified")
     }

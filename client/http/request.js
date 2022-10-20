@@ -1,11 +1,12 @@
-import axios from 'axios'
+import myAxios from './axios'
 
 export const createRequest = async (body) => {
-    const response  = await axios.post("https://backend.gtrans.kz/requests", body);
+    const response  = await myAxios.post("/requests", body);
     return response;
 }
 
 export const getRequests = async () => {
-    const response  = await axios.get("https://backend.gtrans.kz/requests");
+    const response  = await myAxios.get("/requests");
     return response; 
 }
+ 

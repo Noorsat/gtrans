@@ -25,25 +25,24 @@ const Account = () => {
         router.push("/login")
     }
 
-
     return (
         <>
-        <Card title="Мой аккаунт" style={{ width:400, margin:"0 auto", marginTop:50}}>
-            <div className={styles.item}>
-                Email: <span className={styles.text}>{user?.email}</span>
-            </div>
-            <div className={styles.item}>
-                Компания: <span className={styles.text}>{user?.companyName}</span>
-            </div>
-            <div className={styles.item}>
-                Контакты: <span className={styles.text}>{user?.phoneNumber}</span>
-            </div>
-            <div className="text-center">
-                <Button type='primary' onClick={exitHandler}>
-                    Выйти
-                </Button>
-            </div>
-        </Card>
+            <Card title="Мой аккаунт" style={{ width:400, margin:"0 auto", marginTop:50}}>
+                <div className={styles.item}>
+                    Email: <span className={styles.text}>{user?.email}</span>
+                </div>
+                <div className={styles.item}>
+                    Компания: <span className={styles.text}>{user?.companyName}</span>
+                </div>
+                <div className={styles.item}>
+                    Контакты: <span className={styles.text}>{user?.phoneNumber}</span>
+                </div>
+                <div className="text-center">
+                    <Button type='primary' onClick={exitHandler}>
+                        Выйти
+                    </Button>
+                </div>
+            </Card>
         </>
     )
 }

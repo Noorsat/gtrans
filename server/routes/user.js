@@ -1,5 +1,5 @@
 import express from 'express';
-import { forgotPassword, likeAdd, loginUser, resetPassword, signupUser, unlikeAdd } from '../controllers/user.js';
+import { forgotPassword, likeAdd, loginUser, resetPassword, resetPasswordPost, signupUser, unlikeAdd } from '../controllers/user.js';
 
 const router = express.Router();
 
@@ -15,5 +15,7 @@ router.put("/unlike/:id", unlikeAdd)
 router.post("/forgot-password", forgotPassword)
 
 router.get("/reset-password/:id/:token", resetPassword)
+
+router.post("/reset-password/:id/:token", resetPasswordPost)
 
 export default router;

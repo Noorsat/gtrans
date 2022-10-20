@@ -72,11 +72,15 @@ const Login = () => {
             <Checkbox>Запомнить меня</Checkbox>
         </Form.Item>
         <Form.Item
-          
-            style={{marginBottom:12}}
+            style={{marginBottom:0}}
         >
             <Link href={"/register"}>Регистрация</Link>
         </Form.Item>
+        <Form.Item
+          style={{marginBottom:8}}
+        >
+          <Link href={"/forgot"}>Забыли пароль?</Link>
+      </Form.Item>
           <Form.Item
             
           >

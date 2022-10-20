@@ -27,7 +27,7 @@ const Header = ({user}) => {
              </div>
           </div>
           <div className='logo'>
-            <img src="./logo.svg" width={130}/>
+            <img src="/./logo.svg" width={130}/>
           </div>
           <div className='d-flex align-items-center'>
             <div>
