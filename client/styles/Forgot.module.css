@@ -12,3 +12,11 @@
 .button{
     text-align: center;
 }
+@media (max-width:500px){
+    .wrapper{
+        max-width: 100%;
+        width: 80%;
+        margin: 0 auto;
+        margin-top: 90px;
+    }
+}

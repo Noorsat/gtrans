@@ -12,6 +12,7 @@ const Reset = () => {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
 
+
     useEffect(() => {
         if (router.isReady){
             getResetPassword(id, token).then((res) => {
@@ -32,12 +33,21 @@ const Reset = () => {
             password:password
         }
         postResetPassword(id, token, body).then((res) => {
-            console.log(res.data)
+            if (res.status < 400){
+                notification["success"]({
+                    message:"Пароль поменялся"
+                })
+                router.push("/login")
+            }
+        }).catch((res) => {
+            notification["error"]({
+                message:res.response.data.message
+            })
         })
     }
 
     return (
-        <div>
+        <div className={styles.wrapper}>
             {
                 isShow &&
                 <div>

@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import Order from '../models/order.js'
 import nodemailer from 'nodemailer';
+import validator from 'validator';
 
 const createToken = (_id, companyName, phoneNumber, email, secret) => {
     return jwt.sign({_id, companyName, phoneNumber, email}, secret ? secret : process.env.SECRET, {expiresIn: '3d'})
@@ -133,6 +134,9 @@ export const resetPasswordPost = async (req, res) => {
     const oldUser = await User.findOne({_id:id})
     if (!oldUser){
         return res.status(404).json({message: "Пользователь не существует!"})
+    }
+    if (!validator.isStrongPassword(password)){
+        return res.status(404).json({message: "Пароль недостаточно надежный"})
     }
     const secret = process.env.SECRET + oldUser?.password; 
     try{

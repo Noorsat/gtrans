@@ -1,7 +1,8 @@
 import styles from './../../styles/Forgot.module.css';
-import { Button, Checkbox, Form, Input } from 'antd';
+import { Button, Checkbox, Form, Input, notification } from 'antd';
 import {useState} from 'react';
 import { forgotPassword } from '../../http/auth';
+import { AiFillTrophy } from 'react-icons/ai';
 
 const ForgotPassword = () => {
     const [email, setEmail] = useState();
@@ -18,12 +19,20 @@ const ForgotPassword = () => {
             email
         }
         forgotPassword(body).then((res) => {
-            console.log(res.data)
+            if (res.status === 200){
+                notification["success"]({
+                    message:"Мы отправили сообщениие для восстанавление пароля вам в почту!"
+                })
+            }
+        }).catch((res) => {
+            notification["error"]({
+                message: res.response.data.message
+            })
         })
     }
 
     return (
-        <div>
+        <div className={styles.wrapper}>
             <div className={styles.title}>
                 Для восстановления доступа к аккаунту заполните форму ниже
             </div>

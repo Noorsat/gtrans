@@ -31,9 +31,9 @@ const Register = () => {
     };
 
       const onFinishFailed = (errorInfo) => {
-        console.log(notification["error"]({
+        notification["error"]({
           message:"Заполните все поля правильно"
-        }));
+        });
       };
     
       const prefixSelector = (
