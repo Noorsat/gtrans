@@ -35,7 +35,7 @@ export const register = async (req, res) => {
 
         const user = await SafePhoneUser.create({email, password: hash, code})
 
-        const token = createToken(user._id, user.emails, user.password, user.code);
+        const token = createToken(user._id, user.email, user.password, user.code);
 
         res.status(200).json({email, token})
 
@@ -86,7 +86,7 @@ export const sendEmailPhoto = async (req, res) => {
           var mailOptions = {
             from: 'itsnursat@gmail.com',
             to: email,
-            subject: '',
+            subject: 'asda',
             text: `adaskmdlak`
           };
           transporter.sendMail(mailOptions, function(error, info){

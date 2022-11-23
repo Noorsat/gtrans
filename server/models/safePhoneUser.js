@@ -18,4 +18,4 @@ const safePhoneUserSchema = new Schema({
 
 const SafePhoneUser = mongoose.model("SafePhoneUserSchema", safePhoneUserSchema) 
 
-export default SafePhoneUser
+export default SafePhoneUser;
