@@ -3,6 +3,7 @@ import validator from 'validator';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import nodemailer from 'nodemailer';
+import multiparty from 'multiparty';
 
 const createToken = (_id, companyName, phoneNumber, email, secret) => {
     return jwt.sign({_id, companyName, phoneNumber, email}, secret ? secret : process.env.SECRET, {expiresIn: '3d'})
@@ -74,34 +75,45 @@ export const login = async (req, res) => {
 
 export const sendEmailPhoto = async (req, res) => {
     let {email} = req.body;
-    try{
-        var transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-              user: 'itsnursat@gmail.com',
-              pass: 'pdlfyedtkldiqrik'
-            }
-          });
+
+    let form = new multiparty.Form({uploadDir: '../public/images'})
+
+    form.parse(req, function(err, fields, files){
+        if (err) return res.send({error: err.message})
+
+        const imagePath = files.image[0].path;
+        const imageFileName = imagePath.slice(imagePath.lastIndexOf("\\")+1);
+        const imageURL = "https://backend.gtrans.kz/images/" + imageFileName;
+        res.status(200).json({imageURL})
+    })
+    // try{
+    //     var transporter = nodemailer.createTransport({
+    //         service: 'gmail',
+    //         auth: {
+    //           user: 'itsnursat@gmail.com',
+    //           pass: 'pdlfyedtkldiqrik'
+    //         }
+    //       });
           
-          var mailOptions = {
-            from: 'itsnursat@gmail.com',
-            to: email,
-            subject: 'asda',
-            text: `adaskmdlak`
-          };
-          transporter.sendMail(mailOptions, function(error, info){
-            if (error) {
-              console.log(error);
-            } else {
-              console.log('Email sent: ' + info.response);
-            }
-          });
-          res.status(200).json({
-            message:"Email sent: " + email
-          })
-    }catch (error){
-        res.status(400).json({error: error.message})
-    }
+    //       var mailOptions = {
+    //         from: 'itsnursat@gmail.com',
+    //         to: email,
+    //         subject: 'asda',
+    //         text: `adaskmdlak`
+    //       };
+    //       transporter.sendMail(mailOptions, function(error, info){
+    //         if (error) {
+    //           console.log(error);
+    //         } else {
+    //           console.log('Email sent: ' + info.response);
+    //         }
+    //       });
+    //       res.status(200).json({
+    //         message:"Email sent: " + email
+    //       })
+    // }catch (error){
+    //     res.status(400).json({error: error.message})
+    // }
   
 
       
