@@ -3,11 +3,24 @@ import validator from 'validator';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import nodemailer from 'nodemailer';
-import multiparty from 'multiparty';
+import multer from 'multer';
+import path from 'path'
 
 const createToken = (_id, companyName, phoneNumber, email, secret) => {
     return jwt.sign({_id, companyName, phoneNumber, email}, secret ? secret : process.env.SECRET, {expiresIn: '3d'})
 }
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, "../public/images")
+    },
+    filename: (req, file, cb) => {
+        console.log(file)
+        cb(null, Date.now() + path.extname(file.originalname))
+    } 
+})
+
+const upload = multer({storage: storage})
 
 export const register = async (req, res) => {
     const {email, password, code} = req.body;
@@ -73,19 +86,23 @@ export const login = async (req, res) => {
     }
 }
 
-export const sendEmailPhoto = async (req, res) => {
-    let {email} = req.body;
+export const sendEmailPhoto = (req, res) => {
+    // let {email} = req.body;
+    res.send("Image Uploaded")
+    // let form = new multiparty.Form({uploadDir: '../public/images'})
 
-    let form = new multiparty.Form({uploadDir: '../public/images'})
+    // console.log(req.body)
 
-    form.parse(req, function(err, fields, files){
-        if (err) return res.send({error: err.message})
+    // form.parse(req, function(err, fields, files){
+    //     console.log(files)
 
-        const imagePath = files.image[0].path;
-        const imageFileName = imagePath.slice(imagePath.lastIndexOf("\\")+1);
-        const imageURL = "https://backend.gtrans.kz/images/" + imageFileName;
-        res.status(200).json({imageURL})
-    })
+    //     if (err) return res.send({error: err.message})
+
+    //     const imagePath = files.image.path;
+    //     const imageFileName = imagePath.slice(imagePath.lastIndexOf("\\")+1);
+    //     const imageURL = "https://backend.gtrans.kz/images/" + imageFileName;
+    //     res.status(200).json({imageURL})
+    // })
     // try{
     //     var transporter = nodemailer.createTransport({
     //         service: 'gmail',
