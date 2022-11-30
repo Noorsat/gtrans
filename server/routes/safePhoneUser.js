@@ -6,15 +6,16 @@ import nodemailer from 'nodemailer';
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, "public")
+        cb(null, "public")    
     },
     filename: (req, file, cb) => {
-        console.log(file)
         cb(null, Date.now() + path.extname(file.originalname))
-    } 
+    }
 })
 
-const upload = multer({storage: storage})
+const upload = multer({storage: storage, limits: {
+    fileSize:1000*1000*1
+}})
 
 const router = express.Router();
 
