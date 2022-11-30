@@ -1,4 +1,4 @@
-import mongoose, { mongo } from "mongoose";
+import mongoose from "mongoose";
 
 const orderSchema = mongoose.Schema({
     pointA:String,
@@ -18,6 +18,7 @@ const orderSchema = mongoose.Schema({
         status: Number 
     }]
 }, {timestamps: true })
+
 const Order = mongoose.model("OrderSchema", orderSchema)
 
 export default Order;
