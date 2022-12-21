@@ -28,10 +28,10 @@ router.post("/send-email-in-error", (req, res) => {
             console.log(err);
         }else{
             const newImage = new Image({
-                name: req.body.name,
+                name: req.file.filename,
                 image: {
                     data: req.file.file,
-                    contentType: 'image/png'
+                    contentType: 'image/jpg'
                 }
             })
             newImage.save()
