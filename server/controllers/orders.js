@@ -58,7 +58,6 @@ export const changeStatusRequest = async (req, res ) => {
 
     const newOrder = req.body;
 
-    console.log(newOrder)
 
     const updatedOrder = await Order.findByIdAndUpdate(
         req.params.id,
@@ -69,7 +68,6 @@ export const changeStatusRequest = async (req, res ) => {
         }
     )
 
-    console.log(updatedOrder)
 
     res.send(updatedOrder)
 }

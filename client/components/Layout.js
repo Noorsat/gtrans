@@ -9,7 +9,6 @@ const Layout = ({children}) => {
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
-    console.log(user)
     setUser(user);
   }, [children])
 

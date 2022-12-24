@@ -29,7 +29,6 @@ const Request = () => {
     }, [])
       
       const onSearch = (value) => {
-        console.log('search:', value);
       };
 
       const createOrderHandler = () => {

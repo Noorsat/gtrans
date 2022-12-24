@@ -25,16 +25,12 @@ router.post("/login", login);
 router.post("/send-email-in-error", (req, res) => {
     upload(req, res, (err) => {
         if (err){
-            console.log(err);
         }else{
-            const newImage = new Image({
-                name: req.file.filename,
-                image: {
-                    data: req.file.file,
-                    contentType: 'image/jpg'
-                }
-            })
-            newImage.save()
+          // const form = new FormData();
+          // form.append('file', req.file.buffer, {
+          //   contentType: req.file.mimetype,
+          //   filename: req.file.originalname,
+          // });
             var transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {

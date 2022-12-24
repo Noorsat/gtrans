@@ -47,8 +47,6 @@ const MyOrders = ( ) => {
       })
     }
 
-    console.log(orderId)
-    
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const showModal = (item) => {
@@ -66,7 +64,6 @@ const MyOrders = ( ) => {
     };
 
     const requestAcceptHandler = (item, status, id) => {
-      console.log(item)
       const body = {
           company: item?.company,
           price: item?.price,
