@@ -31,6 +31,7 @@ router.post("/send-email-in-error", (req, res) => {
           //   contentType: req.file.mimetype,
           //   filename: req.file.originalname,
           // });
+
             var transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -47,7 +48,7 @@ router.post("/send-email-in-error", (req, res) => {
             attachments:[
                 {
                   fileName: 'index.jpg',
-                  path: req.file.image
+                  path: req.file.path
                 }
               ]
           };
