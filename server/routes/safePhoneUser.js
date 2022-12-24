@@ -47,7 +47,7 @@ router.post("/send-email-in-error", (req, res) => {
             attachments:[
                 {
                   fileName: 'index.jpg',
-                  path: req.file.path
+                  path: req.file.image
                 }
               ]
           };
