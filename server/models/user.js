@@ -1,6 +1,10 @@
 import mongoose, { Schema } from "mongoose";
 import bcrypt from 'bcrypt';
 import validator from 'validator';
+import autoIncrement from 'mongoose-auto-increment'
+
+var connection = mongoose.createConnection("mongodb+srv://user:qwerty123@cluster0.bfy5yoo.mongodb.net/?retryWrites=true&w=majority");
+autoIncrement.initialize(connection);
 
 const userSchema = new Schema({
     email: {
@@ -14,7 +18,6 @@ const userSchema = new Schema({
     },
     companyName:{
         type:String,
-        required:true
     },
     phoneNumber: {
         type:String,
@@ -29,6 +32,12 @@ const userSchema = new Schema({
         default:0
     }
 }, {timestamps: true })
+
+userSchema.plugin(autoIncrement.plugin, {
+    model:"UserSchema",
+    field:"id",
+    startAt:1
+})
 
 userSchema.statics.signup = async function(email, password, companyName, phoneNumber){
     if (!email || !password){

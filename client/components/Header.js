@@ -57,11 +57,11 @@ const Header = ({user}) => {
         </div>
         <div className='position-relative border-bottom border-top pt-3 pb-3 d-md-block d-none'>
           <div className='container d-flex justify-content-between'>
-            <div className='d-flex justify-content-center ms-auto me-auto gap-3'>
-              <div style={{marginLeft:150}}>
-                <Link href="/">Главная</Link>
+            <div className='d-flex justify-content-center ms-auto me-auto gap-3' style={{marginLeft:150}}>
+              <Link href="/request">Ввести заказ</Link>
+              <div>
+                <Link href="/tracking">Трекер</Link>
               </div>
-              <Link href="/request">Заказать доставку</Link>
             </div>
             <div className='d-flex'>
                 <div className='me-3'>

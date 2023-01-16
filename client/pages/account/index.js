@@ -27,15 +27,18 @@ const Account = () => {
 
     return (
         <>
-            <Card title="Мой аккаунт" style={{ width:400, margin:"0 auto", marginTop:50}}>
+            <Card title="Мой аккаунт" style={{ width:600, margin:"0 auto", marginTop:50}}>
                 <div className={styles.item}>
                     Email: <span className={styles.text}>{user?.email}</span>
                 </div>
                 <div className={styles.item}>
-                    Компания: <span className={styles.text}>{user?.companyName}</span>
+                    Контакты: <span className={styles.text}>{user?.phoneNumber}</span>
                 </div>
                 <div className={styles.item}>
-                    Контакты: <span className={styles.text}>{user?.phoneNumber}</span>
+                    Адрес склада: <span className={styles.text}>广州市一库越秀区荔德路318号汇富商贸中心A13栋104号 王明磊 13930311979</span>
+                </div>
+                <div className={styles.item}>
+                    Инд код: <span className={styles.text}>SM215-xxxx</span>
                 </div>
                 <div className="text-center">
                     <Button type='primary' onClick={exitHandler}>
