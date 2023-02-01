@@ -1,0 +1,12 @@
+.wrapper{
+    display: flex;
+}
+.table{
+    width:100%;
+}
+.input{
+    width:350px;
+    margin-bottom: 20px;
+    margin-top: 20px;
+    margin-left: 20px;
+}

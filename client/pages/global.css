@@ -1,3 +1,6 @@
-@media (max-width: 575px){
-
+.userModal.ant-modal{
+    width:100%!important;
+}
+.volumeModal.ant-modal{
+    width:80%!important;
 }

@@ -8,9 +8,8 @@ import styles from './../styles/Layout.module.css';
 import TemporaryDrawer from './Drawer';
 
 const Header = ({user}) => {
-
     return (
-        <div className='layout'>
+      <div className='layout'>
         <div className={styles.container}>
         <div className='d-md-flex justify-content-between align-items-center pt-3 pb-3 d-none'>
           <div>
@@ -58,10 +57,12 @@ const Header = ({user}) => {
         <div className='position-relative border-bottom border-top pt-3 pb-3 d-md-block d-none'>
           <div className='container d-flex justify-content-between'>
             <div className='d-flex justify-content-center ms-auto me-auto gap-3' style={{marginLeft:150}}>
-              <Link href="/request">Ввести заказ</Link>
-              <div>
-                <Link href="/tracking">Трекер</Link>
-              </div>
+              <Link href="/request">Калькулятор</Link>
+              <Link href="/tracking">Трекер</Link>
+              {
+                user?.role === "admin" &&
+                <Link href="/admin">Dashboard</Link>
+              }
             </div>
             <div className='d-flex'>
                 <div className='me-3'>

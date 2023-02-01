@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import jwt_decode from "jwt-decode";
 import styles from '../../styles/Account.module.css';
 import { useRouter } from 'next/router';
+import { getId } from '../../components/validation';
 
 
 const Account = () => {
@@ -13,11 +14,11 @@ const Account = () => {
         const user = JSON.parse(localStorage.getItem("user"))
         if (user){
             var decoded = jwt_decode(user?.token);
+            console.log(decoded)
             setUser(decoded);
         }else{
             router.push("/login")
         }
-
     }, [])
 
     const exitHandler = () => {
@@ -37,9 +38,9 @@ const Account = () => {
                 <div className={styles.item}>
                     Адрес склада: <span className={styles.text}>广州市一库越秀区荔德路318号汇富商贸中心A13栋104号 王明磊 13930311979</span>
                 </div>
-                <div className={styles.item}>
-                    Инд код: <span className={styles.text}>SM215-xxxx</span>
-                </div>
+                {/* <div className={styles.item}>
+                    Инд код: <span className={styles.text}>SM215-{getId(user?.id)}</span>
+                </div> */}
                 <div className="text-center">
                     <Button type='primary' onClick={exitHandler}>
                         Выйти

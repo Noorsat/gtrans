@@ -1,6 +1,6 @@
-import { Table, Button, Modal, Input } from 'antd';
+import { Table, Button, Modal, Input, notification } from 'antd';
 import {useState, useEffect} from 'react';
-import { acceptRequest, changeStatusRequest, getOrders } from '../../http/orders';
+import { acceptRequest, addTrackerCode, changeStatusRequest, getOrders } from '../../http/orders';
 import moment from 'moment'
 import { getRequests } from '../../http/request';
 import { useRouter } from 'next/router';
@@ -12,8 +12,11 @@ import { companyPutLike, companyPutUnlike } from '../../http/auth';
 const MyOrders = ( ) => {
     const [orders, setOrders] = useState()
     const [orderId, setOrderId] = useState();
+    const [orderIndividualCode, setOrderIndividualCode] = useState();
     const [selectedOrder, setSelectedOrder] = useState();
     const [user, setUser] = useState()
+    const [trackerCodeModal, setTrackerCodeModal] = useState();
+    const  [trackerInput, setTrackerInput] = useState();
 
     const router = useRouter()
 
@@ -21,7 +24,15 @@ const MyOrders = ( ) => {
 
     useEffect(() => {
         getOrders().then((res) => {
-            setOrders(res.data)
+          let repeatedOrders = [];
+          let newOrders = res.data.map((order, index) => {
+            if (!repeatedOrders.includes(order?.individualCode)){
+              order.rowSpan = res.data.filter((item, i) => item?.individualCode === order?.individualCode).length;
+            }
+            repeatedOrders.push(order?.individualCode);
+            return order;
+          })
+          setOrders(newOrders)
         })
         getRequests().then((res) => {
             setRequests(res.data);
@@ -57,10 +68,31 @@ const MyOrders = ( ) => {
   
     const handleOk = () => {
       setIsModalOpen(false);
+      const body = {
+        trackCode: trackerInput,
+        individualCode: orderIndividualCode,
+      }
+      addTrackerCode(body).then((res) => {
+        if (res?.status < 400){
+          setTrackerInput("");
+          setOrderId(0);
+          notification["success"]({
+            message:"Вы успешно добавили трекер код"
+          })
+          router.push({
+            pathname: "/tracking", 
+            query: {
+              trackCode:trackerInput
+            }
+          })
+          setTrackerInput("");
+        }
+      })
     };
   
     const handleCancel = () => {
-      setIsModalOpen(false);
+      //setIsModalOpen(false);
+      setTrackerCodeModal(false)
     };
 
     const requestAcceptHandler = (item, status, id) => {
@@ -93,6 +125,12 @@ const MyOrders = ( ) => {
         })
       }
     }
+9
+    const trackerModalOpenHandler = (item) => {
+      setOrderId(item._id);
+      setOrderIndividualCode(item?.individualCode);
+      setTrackerCodeModal(true);
+    }
 
     const columns = [
         {
@@ -102,53 +140,86 @@ const MyOrders = ( ) => {
           width:10
         },
         {
-          title:"Откуда",
-          dataIndex: 'pointA',
-          key: 'pointA',
-        },
-        {
-          title:"Куда",
-          dataIndex: 'pointB',
-          key: 'pointB',
-        },
-        {
           title:"Наименование груза",
           dataIndex: 'type',
           key: 'type',
         },
         {
-          title:"Вес (кг)",
+          title:"Вес одной коробки (кг)",
           dataIndex: 'weight',
           key: 'weight',
         },
         {
-          title:"Объемы (м3)",
-          dataIndex: 'volume',
-          key: 'volume',
+          title:"Длина (м3)",
+          dataIndex: 'len',
+          key: 'len',
+        },
+        {
+          title:"Ширина (м3)",
+          dataIndex: 'width',
+          key: 'width',
+        },
+        {
+          title:"Высота (м3)",
+          dataIndex: 'height',
+          key: 'height',
+        },
+        {
+          title:"Количество",
+          dataIndex:"count",
+          key:"count"
         },
         {
           title:"Комментарии",
-          dataIndex: 'count',
-          key: 'count',
+          dataIndex: 'comment',
+          key: 'comment',
         },
         {
-          title:"Посмотреть заявки",
+          title:"Инд код",
+          dataIndex: 'individualCode',
+          key: 'individualCode',
+          onCell: (_, index) => ({
+            rowSpan: _.rowSpan ? _.rowSpan : 0
+          })
+        },
+        {
+          title:"Трек код",
           dataIndex: 'request',
           key: 'request',
-          render: (e, item) => item?.acceptedRequest?.filter(i => i.status === 4).length > 0 ? <div>Спасибо!</div> : item?.acceptedRequest?.filter(i => i.status === 3).length > 0 ? 
-          <div className='text-center'>
-            Оцените перевозчика
-            <div className='d-flex justify-content-center gap-3'>
+          onCell: (_, index) => ({
+            rowSpan: _.rowSpan ? _.rowSpan : 0
+          }),
+          // render: (e, item) => item?.acceptedRequest?.filter(i => i.status === 4).length > 0 ? <div>Спасибо!</div> : item?.acceptedRequest?.filter(i => i.status === 3).length > 0 ? 
+          // <div className='text-center'>
+          //   Оцените перевозчика
+          //   <div className='d-flex justify-content-center gap-3'>
+          //     <div>
+          //       <AiFillLike size={30} className={styles.like} onClick={() => likeHandler(item)} />
+          //     </div>
+          //     <div>
+          //       <AiFillDislike size={30} className={styles.unlike} onClick={() => unlikeHandler(item)} />
+          //     </div>
+          //   </div>  
+          // </div> 
+          // :
+          // <Button type='primary' onClick={() => showModal(item)}>Посмотреть заявки</Button>
+          render: (e, item) => {
+            return (
+                item?.trackCode ? 
+                  <div
+                    className={styles.trackCode} 
+                    onClick={() => router.push({
+                    pathname: "/tracking", 
+                    query: {
+                      trackCode:item.trackCode
+                    }
+                  })}>{item.trackCode}</div>
+                :
               <div>
-                <AiFillLike size={30} className={styles.like} onClick={() => likeHandler(item)} />
+                <Button type='primary' onClick={() => trackerModalOpenHandler(item)}>Указать трек код</Button>
               </div>
-              <div>
-                <AiFillDislike size={30} className={styles.unlike} onClick={() => unlikeHandler(item)} />
-              </div>
-            </div>  
-          </div> 
-          :
-          <Button type='primary' onClick={() => showModal(item)}>Посмотреть заявки</Button>
+            )            
+          }
         },
       ]
 
@@ -219,7 +290,7 @@ const MyOrders = ( ) => {
       ]
     return (
         <div>
-            <Table dataSource={orders?.filter(order => order?.accountId === user?._id)} columns={columns}  title={() => `Мой заказы`} scroll={{x:800}} />
+            <Table dataSource={orders?.filter(order => order?.accountId === user?._id)} columns={columns}  title={() => `Мой заказы`} scroll={{x:800}} pagination={false}/>
             <Modal title="Посмотреть заявки" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}
               width={850}
               footer={
@@ -230,7 +301,15 @@ const MyOrders = ( ) => {
             >
                 <Table columns={requestColumns} dataSource={requests?.filter(item => item.orderID == orderId)} pagination={false} />
             </Modal>
-
+            <Modal open={trackerCodeModal} title="Указать трек код" onCancel={handleCancel}
+              footer={
+                [
+                  <Button type='primary' onClick={handleOk}>Сохранить трек код</Button>
+                ]
+              }
+            > 
+              <Input placeholder='Трек код' value={trackerInput} onChange={(e) => setTrackerInput(e.target.value) }/>
+            </Modal>
         </div>
     )   
 }

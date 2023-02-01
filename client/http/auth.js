@@ -35,3 +35,13 @@ export const postResetPassword = (id,token,body) => {
     const response = myAxios.post("/user/reset-password/"+id+"/"+token, body);
     return response;
 }
+
+export const getAllUsers = () => {
+    const response = myAxios.get("/user/all");
+    return response;
+}
+
+export const getUserById = (id) => {
+    const response = myAxios.get("/user/"+id);
+    return response;
+}

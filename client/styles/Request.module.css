@@ -7,3 +7,31 @@
     font-size:20px;
     font-weight: 700;
 }
+.ind{
+    color:red;
+    margin-bottom: 20px;
+    font-size:24px;
+}
+.ind span{
+    font-weight: 700;
+    font-size: 30px;
+}
+.volume{
+    text-align: center;
+    width:100%;
+    font-size: 18px;
+    text-decoration: underline;
+    color:#1890ff;
+    font-weight: 700;
+}
+.plus{
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.plus__icon{
+    background:lightblue; 
+    border-radius: 50%;
+    padding: 3px;
+    cursor: pointer;
+}

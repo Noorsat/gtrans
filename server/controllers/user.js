@@ -5,8 +5,8 @@ import Order from '../models/order.js'
 import nodemailer from 'nodemailer';
 import validator from 'validator';
 
-const createToken = (_id, companyName, phoneNumber, email, secret) => {
-    return jwt.sign({_id, companyName, phoneNumber, email}, secret ? secret : process.env.SECRET, {expiresIn: '3d'})
+const createToken = (_id, companyName, phoneNumber, email, id, secret) => {
+    return jwt.sign({_id, companyName, phoneNumber, email, id}, secret ? secret : process.env.SECRET, {expiresIn: '3d'})
 }
 
 export const loginUser = async (req, res) => {
@@ -14,9 +14,9 @@ export const loginUser = async (req, res) => {
     try{
         const user = await User.login(email.toLowerCase(), password)
 
-        const token = createToken(user._id, user.companyName, user.phoneNumber, user.email);
+        const token = createToken(user._id, user.companyName, user.phoneNumber, user.email, String(user.id));
 
-        res.status(200).json({email, token})
+        res.status(200).json({email, token, role: user?.role})
     }catch(error){
         res.status(400).json({error: error.message})
     }
@@ -155,4 +155,24 @@ export const resetPasswordPost = async (req, res) => {
     } catch (e){
         res.status(401).send("Not Verified")
     }
+}
+
+export const getAllUsers = async (req, res) => {
+    const users = await User.find();
+
+    if (users.length === 0){
+        return res.status(404).json({message:"Нету пользователей"})
+    }
+
+    return res.status(200).json(users)
+}
+
+export const getUserById = async (req, res) => {
+    const id = req.params.id;
+
+    const user = await User.findById(id);
+
+    if (!user) return res.status(404).json({message: "Такого пользователя не существует"})
+
+    return res.status(200).json(user);
 }

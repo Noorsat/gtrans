@@ -7,7 +7,7 @@ import moment from 'moment'
 import {createRequest} from '../http/request';
 import InputMask from 'react-input-mask';
 import styles from './../styles/Home.module.css';
-import { useRouter } from 'next/router';
+import { Router, useRouter } from 'next/router';
 import jwt_decode from 'jwt-decode'
 
 export default function Home() {
@@ -19,14 +19,15 @@ export default function Home() {
   const router = useRouter();
  
   useEffect(() => {
-    getOrders().then((res) => {
-      setOrders(res.data)
-    })
-    const user = JSON.parse(localStorage.getItem("user"))
-    if (user){
-        var decoded = jwt_decode(user?.token);
-        setUser(decoded);
-    }
+    // getOrders().then((res) => {
+    //   setOrders(res.data)
+    // })
+    // const user = JSON.parse(localStorage.getItem("user"))
+    // if (user){
+    //     var decoded = jwt_decode(user?.token);
+    //     setUser(decoded);
+    // }
+    router.push("/request")
   }, [])
 
   const openRequestHandler = (item) => {
@@ -102,43 +103,45 @@ export default function Home() {
     },
   ]
 
-  return ( 
-        <div>
-          <Table dataSource={orders} columns={columns} scroll={{x:800}} title={() => "Все заказы"} className="border-top border-md-none" />
-          <Modal title="Предложить цену" open={requestModal} onCancel={() => setRequestModal(false)}
-            footer={[
-              <Button onClick={() => setRequestModal(false)}>
-                Назад
-              </Button>,
-              <Button type='primary' onClick={requestCreateHandler}>
-                Оставить заявку
-              </Button>
-            ]}
-          >
-            <Input placeholder='Компания' className='mb-3' value={user?.companyName} disabled/>
-            <Input className={`mb-3 w-100 ${styles.phone__input}`} value={user?.phoneNumber} disabled/>
-            <div className='d-flex align-items-center mb-3 gap-2'>
-              <Input placeholder='Цена'  onChange={(e) => setRequest({...request, price: e.target.value})}/>
-              <div>
-                ₸
-              </div>
-            </div>
-            <Input placeholder='Комментарии' onChange={(e) => setRequest({...request, comment: e.target.value})}/>
-          </Modal>
-    <style jsx global>{`
-        html,
-        body {
-          padding: 0;
-          margin: 0;
-          font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
-            Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
-            sans-serif;
-        }
 
-        * {
-          box-sizing: border-box;
-        }
-      `}</style>
-      </div>
+  return ( 
+    //     <div>
+    //       <Table dataSource={orders} columns={columns} scroll={{x:800}} title={() => "Все заказы"} className="border-top border-md-none" />
+    //       <Modal title="Предложить цену" open={requestModal} onCancel={() => setRequestModal(false)}
+    //         footer={[
+    //           <Button onClick={() => setRequestModal(false)}>
+    //             Назад
+    //           </Button>,
+    //           <Button type='primary' onClick={requestCreateHandler}>
+    //             Оставить заявку
+    //           </Button>
+    //         ]}
+    //       >
+    //         <Input placeholder='Компания' className='mb-3' value={user?.companyName} disabled/>
+    //         <Input className={`mb-3 w-100 ${styles.phone__input}`} value={user?.phoneNumber} disabled/>
+    //         <div className='d-flex align-items-center mb-3 gap-2'>
+    //           <Input placeholder='Цена'  onChange={(e) => setRequest({...request, price: e.target.value})}/>
+    //           <div>
+    //             ₸
+    //           </div>
+    //         </div>
+    //         <Input placeholder='Комментарии' onChange={(e) => setRequest({...request, comment: e.target.value})}/>
+    //       </Modal>
+    // <style jsx global>{`
+    //     html,
+    //     body {
+    //       padding: 0;
+    //       margin: 0;
+    //       font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
+    //         Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
+    //         sans-serif;
+    //     }
+
+    //     * {
+    //       box-sizing: border-box;
+    //     }
+    //   `}</style>
+    //   </div>
+    <></>
   )
 }

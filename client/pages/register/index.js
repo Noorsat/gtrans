@@ -112,7 +112,7 @@ const Register = () => {
             <Input.Password onChange={(e) => setUser({...user, confirmPassword: e.target.value})} value={user?.confirmPassword} />
           </Form.Item>
 
-        <Form.Item
+        {/* <Form.Item
             label="Название компании"
             name="companyName"
             rules={[
@@ -123,7 +123,7 @@ const Register = () => {
             ]}
           >
             <Input onChange={(e) => setUser({...user, companyName: e.target.value})} value={user?.companyName} />
-          </Form.Item>
+          </Form.Item> */}
 
           <Form.Item
             name="phoneNumber"

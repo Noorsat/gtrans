@@ -1,3 +1,4 @@
+import { response } from 'express';
 import Order from './../models/order.js'
 
 export const getOrders = async (req, res) => {
@@ -13,14 +14,11 @@ export const getOrders = async (req, res) => {
 export const createOrder = async (req, res) => {
     const order = req.body;
 
-    const newOrder = new Order(order)
-    try{
-        await newOrder.save()
-
-        res.status(201).json(newOrder)
-    }catch (error) {
+    await Order.insertMany(order).then(function() {
+        res.status(201).json(order)
+    }).catch(function(error) {
         res.status(409).json({message: error.message})
-    }
+    });
 }
 
 export const updateOrder = async (req, res) => {
@@ -68,6 +66,44 @@ export const changeStatusRequest = async (req, res ) => {
         }
     )
 
-
     res.send(updatedOrder)
+}
+
+export const changeTrackCode = async (req, res) => {
+    const order = await Order.find({individualCode: req.body.individualCode});
+
+    if (order.length === 0) return res.status(404).json({message: "Order not found..."})
+
+    let orders = await Order.updateMany({  
+            individualCode: req.body.individualCode
+        },
+        {
+            $set: {
+                trackCode: req.body.trackCode,
+                status:1
+            }
+        }
+    )
+
+    res.status(200).send(orders);
+}
+
+export const getOrderByTrackCode = async (req, res) => {
+    const order = await Order.find({trackCode: req.params.trackCode});
+
+    if (order.length === 0){
+        return res.status(404).json({message:'Такого трек кода не существует'})
+    }else{
+        return res.status(200).json(order);
+    }
+}
+
+export const getOrdersByAccountId = async (req, res) => {
+    const id = req.params.id;
+
+    const orders = await Order.find({accountId:id});
+
+    if (orders.length === 0) return res.status(404).json({message: "У этого пользователя нету заказов"})
+
+    return res.status(200).json(orders)
 }

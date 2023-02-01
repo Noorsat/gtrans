@@ -11,8 +11,13 @@ const Login = () => {
 
     const onFinish = (values) => {
         login(user).then((res) => {
+            console.log(res.data)
             localStorage.setItem("user", JSON.stringify(res.data))
-            router.push("/");
+            if (res.data.role === "admin"){
+              router.push("/admin")
+            }else{
+              router.push("/request");
+            }
         }).catch((res) => {
             notification["error"]({
                 message:res.response.data.error
