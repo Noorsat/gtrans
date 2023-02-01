@@ -29,7 +29,7 @@ export const signupUser = async (req, res) => {
     try{
         const user = await User.signup(email.toLowerCase(), password, companyName, phoneNumber)
 
-        const token = createToken(user._id, user.companyName, user.phoneNumber);
+        const token = createToken(user._id, user.companyName, user.phoneNumber, user.email, String(user.id));
 
         res.status(200).json({email, token})
     }catch(error){
