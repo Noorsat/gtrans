@@ -260,13 +260,13 @@ const Request = () => {
      }
 
     const changeOrderInfo = (i, param, value) => {
-      const re = /^[0-9\b]+$/;
+      const re = /^[0-9\b,.]+$/;
       
       setOrders(orders.map((order, index) => {
         if (index === i){
           if ((param === "weight" || param === "len" || param === "width" || param === "height" || param === "count")){
             if (value === '' || re.test(value)){
-              order[param] = value;
+              order[param] = value.replace(",",'.');
             }
           }else if (param === "comment"){
             order[param] = value;
@@ -399,18 +399,18 @@ const Request = () => {
                     </Select>
                 </div>
                 <div className='d-block gap-3 mb-0 mb-md-3 d-md-flex'>
-                  <Input placeholder='Вес одной коробки (кг)' className='mb-3 mb-md-0' onChange={(e) => changeOrderInfo(index, "weight",  e.target.value.replace(",","."))} value={order?.weight}/>
+                  <Input placeholder='Вес одной коробки (кг)' className='mb-3 mb-md-0' onChange={(e) => changeOrderInfo(index, "weight",  e.target.value)} value={order?.weight}/>
                   {
                     order?.weight > 20 && 
                     <>
-                      <Input placeholder='Длина (м)' className='mb-3 me-3 mb-md-0' onChange={(e) => changeOrderInfo(index, "len", e.target.value.replace(",","."))} value={order?.len}/>
-                      <Input placeholder='Ширина (м)' className='mb-3 me-3 mb-md-0' onChange={(e) => changeOrderInfo(index, "width", e.target.value.replace(",","."))} value={order?.width}/>
-                      <Input placeholder='Высота (м)' className='mb-3 me-3 mb-md-0' onChange={(e) => changeOrderInfo(index, "height", e.target.value.replace(",","."))} value={order?.height}/>
+                      <Input placeholder='Длина (м)' className='mb-3 me-3 mb-md-0' onChange={(e) => changeOrderInfo(index, "len", e.target.value)} value={order?.len}/>
+                      <Input placeholder='Ширина (м)' className='mb-3 me-3 mb-md-0' onChange={(e) => changeOrderInfo(index, "width", e.target.value)} value={order?.width}/>
+                      <Input placeholder='Высота (м)' className='mb-3 me-3 mb-md-0' onChange={(e) => changeOrderInfo(index, "height", e.target.value)} value={order?.height}/>
                     </>
                   }
-                  <Input placeholder='Количество' className='mb-3 mb-md-0' onChange={(e) => changeOrderInfo(index, "count", e.target.value.replace(",","."))} value={order?.count}/>
+                  <Input placeholder='Количество' className='mb-3 mb-md-0' onChange={(e) => changeOrderInfo(index, "count", e.target.value)} value={order?.count}/>
                 </div>
-                <Input placeholder='Комментарии' className='w-100 mb-3' onChange={(e) => changeOrderInfo(index, "comment", e.target.value.replace(",","."))} value={order?.comment}/>
+                <Input placeholder='Комментарии' className='w-100 mb-3' onChange={(e) => changeOrderInfo(index, "comment", e.target.value)} value={order?.comment}/>
                 {
                   orders?.length > 1 &&
                   <Button type="danger" className='w-100 mb-3' onClick={() => deleteProductHandler(index)}>Удалить товар</Button>
