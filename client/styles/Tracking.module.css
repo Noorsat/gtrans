@@ -34,3 +34,11 @@
     font-size: 20px;
     font-weight: 700;
 }
+@media (max-width: 500px){
+    .wrapper{
+        padding: 0 20px;
+    }
+    .statuses{
+        padding:0 20px;
+    }
+}

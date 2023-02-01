@@ -36,16 +36,16 @@ export default function TemporaryDrawer({user}) {
     >
       <List style={{height:"100vh", position:"relative"}}>
           <ListItem disablePadding>
-            <Link href="/">
+            <Link href="/request">
                 <div className={styles.link}>
-                    Заказы
+                  Калькулятор
                 </div>
             </Link>
           </ListItem>
           <ListItem disablePadding>
-            <Link href="/request">
+            <Link href="/tracking">
                 <div className={styles.link}>
-                    Заказать доставку
+                  Трекер
                 </div>
             </Link>
           </ListItem>

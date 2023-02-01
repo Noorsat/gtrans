@@ -28,7 +28,7 @@ const Account = () => {
 
     return (
         <>
-            <Card title="Мой аккаунт" style={{ width:600, margin:"0 auto", marginTop:50}}>
+            <Card title="Мой аккаунт" style={{ maxWidth:600, margin:"0 auto", marginTop:50}}>
                 <div className={styles.item}>
                     Email: <span className={styles.text}>{user?.email}</span>
                 </div>

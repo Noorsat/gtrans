@@ -29,7 +29,7 @@ const Request = () => {
         width:"",
         height:"",
         weight:"",
-        count:1,
+        count:"",
         comment:""
        } 
       ]
@@ -66,6 +66,22 @@ const Request = () => {
             if (res?.status === 201){
               setModal(true)
               setIndCode(getIndividualCode(user?.id)+"-"+(count+1))
+              // notification["success"]({
+              //   message:'Ваш заказ создан',
+              // })
+              // setOrder({})
+              // router.push("/my-orders")
+            }
+          })
+        }).catch((res) => {
+          const body = orders.map(order => {
+            return {...order, accountId : user?._id, type: order?.name, individualCode: getIndividualCode(user?.id)+"-1"}
+          })
+    
+          createOrder(body).then((res) => {
+            if (res?.status === 201){
+              setModal(true)
+              setIndCode(getIndividualCode(user?.id)+"-1")
               // notification["success"]({
               //   message:'Ваш заказ создан',
               // })
@@ -312,7 +328,7 @@ const Request = () => {
           width:"",
           height:"",
           weight:"",
-          count:1,
+          count:"",
           comment:""
         }])
       }
@@ -382,7 +398,7 @@ const Request = () => {
                     >
                     </Select>
                 </div>
-                <div className='d-block gap-3 mb-3 d-md-flex'>
+                <div className='d-block gap-3 mb-0 mb-md-3 d-md-flex'>
                   <Input placeholder='Вес одной коробки (кг)' className='mb-3 mb-md-0' onChange={(e) => changeOrderInfo(index, "weight",  e.target.value.replace(",","."))} value={order?.weight}/>
                   {
                     order?.weight > 20 && 
