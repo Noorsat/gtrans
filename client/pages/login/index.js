@@ -11,7 +11,6 @@ const Login = () => {
 
     const onFinish = (values) => {
         login(user).then((res) => {
-            console.log(res.data)
             localStorage.setItem("user", JSON.stringify(res.data))
             if (res.data.role === "admin"){
               router.push("/admin")

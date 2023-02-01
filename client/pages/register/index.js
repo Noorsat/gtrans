@@ -19,10 +19,12 @@ const Register = () => {
         phoneNumber: "+7"+user.phoneNumber
       }
       register(body).then((res) => {
-        router.push("/login")
         notification["success"]({
           message:"Вы успешно зарегистрировалась"
         })
+        console.log(res.data)
+        localStorage.setItem("user", JSON.stringify(res.data))
+        router.push("/request");
       }).catch((res) => (
         notification["error"]({
           message:res.response.data.error
