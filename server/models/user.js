@@ -52,10 +52,6 @@ userSchema.statics.signup = async function(email, password, companyName, phoneNu
         throw Error("Email не является допустимым")
     }
 
-    if (!validator.isStrongPassword(password)){
-        throw Error("Пароль недостаточно надежный")
-    }
-
     const exists = await this.findOne({email});
 
     if (exists){
