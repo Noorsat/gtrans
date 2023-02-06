@@ -390,9 +390,9 @@ const Request = () => {
                 <div className='d-block gap-3 mb-0 mb-md-3 d-md-flex'>
                   <Input placeholder='Вес одной коробки (кг)' className='mb-3 mb-md-0' onChange={(e) => changeOrderInfo(index, "weight",  e.target.value)} value={order?.weight}/>
                   
-                  <Input placeholder='Длина (м)' className='mb-3 me-3 mb-md-0' onChange={(e) => changeOrderInfo(index, "len", e.target.value)} value={order?.len}/>
-                  <Input placeholder='Ширина (м)' className='mb-3 me-3 mb-md-0' onChange={(e) => changeOrderInfo(index, "width", e.target.value)} value={order?.width}/>
-                  <Input placeholder='Высота (м)' className='mb-3 me-3 mb-md-0' onChange={(e) => changeOrderInfo(index, "height", e.target.value)} value={order?.height}/>
+                  <Input placeholder='Длина одной коробки (м)' className='mb-3 me-3 mb-md-0' onChange={(e) => changeOrderInfo(index, "len", e.target.value)} value={order?.len}/>
+                  <Input placeholder='Ширина одной коробки (м)' className='mb-3 me-3 mb-md-0' onChange={(e) => changeOrderInfo(index, "width", e.target.value)} value={order?.width}/>
+                  <Input placeholder='Высота одной коробки (м)' className='mb-3 me-3 mb-md-0' onChange={(e) => changeOrderInfo(index, "height", e.target.value)} value={order?.height}/>
                     
                   <Input placeholder='Количество' className='mb-3 mb-md-0' onChange={(e) => changeOrderInfo(index, "count", e.target.value)} value={order?.count}/>
                 </div>
