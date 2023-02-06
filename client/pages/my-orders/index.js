@@ -134,12 +134,6 @@ const MyOrders = ( ) => {
 
     const columns = [
         {
-          title:"ID",
-          dataIndex: '_id',
-          key: '_id',
-          width:10
-        },
-        {
           title:"Наименование груза",
           dataIndex: 'type',
           key: 'type',
@@ -290,7 +284,7 @@ const MyOrders = ( ) => {
       ]
     return (
         <div>
-            <Table dataSource={orders?.filter(order => order?.accountId === user?._id)} columns={columns}  title={() => `Мой заказы`} scroll={{x:800}} pagination={false}/>
+            <Table dataSource={orders?.filter(order => order?.accountId === user?._id)} columns={columns}  title={() => `Мои заказы`} scroll={{x:800}} pagination={false}/>
             <Modal title="Посмотреть заявки" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}
               width={850}
               footer={

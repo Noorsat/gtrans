@@ -110,18 +110,14 @@ const Request = () => {
         return "SM215-" + getId(id);
       }
      }
-
-     useEffect(() => {
-          // let totalWeight = orders?.reduce((total, order) => {
-          //   return total += Number(order?.weight) * Number(order?.count)
-          // }, 0)
-          // let totalVolume = orders?.reduce((total, order) => {
-          //   return total += Number(order?.len)*Number(order?.width)*Number(order?.height)
-          // }, 0)
+    
+      useEffect(() => {
           let totalPrice = 0;
           orders?.map(order => {
           if (order?.weight.length > 0 && order?.len.length > 0 && order?.width.length > 0 && order?.height.length > 0){
-          const density = Number(order?.weight) / (Number(order?.len) * Number(order?.width) * Number(order?.height))
+            const totalWeight = Number(order?.weight)*Number(order?.count); 
+            const totalVolume = (Number(order?.len) * Number(order?.width) * Number(order?.height)) * Number(order.count);
+            const density = totalWeight / totalVolume;
           if (density && order.weight > 100){
           if (order?.type === "first"){
                 if (density < 100){
@@ -206,16 +202,15 @@ const Request = () => {
               totalPrice += (4.1 * Number(order?.weight))* order?.count
             }
           }
-        }else if (order?.weight > 20 && order?.weight <= 100){
-          const cup = (Number(order?.len) * Number(order?.width) * Number(order?.height))
+        }else if (totalWeight > 20 && totalWeight <= 100){
           if (order?.type === "first"){
-            totalPrice += (cup* 490)* order?.count
+            totalPrice += (totalVolume* 490)
           }else if (order?.type === "second"){
-            totalPrice += (cup*580)* order?.count
+            totalPrice += (totalVolume*580)
           }
+        }else{
+          totalPrice += 7 * order?.weight* order?.count;
         }
-      }else{
-        totalPrice += 7 * order?.weight* order?.count;
       }
         })
         if (totalPrice !== 0){
@@ -400,14 +395,11 @@ const Request = () => {
                 </div>
                 <div className='d-block gap-3 mb-0 mb-md-3 d-md-flex'>
                   <Input placeholder='Вес одной коробки (кг)' className='mb-3 mb-md-0' onChange={(e) => changeOrderInfo(index, "weight",  e.target.value)} value={order?.weight}/>
-                  {
-                    order?.weight > 20 && 
-                    <>
-                      <Input placeholder='Длина (м)' className='mb-3 me-3 mb-md-0' onChange={(e) => changeOrderInfo(index, "len", e.target.value)} value={order?.len}/>
-                      <Input placeholder='Ширина (м)' className='mb-3 me-3 mb-md-0' onChange={(e) => changeOrderInfo(index, "width", e.target.value)} value={order?.width}/>
-                      <Input placeholder='Высота (м)' className='mb-3 me-3 mb-md-0' onChange={(e) => changeOrderInfo(index, "height", e.target.value)} value={order?.height}/>
-                    </>
-                  }
+                  
+                  <Input placeholder='Длина (м)' className='mb-3 me-3 mb-md-0' onChange={(e) => changeOrderInfo(index, "len", e.target.value)} value={order?.len}/>
+                  <Input placeholder='Ширина (м)' className='mb-3 me-3 mb-md-0' onChange={(e) => changeOrderInfo(index, "width", e.target.value)} value={order?.width}/>
+                  <Input placeholder='Высота (м)' className='mb-3 me-3 mb-md-0' onChange={(e) => changeOrderInfo(index, "height", e.target.value)} value={order?.height}/>
+                    
                   <Input placeholder='Количество' className='mb-3 mb-md-0' onChange={(e) => changeOrderInfo(index, "count", e.target.value)} value={order?.count}/>
                 </div>
                 <Input placeholder='Комментарии' className='w-100 mb-3' onChange={(e) => changeOrderInfo(index, "comment", e.target.value)} value={order?.comment}/>
