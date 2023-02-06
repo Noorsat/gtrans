@@ -214,7 +214,7 @@ const Request = () => {
       }
         })
         if (totalPrice !== 0){
-          setPrice(totalPrice)
+          setPrice(Math.round(totalPrice))
         }
         setTotalVolume(orders.reduce((total, order) => {
           let density = Number(order?.len) * Number(order?.height) * Number(order?.width)*order?.count;
