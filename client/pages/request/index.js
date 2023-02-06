@@ -335,15 +335,9 @@ const Request = () => {
       const buttonDisabled = () => {
         let checkButton = false;
         orders?.map(order => {
-          if (Number(order?.weight) > 20){
             if (order.type === "" || order?.weight === "" || order?.len === "" || order?.height === "" || order?.width === "" || order?.count == ""){
               checkButton = true;
             }
-          }else{
-            if (order.type === "" || order.weight === "" || order.count === ""){
-              checkButton = true;
-            }
-          }
         })
         return checkButton
       } 
