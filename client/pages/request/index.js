@@ -1,4 +1,4 @@
-import { Button, DatePicker, Form, Input, Select, Table, notification, Modal} from 'antd';
+import { Button, DatePicker, Form, Input, Select, Table, notification, Modal, Alert} from 'antd';
 import {useState, useEffect} from 'react';
 import {createOrder, getOrders, getOrdersByAccountId} from './../../http/orders';
 import styles from './../../styles/Request.module.css';
@@ -8,6 +8,7 @@ import { useRouter } from 'next/router';
 import { getId } from '../../components/validation';
 import {AiOutlinePlus} from 'react-icons/ai';
 import { height } from '@mui/system';
+import Link from 'next/link';
 
 
 const Request = () => {
@@ -350,8 +351,12 @@ const Request = () => {
               </Button>
             ]}
               onCancel={onCancel}
+              width={"80%"}
             >
-              <div className={styles.ind}>Ваш индидуальный код: <span>{indCode}</span></div>
+              <div className={styles.ind}>Ваш код: <span>{indCode}</span></div>
+              <div className={styles.ind}>Адрес склада: <span>广州市一库越秀区荔德路318号汇富商贸中心A13栋104号 王明磊 13930311979</span></div>
+              <Alert message="Укажите эти данные на коробке с товаром" type="info" className='mb-3' showIcon />
+              <Link href="/tracking" className='mt-3'>Трекинг</Link>
             </Modal>
             {/* <Modal open={volumeModal} className="volumeModal">
               <div className='d-flex justify-content-between'>
@@ -365,6 +370,8 @@ const Request = () => {
             <div className="mt-5 text-center">
                 <h4>Калькулятор</h4>
             </div>
+            <Alert message="Укажите параметры товара" type="info" className='w-75 ms-auto me-auto mb-3' showIcon />
+            <Alert message="Цена появится автоматически когда введете информацию про груз (вес, длина, ширина, высота, количество)" className='w-75 ms-auto me-auto mb-3' type="warning" showIcon />
             <Form className='w-md-50  w-75 ms-auto me-auto'>
               {
                 orders.map((order, index) => (
@@ -419,6 +426,7 @@ const Request = () => {
                       Общий объем: <span>{totalVolume} м3</span>
                     </div>
                 }
+                <Alert message="Если вы готовы заказать доставку, нажмите на кнопку снизу" className='mb-3' type="error"/>
                 <Button type='primary' className='w-100' onClick={createOrderHandler} disabled={buttonDisabled()}>Оформить заказ</Button>
             </Form>
         </div>

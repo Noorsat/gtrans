@@ -1,5 +1,4 @@
 import Head from 'next/head'
-
 import {Button, Input, Modal, notification, Table} from 'antd'
 import { useState,useEffect } from 'react';
 import { getOrders } from '../http/orders';
