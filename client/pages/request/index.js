@@ -60,7 +60,7 @@ const Request = () => {
             }
           })
           const body = orders.map(order => {
-            return {...order, accountId : user?._id, type: order?.name, individualCode: getIndividualCode(user?.id)+"-"+(count+1)}
+            return {...order, accountId : user?._id, type: order?.name, individualCode: getIndividualCode(user?.id)+"-"+(count+1), price: price}
           })
     
           createOrder(body).then((res) => {
@@ -76,9 +76,8 @@ const Request = () => {
           })
         }).catch((res) => {
           const body = orders.map(order => {
-            return {...order, accountId : user?._id, type: order?.name, individualCode: getIndividualCode(user?.id)+"-1"}
+            return {...order, accountId : user?._id, type: order?.name, individualCode: getIndividualCode(user?.id)+"-1", price: price}
           })
-    
           createOrder(body).then((res) => {
             if (res?.status === 201){
               setModal(true)
@@ -115,7 +114,7 @@ const Request = () => {
       useEffect(() => {
           let totalPrice = 0;
           orders?.map(order => {
-          if (order?.weight.length > 0 && order?.len.length > 0 && order?.width.length > 0 && order?.height.length > 0){
+          if (order?.weight.length > 0 && order?.len.length > 0 && order?.width.length > 0 && order?.height.length > 0 && order?.count.length >0){
             const totalWeight = Number(order?.weight)*Number(order?.count); 
             const totalVolume = (Number(order?.len) * Number(order?.width) * Number(order?.height)) * Number(order.count);
             const density = totalWeight / totalVolume;
@@ -212,6 +211,8 @@ const Request = () => {
         }else{
           totalPrice += 7 * order?.weight* order?.count;
         }
+      }else{
+        setPrice(0);
       }
         })
         if (totalPrice !== 0){

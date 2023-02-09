@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import { useRouter } from 'next/router';
 import { GiFactory } from 'react-icons/gi';
 import { BiPackage } from 'react-icons/bi';
+import { GrWaypoint } from 'react-icons/gr';
 import {RiFlightTakeoffFill, RiFlightLandFill, RiCreativeCommonsLine} from 'react-icons/ri';
 import { AiFillCheckCircle } from 'react-icons/ai';
 import styles from './../../styles/Tracking.module.css'
@@ -11,6 +12,7 @@ import moment from 'moment';
 
 const Tracking = () => {
     const [trackerCode, setTrackerCode] = useState();
+    const [status, setStatus] = useState();
 
     const router = useRouter()
     const { trackCode } = router.query
@@ -23,9 +25,9 @@ const Tracking = () => {
                     let nowDate = moment();
                     let statusDate = moment(res.data[0].updatedAt)
                     let diff = nowDate.diff(statusDate, 'days');
+                    setStatus(Number(res.data[0].status))
                     setDiff(diff)
                     setOrder(res.data[0])
-    
                 }
             }).catch((res) => {
                 if (res.response.status === 404){
@@ -47,9 +49,9 @@ const Tracking = () => {
                 let nowDate = moment();
                 let statusDate = moment(res.data[0].updatedAt)
                 let diff = nowDate.diff(statusDate, 'days');
+                setStatus(Number(res.data[0].status))
                 setDiff(diff)
                 setOrder(res.data[0])
-
             }
         }).catch((res) => {
             if (res.response.status === 404){
@@ -61,6 +63,7 @@ const Tracking = () => {
         })
     }
 
+    console.log(status)
 
     return (
         <div>
@@ -73,7 +76,15 @@ const Tracking = () => {
             {
                 order && 
                 <div className={styles.statuses}>
-                    <div className={styles.status} style={{opacity: diff < 5 && 1.0}}>
+                    <div className={styles.status} style={{opacity: (status === 0) && 1.0}}>
+                        <div className={styles.status__logo}>
+                            <GrWaypoint size={50} color={"#000"}/>
+                        </div>
+                        <div className={styles.status__text}>
+                            Не поступил на склад
+                        </div>
+                    </div>
+                    <div className={styles.status} style={{opacity: (diff < 5 && status === 1) && 1.0}}>
                         <div className={styles.status__logo}>
                             <GiFactory size={50} color={"#000"}/>
                         </div>
@@ -81,7 +92,7 @@ const Tracking = () => {
                             Склад в Гуанжоу
                         </div>
                     </div>
-                    <div className={styles.status} style={{opacity: (diff >= 5 && diff < 7) && 1.0}}>
+                    <div className={styles.status} style={{opacity: (diff >= 5 && diff < 7 && status === 1) && 1.0}}>
                         <div className={styles.status__logo}>
                             <BiPackage  size={50}  />
                         </div>
@@ -89,7 +100,7 @@ const Tracking = () => {
                             Упаковано для отправки
                         </div>
                     </div>
-                    <div className={styles.status} style={{opacity: (diff >= 7 && diff < 15) && 1.0}}>
+                    <div className={styles.status} style={{opacity: (diff >= 7 && diff < 15 && status === 1) && 1.0}}>
                         <div className={styles.status__logo}>
                             <RiFlightTakeoffFill  size={50} />
                         </div>
@@ -97,7 +108,7 @@ const Tracking = () => {
                             На пути к границе 
                         </div>
                     </div>
-                    <div className={styles.status} style={{opacity: (diff >= 15 && diff < 18) && 1.0}}>
+                    <div className={styles.status} style={{opacity: (diff >= 15 && diff < 18 && status === 1) && 1.0}}>
                         <div className={styles.status__logo}>
                             <RiFlightLandFill  size={50} />
 
@@ -106,7 +117,7 @@ const Tracking = () => {
                             На пути к складу
                         </div>
                     </div>
-                    <div className={styles.status} style={{opacity: (diff >= 18) && 1.0}}>
+                    <div className={styles.status} style={{opacity: (diff >= 18 && status === 1) && 1.0}}>
                         <div className={styles.status__logo}>
                             <AiFillCheckCircle  size={50} />
                         </div>

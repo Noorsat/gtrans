@@ -4,14 +4,14 @@ import {
     MenuUnfoldOutlined,
     MenuFoldOutlined
   } from '@ant-design/icons';
-import { Button, Input, Menu, Modal, notification, Table } from 'antd';
+import { Button, Checkbox, Input, Menu, Modal, notification, Table } from 'antd';
 import { useState, useEffect } from 'react';
 import jwt_decode from "jwt-decode";
 import { getAllUsers, getUserById } from '../../http/auth';
-import { getOrders, getOrdersByAccountId } from '../../http/orders';
+import { addTrackerCode, getOrders, getOrdersByAccountId, removeTrackCode } from '../../http/orders';
 import styles from './Admin.module.css';
 import { getId } from '../../components/validation';
-
+import { useRouter } from 'next/router';
 
   function getItem(label, key, icon, children, type) {
     return {
@@ -36,10 +36,13 @@ import { getId } from '../../components/validation';
     const [dashboardData, setDashboardData] = useState();
     const [dashboardColumns, setDashboardColumns] = useState();
     const [phoneInput, setPhoneInput] = useState();
-
+    const [trackerModal, setTrackerModal] = useState();
+    const [selectedIndCode, setSelectedIndCode] = useState();
     const [userModal, setUserModal] = useState(false);
     const [userModalData, setUserModalData] = useState();
     const [userModalColumns, setUserModalColumns] = useState();
+
+    const router = useRouter();
 
     useEffect(() => {
         const user = JSON.parse(localStorage.getItem("user"))
@@ -155,6 +158,39 @@ import { getId } from '../../components/validation';
       setDashboardData(allData.filter(item => item?.phoneNumber?.includes(e.target.value)))
     }
 
+    const trackerHandler = (e, item) => {
+      const body = {
+        trackCode: "",
+        individualCode: item.individualCode,
+      }
+      if (e.target.checked){
+        addTrackerCode(body).then((res) => {
+          if (res?.status < 400){
+            notification["success"]({
+              message:"Товар доставлен на склад"
+            })
+          }
+        })
+      }else{
+        setTrackerModal(true);
+        setSelectedIndCode(item.individualCode)
+      }
+    }
+
+    const trackerSwitchHandler = () => {
+      const body ={
+        individualCode: selectedIndCode
+      }
+      removeTrackCode(body).then((res) => {
+        if (res.status < 400){
+          notification["success"]({
+            message:"Вы убрали галочку"
+          })
+          setTrackerModal(false)
+        } 
+      })
+    }
+
     const menuChangeHandler = (e) => {
         if (e.key === "Пользователи"){
             setDashboardMode("Пользователи")
@@ -201,76 +237,96 @@ import { getId } from '../../components/validation';
             })
             setDashboardColumns(
                 [
-                    {
-                      title:"ID",
-                      dataIndex: '_id',
-                      key: '_id',
-                      width:10
-                    },
-                    {
-                      title:"Наименование груза",
-                      dataIndex: 'type',
-                      key: 'type',
-                    },
-                    {
-                      title:"Вес одной коробки (кг)",
-                      dataIndex: 'weight',
-                      key: 'weight',
-                    },
-                    {
-                      title:"Длина (м3)",
-                      dataIndex: 'len',
-                      key: 'len',
-                    },
-                    {
-                      title:"Ширина (м3)",
-                      dataIndex: 'width',
-                      key: 'width',
-                    },
-                    {
-                      title:"Высота (м3)",
-                      dataIndex: 'height',
-                      key: 'height',
-                    },
-                    {
-                      title:"Количество",
-                      dataIndex: 'count',
-                      key: 'count',
-                    },
-                    {
-                      title:"Комментарии",
-                      dataIndex: 'comment',
-                      key: 'comment',
-                    },
-                    {
-                      title:"Инд код",
-                      dataIndex: 'individualCode',
-                      key: 'individualCode',
-                      onCell: (_, index) => ({
-                        rowSpan: _.rowSpan ? _.rowSpan : 0
-                      })
-                    },
-                    {
-                      title:"Трек код",
-                      dataIndex: 'trackCode',
-                    key: 'trackCode',
-                      // render: (e, item) => item?.acceptedRequest?.filter(i => i.status === 4).length > 0 ? <div>Спасибо!</div> : item?.acceptedRequest?.filter(i => i.status === 3).length > 0 ? 
-                      // <div className='text-center'>
-                      //   Оцените перевозчика
-                      //   <div className='d-flex justify-content-center gap-3'>
-                      //     <div>
-                      //       <AiFillLike size={30} className={styles.like} onClick={() => likeHandler(item)} />
-                      //     </div>
-                      //     <div>
-                      //       <AiFillDislike size={30} className={styles.unlike} onClick={() => unlikeHandler(item)} />
-                      //     </div>
-                      //   </div>  
-                      // </div> 
-                      // :
-                      // <Button type='primary' onClick={() => showModal(item)}>Посмотреть заявки</Button>
-                    },
+                  {
+                    title:"Прибыло на склад",
+                    onCell: (_, index) => ({
+                      rowSpan: _.rowSpan ? _.rowSpan : 0
+                    }),
+                    render:(e, item) => (
+                      <div className='d-flex justify-content-center'>
+                        <Checkbox onChange={(e) => trackerHandler(e, item)} defaultChecked={item?.status === 1} />
+                      </div>
+                    )
+                  }, 
+                  {
+                    title:"Наименование груза",
+                    dataIndex: 'type',
+                    key: 'type',
+                  },
+                  {
+                    title:"Вес одной коробки (кг)",
+                    dataIndex: 'weight',
+                    key: 'weight',
+                  },
+                  {
+                    title:"Длина (м3)",
+                    dataIndex: 'len',
+                    key: 'len',
+                  },
+                  {
+                    title:"Ширина (м3)",
+                    dataIndex: 'width',
+                    key: 'width',
+                  },
+                  {
+                    title:"Высота (м3)",
+                    dataIndex: 'height',
+                    key: 'height',
+                  },
+                  {
+                    title:"Количество",
+                    dataIndex:"count",
+                    key:"count"
+                  },
+                  {
+                    title:"Комментарии",
+                    dataIndex: 'comment',
+                    key: 'comment',
+                  },
+                  {
+                    title:"Инд код",
+                    dataIndex: 'individualCode',
+                    key: 'individualCode',
+                    onCell: (_, index) => ({
+                      rowSpan: _.rowSpan ? _.rowSpan : 0
+                    })
+                  },
+                  {
+                    title:'Цена',
+                    dataIndex:'price',
+                    key:'price',
+                    onCell: (_, index) => ({
+                      rowSpan: _.rowSpan ? _.rowSpan : 0
+                    }),
+                    render: (e, item) => (
+                      <>{item.price}$</>
+                    )  
+                  },
+                  {
+                    title:'Трекинг',
+                    dataIndex:'request',
+                    key:'request',
+                    onCell: (_, index) => ({
+                      rowSpan: _.rowSpan ? _.rowSpan : 0
+                    }),
+                    render: (e, item) => (
+                          <Button
+                            className={styles.trackCode} 
+                            onClick={() => router.push({
+                            pathname: "/tracking", 
+                            query: {
+                              trackCode:item.individualCode
+                            }
+                            })}
+                            type="primary"
+                            >Отследовать заказ</Button>
+                    )
+                  },
                     {
                         title:"Заказщик",
+                        onCell: (_, index) => ({
+                          rowSpan: _.rowSpan ? _.rowSpan : 0
+                        }),
                         render: (e,item) => <Button type='primary' onClick={() => findUserHandler(item.accountId)}>Узнать заказщика</Button>
                     },
                 ]
@@ -284,6 +340,16 @@ import { getId } from '../../components/validation';
                     <Table columns={userModalColumns} dataSource={userModalData} pagination={false} />
                 </Modal>
             </div>
+            <Modal open={trackerModal} footer={[
+              <Button onClick={() =>  setTrackerModal(false)}>
+                Назад
+              </Button>,
+              <Button onClick={trackerSwitchHandler}>
+                Убрать
+              </Button>
+            ]}>
+              Вы точно хотите убрать галочку?
+            </Modal>
         <div
             style={{
             width: 256,

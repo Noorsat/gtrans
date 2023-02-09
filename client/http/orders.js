@@ -25,6 +25,11 @@ export const addTrackerCode = async (body) => {
     return response;
 }
 
+export const removeTrackCode = async (body) => {
+    const response = await myAxios.put("/orders/tracker/return", body)
+    return response;
+}
+
 export const getOrderByTrackCode = async (id) => {
     const response = await myAxios.get("/orders/tracker/"+id);
     return response;

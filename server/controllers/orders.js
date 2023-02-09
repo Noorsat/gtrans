@@ -69,6 +69,8 @@ export const changeStatusRequest = async (req, res ) => {
     res.send(updatedOrder)
 }
 
+
+
 export const changeTrackCode = async (req, res) => {
     const order = await Order.find({individualCode: req.body.individualCode});
 
@@ -79,7 +81,6 @@ export const changeTrackCode = async (req, res) => {
         },
         {
             $set: {
-                trackCode: req.body.trackCode,
                 status:1
             }
         }
@@ -88,11 +89,29 @@ export const changeTrackCode = async (req, res) => {
     res.status(200).send(orders);
 }
 
+export const switchTrackCode = async (req, res) => {
+    const order = await Order.find({individualCode: req.body.individualCode});
+
+    if (order.length === 0) return res.status(404).json({message: "Order not found..."})
+
+    let orders = await Order.updateMany({  
+            individualCode: req.body.individualCode
+        },
+        {
+            $set: {
+                status:0
+            }
+        }
+    )
+
+    res.status(200).send(orders);
+}
+
 export const getOrderByTrackCode = async (req, res) => {
-    const order = await Order.find({trackCode: req.params.trackCode});
+    const order = await Order.find({individualCode: req.params.trackCode});
 
     if (order.length === 0){
-        return res.status(404).json({message:'Такого трек кода не существует'})
+        return res.status(404).json({message:'Такого кода не существует'})
     }else{
         return res.status(200).json(order);
     }

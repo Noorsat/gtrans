@@ -7,6 +7,7 @@ const orderSchema = mongoose.Schema({
     weight:String,
     height:String,
     len:String,
+    price: String,
     width: String,
     volume: String,
     count: String,
@@ -15,7 +16,10 @@ const orderSchema = mongoose.Schema({
     trackCode:String,
     individualCode: String,
     comment: String,
-    status:Number,
+    status:{
+        type:Number,
+        default:0,
+    },
     acceptedRequest: [{
         requestId: String,
         company: String,

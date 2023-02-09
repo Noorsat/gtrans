@@ -177,44 +177,75 @@ const MyOrders = ( ) => {
           })
         },
         {
-          title:"Трек код",
-          dataIndex: 'request',
-          key: 'request',
+          title:'Цена',
+          dataIndex:'price',
+          key:'price',
           onCell: (_, index) => ({
             rowSpan: _.rowSpan ? _.rowSpan : 0
           }),
-          // render: (e, item) => item?.acceptedRequest?.filter(i => i.status === 4).length > 0 ? <div>Спасибо!</div> : item?.acceptedRequest?.filter(i => i.status === 3).length > 0 ? 
-          // <div className='text-center'>
-          //   Оцените перевозчика
-          //   <div className='d-flex justify-content-center gap-3'>
-          //     <div>
-          //       <AiFillLike size={30} className={styles.like} onClick={() => likeHandler(item)} />
-          //     </div>
-          //     <div>
-          //       <AiFillDislike size={30} className={styles.unlike} onClick={() => unlikeHandler(item)} />
-          //     </div>
-          //   </div>  
-          // </div> 
-          // :
-          // <Button type='primary' onClick={() => showModal(item)}>Посмотреть заявки</Button>
-          render: (e, item) => {
-            return (
-                item?.trackCode ? 
-                  <div
-                    className={styles.trackCode} 
-                    onClick={() => router.push({
-                    pathname: "/tracking", 
-                    query: {
-                      trackCode:item.trackCode
-                    }
-                  })}>{item.trackCode}</div>
-                :
-              <div>
-                <Button type='primary' onClick={() => trackerModalOpenHandler(item)}>Указать трек код</Button>
-              </div>
-            )            
-          }
+          render: (e, item) => (
+            <>{item.price}$</>
+          )  
         },
+        {
+          title:'Трекинг',
+          dataIndex:'request',
+          key:'request',
+          onCell: (_, index) => ({
+            rowSpan: _.rowSpan ? _.rowSpan : 0
+          }),
+          render: (e, item) => (
+                <Button
+                  className={styles.trackCode} 
+                  onClick={() => router.push({
+                  pathname: "/tracking", 
+                  query: {
+                    trackCode:item.individualCode
+                  }
+                  })}
+                  type="primary"
+                  >Отследовать заказ</Button>
+          )
+        }
+        // {
+        //   title:"Трек код",
+        //   dataIndex: 'request',
+        //   key: 'request',
+        //   onCell: (_, index) => ({
+        //     rowSpan: _.rowSpan ? _.rowSpan : 0
+        //   }),
+        //   // render: (e, item) => item?.acceptedRequest?.filter(i => i.status === 4).length > 0 ? <div>Спасибо!</div> : item?.acceptedRequest?.filter(i => i.status === 3).length > 0 ? 
+        //   // <div className='text-center'>
+        //   //   Оцените перевозчика
+        //   //   <div className='d-flex justify-content-center gap-3'>
+        //   //     <div>
+        //   //       <AiFillLike size={30} className={styles.like} onClick={() => likeHandler(item)} />
+        //   //     </div>
+        //   //     <div>
+        //   //       <AiFillDislike size={30} className={styles.unlike} onClick={() => unlikeHandler(item)} />
+        //   //     </div>
+        //   //   </div>  
+        //   // </div> 
+        //   // :
+        //   // <Button type='primary' onClick={() => showModal(item)}>Посмотреть заявки</Button>
+        //   render: (e, item) => {
+        //     return (
+        //         item?.trackCode ? 
+        //           <div
+        //             className={styles.trackCode} 
+        //             onClick={() => router.push({
+        //             pathname: "/tracking", 
+        //             query: {
+        //               trackCode:item.trackCode
+        //             }
+        //           })}>{item.trackCode}</div>
+        //         :
+        //       <div>
+        //         <Button type='primary' onClick={() => trackerModalOpenHandler(item)}>Указать трек код</Button>
+        //       </div>
+        //     )            
+        //   }
+        // },
       ]
 
       const requestColumns = [
