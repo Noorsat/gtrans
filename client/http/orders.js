@@ -21,7 +21,12 @@ export const changeStatusRequest = async (body, id) => {
 }
 
 export const addTrackerCode = async (body) => {
-    const response = await myAxios.put("/orders/tracker/change", body)
+    const response = await myAxios.put("/orders/tracker/accept/china", body)
+    return response;
+}
+
+export const acceptProduct = async (body) => {
+    const response = await myAxios.put("/orders/tracker/accept", body)
     return response;
 }
 
@@ -37,5 +42,20 @@ export const getOrderByTrackCode = async (id) => {
 
 export const getOrdersByAccountId = async (id) => {
     const response = await myAxios.get("/orders/account/"+id);
+    return response;
+}
+
+export const getOrderById = async (id) => {
+    const response = await myAxios.get("/orders/"+id);
+    return response;
+}
+
+export const changePriceByAdmin = async (id, body) => {
+    const response = await myAxios.put('/orders/price/'+id, body);
+    return response;
+}
+
+export const changeTrackCode = async (body) => {
+    const response = await myAxios.put('/orders/tracker/change', body);
     return response;
 }

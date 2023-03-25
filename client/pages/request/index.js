@@ -6,7 +6,6 @@ import moment from 'moment';
 import jwt_decode from 'jwt-decode'
 import { useRouter } from 'next/router';
 import { getId } from '../../components/validation';
-import {AiOutlinePlus} from 'react-icons/ai';
 import { height } from '@mui/system';
 import Link from 'next/link';
 
@@ -39,6 +38,7 @@ const Request = () => {
     const [modal, setModal] = useState(false);
     const [indCode, setIndCode] = useState();
     const [volumeModal, setVolumeModal] = useState(false);
+    const [mobile, setMobile] = useState(false);
 
     useEffect(() => {
         const user = JSON.parse(localStorage.getItem("user"))
@@ -47,6 +47,9 @@ const Request = () => {
             setUser(decoded);
         }else{
           router.push("/login")
+        }
+        if (window.innerWidth < 500){
+          setMobile(true);
         }
     }, [])
 
@@ -60,7 +63,7 @@ const Request = () => {
             }
           })
           const body = orders.map(order => {
-            return {...order, accountId : user?._id, type: order?.name, individualCode: getIndividualCode(user?.id)+"-"+(count+1), price: price}
+            return {...order, accountId : user?._id, type: order?.name, individualCode: getIndividualCode(user?.id)+"-"+(count+1), price: price, volume: Math.round((Number(order?.len) * Number(order?.width) * Number(order?.height)) * Number(order.count))}
           })
     
           createOrder(body).then((res) => {
@@ -76,7 +79,7 @@ const Request = () => {
           })
         }).catch((res) => {
           const body = orders.map(order => {
-            return {...order, accountId : user?._id, type: order?.name, individualCode: getIndividualCode(user?.id)+"-1", price: price}
+            return {...order, accountId : user?._id, type: order?.name, individualCode: getIndividualCode(user?.id)+"-1", price: price, volume: Math.round((Number(order?.len) * Number(order?.width) * Number(order?.height)) * Number(order.count))}
           })
           createOrder(body).then((res) => {
             if (res?.status === 201){
@@ -118,53 +121,55 @@ const Request = () => {
             const totalWeight = Number(order?.weight)*Number(order?.count); 
             const totalVolume = (Number(order?.len) * Number(order?.width) * Number(order?.height)) * Number(order.count);
             const density = totalWeight / totalVolume;
-          if (density && order.weight > 100){
-          if (order?.type === "first"){
+          if (totalWeight <= 30 && totalVolume <= 0.2){
+            totalPrice += 7 * order?.weight* order?.count;
+          }else{ 
+            if (order?.type === "first"){
                 if (density < 100){
                   const cup = (Number(order?.len) * Number(order?.width) * Number(order?.height))
                   totalPrice += (cup* 490)* order?.count
                 }else if (density > 100 && density <= 110){
-                  totalPrice += 4.3 * Number(order?.weight) * order?.count
+                  totalPrice += 4.4 * Number(order?.weight) * order?.count
                 }else if (density > 110 && density <= 120){
-                  totalPrice += 4.2 * Number(order?.weight) * order?.count
+                  totalPrice += 4.3 * Number(order?.weight) * order?.count
                 }else if (density > 120 && density <= 130){
-                  totalPrice += 4.1 * Number(order?.weight) * order?.count
+                  totalPrice += 4.2 * Number(order?.weight) * order?.count
                 }else if (density > 130 && density <= 140){
-                  totalPrice += 4 * Number(order?.weight) * order?.count
+                  totalPrice += 4.1 * Number(order?.weight) * order?.count
                 }else if (density > 140 && density <= 150){
-                  totalPrice += 3.9 * Number(order?.weight) * order?.count
+                  totalPrice += 4 * Number(order?.weight) * order?.count
                 }else if (density > 150 && density <= 160){
-                  totalPrice += 3.8 * Number(order?.weight) * order?.count
+                  totalPrice += 3.9 * Number(order?.weight) * order?.count
                 }else if(density > 160 && density <= 170){
-                  totalPrice += 3.7 * Number(order?.weight) * order?.count
+                  totalPrice += 3.8 * Number(order?.weight) * order?.count
                 }else if(density > 170 && density <= 180){
-                  totalPrice += 3.6 * Number(order?.weight)* order?.count
+                  totalPrice += 3.7 * Number(order?.weight)* order?.count
                 }else if(density > 180 && density <= 190){
-                  totalPrice += (3.5 * Number(order?.weight))* order?.count
+                  totalPrice += (3.6 * Number(order?.weight))* order?.count
                 }else if(density > 190 && density <= 200){
-                  totalPrice += (3.4 * Number(order?.weight))* order?.count
+                  totalPrice += (3.5 * Number(order?.weight))* order?.count
                 }else if (density > 200 && density <= 250){
-                  totalPrice += (3.3 * Number(order?.weight))* order?.count
+                  totalPrice += (3.4 * Number(order?.weight))* order?.count
                 }else if (density > 250 && density <= 300){
-                  totalPrice += (3.2 * Number(order?.weight))* order?.count
+                  totalPrice += (3.3 * Number(order?.weight))* order?.count
                 }else if (density > 300 && density <= 350){
-                  totalPrice += (3.1 * Number(order?.weight))* order?.count
+                  totalPrice += (3.2 * Number(order?.weight))* order?.count
                 }else if (density > 350 && density <= 400){
-                  totalPrice += (3 * Number(order?.weight))* order?.count
+                  totalPrice += (3.1 * Number(order?.weight))* order?.count
                 }else if (density > 400 && density <= 600){
-                  totalPrice += (2.9 * Number(order?.weight))* order?.count
+                  totalPrice += (3 * Number(order?.weight))* order?.count
                 }else if (density > 600 && density <= 800){
-                  totalPrice += (2.8 * Number(order?.weight))* order?.count
+                  totalPrice += (2.9 * Number(order?.weight))* order?.count
                 }else if (density > 800 && density <= 1000){
-                  totalPrice += (2.7 * Number(order?.weight))* order?.count
+                  totalPrice += (2.8 * Number(order?.weight))* order?.count
                 }else if (density > 1000){
-                  totalPrice += (2.6 * Number(order?.weight))* order?.count
+                  totalPrice += (2.7 * Number(order?.weight))* order?.count
                 }
           }else if(order?.type === "second"){
             if (density < 100){
               const cup = (Number(order?.len) * Number(order?.width) * Number(order?.height))
               totalPrice += (cup * 580)* order?.count
-            }else if (density > 100 && density <= 110){
+            }else if (density >= 100 && density <= 110){
               totalPrice += (5.5 * Number(order?.weight))* order?.count
             }else if (density > 110 && density <= 120){
               totalPrice += (5.4 * Number(order?.weight)) * order?.count
@@ -202,26 +207,22 @@ const Request = () => {
               totalPrice += (4.1 * Number(order?.weight))* order?.count
             }
           }
-        }else if (totalWeight > 20 && totalWeight <= 100){
-          if (order?.type === "first"){
-            totalPrice += (totalVolume* 490)
-          }else if (order?.type === "second"){
-            totalPrice += (totalVolume*580)
           }
-        }else{
-          totalPrice += 7 * order?.weight* order?.count;
-        }
-      }else{
-        setPrice(0);
-      }
-        })
-        if (totalPrice !== 0){
-          setPrice(Math.round(totalPrice))
-        }
-        setTotalVolume(orders.reduce((total, order) => {
-          let density = Number(order?.len) * Number(order?.height) * Number(order?.width)*order?.count;
-          return total += density;
-        }, 0));
+          }else{
+            setPrice(0);
+          }
+          })
+          if (totalPrice !== 0){
+            if (totalPrice < 30){
+              setPrice(30);
+            }else{
+              setPrice(Math.round(totalPrice))
+            }
+          }
+          setTotalVolume(orders.reduce((total, order) => {
+            let density = Number(order?.len) * Number(order?.height) * Number(order?.width)*order?.count;
+            return total += density;
+          }, 0));
      }
      , [orders])
 
@@ -345,19 +346,28 @@ const Request = () => {
       } 
 
     return (
-        <div>
-            <Modal open={modal} footer={[
-              <Button onClick={onCancel}>
-                ОК
-              </Button>
-            ]}
+        <div className='container'>
+            <Modal open={modal} footer={null}
               onCancel={onCancel}
-              width={"80%"}
-            >
-              <div className={styles.ind}>Ваш код: <span>{indCode}</span></div>
-              <div className={styles.ind}>Адрес склада: <span>广州市一库越秀区荔德路318号汇富商贸中心A13栋104号 王明磊 13930311979</span></div>
-              <Alert message="Укажите эти данные на коробке с товаром" type="info" className='mb-3' showIcon />
-              <Link href="/tracking" className='mt-3'>Трекинг</Link>
+              width={!mobile ?  "80%" : '95%'}
+            > 
+              <div className={styles.modal__title}>
+                Ваша заявка
+              </div>
+              <div className={styles.inds}>
+                <div className={styles.ind}>Код вашего отправления: <span>{indCode}</span></div>
+                <div className={styles.ind}>Адрес склада: <span>广东省广州市白云区石门街道，窖心大道2号007库房创胜新天地后侧停车场手机号码: 13930311979所在地区</span></div>
+              </div>
+              <div className={styles.modal__tips}>
+                <div>
+                  Обязательно укажите эти данные на коробке с товаром.
+                </div>
+                <div>
+                  Без этих данных ваша посылка потеряется.
+                </div>
+              </div>
+              {/* <Alert message="Укажите эти данные на коробке с товаром" type="info" className='mb-3' showIcon /> */}
+              {/* <Link href="/tracking" className='mt-3'>Трекинг</Link> */}
             </Modal>
             {/* <Modal open={volumeModal} className="volumeModal">
               <div className='d-flex justify-content-between'>
@@ -368,17 +378,26 @@ const Request = () => {
                 <Input placeholder='Вес одной коробки' className='mb-3 me-3 mb-md-0' onChange={(e) => setOrder({...order, height: e.target.value.replace(",",".")})} value={order?.height}/>
               </div>
             </Modal> */}
-            <div className="mt-5 text-center">
+            <div className={`${styles.title}`}>
                 <h4>Калькулятор</h4>
             </div>
-            <Alert message="Укажите параметры товара" type="info" className='w-75 ms-auto me-auto mb-3' showIcon />
-            <Alert message="Цена появится автоматически когда введете информацию про груз (вес, длина, ширина, высота, количество)" className='w-75 ms-auto me-auto mb-3' type="warning" showIcon />
-            <Form className='w-md-50  w-75 ms-auto me-auto'>
+            <div className={styles.tips}>
+              <div className={styles.tip}>
+                1. Заполните параметры товара.
+              </div>
+              <div className={styles.tip}>
+                2. Стоимость доставки появится автоматически, когда вы введете информацию груза (вес, длина, ширина, высота, количество)
+              </div>
+            </div>
+            {/* <Alert message="Укажите параметры товара" type="info" className='w-75 ms-auto me-auto mb-3' showIcon />
+            <Alert message="Цена появится автоматически когда введете информацию про груз (вес, длина, ширина, высота, количество)" className='w-75 ms-auto me-auto mb-3' type="warning" showIcon /> */}
+            <Form className={`w-100 ms-auto me-auto ${styles.form}`}>
               {
                 orders.map((order, index) => (
-                  <>
-                     <div className='mb-3'>
-                    <Select placeholder="Наименование груза" className='w-100' style={{width:"100%"}}
+                  <div className={styles.item}>
+                  <div className={`mb-3`}>
+                    <Select placeholder="Наименование груза" className={`w-100 select`} style={{width:"100%"}}
+                      
                       onChange={(e, label) => typeHandler(e, label, index)}
                       options={
                         [
@@ -395,40 +414,66 @@ const Request = () => {
                     >
                     </Select>
                 </div>
-                <div className='d-block gap-3 mb-0 mb-md-3 d-md-flex'>
-                  <Input placeholder='Вес одной коробки (кг)' className='mb-3 mb-md-0' onChange={(e) => changeOrderInfo(index, "weight",  e.target.value)} value={order?.weight}/>
-                  
-                  <Input placeholder='Длина одной коробки (м)' className='mb-3 me-3 mb-md-0' onChange={(e) => changeOrderInfo(index, "len", e.target.value)} value={order?.len}/>
-                  <Input placeholder='Ширина одной коробки (м)' className='mb-3 me-3 mb-md-0' onChange={(e) => changeOrderInfo(index, "width", e.target.value)} value={order?.width}/>
-                  <Input placeholder='Высота одной коробки (м)' className='mb-3 me-3 mb-md-0' onChange={(e) => changeOrderInfo(index, "height", e.target.value)} value={order?.height}/>
-                    
-                  <Input placeholder='Количество' className='mb-3 mb-md-0' onChange={(e) => changeOrderInfo(index, "count", e.target.value)} value={order?.count}/>
+                <div className={`d-block mb-0 mb-md-3 d-md-flex justify-between ${styles.inputs}`}>
+                  <div className={`input ${styles.input}`}>
+                    <div className={`d-flex ${styles.inputs__wrapper}`}>
+                      <Input placeholder='Вес одной коробки (кг)' onChange={(e) => changeOrderInfo(index, "weight",  e.target.value)} value={order?.weight}/>
+                      <Input placeholder='Длина одной коробки (м)'  onChange={(e) => changeOrderInfo(index, "len", e.target.value)} value={order?.len}/>
+                    </div>
+                    <div className={`d-flex ${styles.inputs__wrapper}`}>
+                    <Input placeholder='Ширина одной коробки (м)' onChange={(e) => changeOrderInfo(index, "width", e.target.value)} value={order?.width}/>
+                    <Input placeholder='Высота одной коробки (м)' onChange={(e) => changeOrderInfo(index, "height", e.target.value)} value={order?.height}/>
+                    </div>
+                    <Input className='mb-3 mb-md-0' placeholder='Количество коробок' onChange={(e) => changeOrderInfo(index, "count", e.target.value)} value={order?.count}/>
+                  </div>
+                  <div className={`comment ${styles.input}`}>
+                   <Input placeholder='Комментарии' onChange={(e) => changeOrderInfo(index, "comment", e.target.value)} value={order?.comment}/>
+                  </div>
                 </div>
-                <Input placeholder='Комментарии' className='w-100 mb-3' onChange={(e) => changeOrderInfo(index, "comment", e.target.value)} value={order?.comment}/>
-                {
+                <div className='d-flex justify-content-md-end justify-content-center mb-md-0 align-items-center w-100'> 
+                  <div className={styles.remove__button} onClick={() => deleteProductHandler(index)}>
+                    Удалить расчет
+                  </div> 
+                </div>
+                {/* {
                   orders?.length > 1 &&
                   <Button type="danger" className='w-100 mb-3' onClick={() => deleteProductHandler(index)}>Удалить товар</Button>
-                }
-                </>  
+                } */}
+                </div>  
                 ))
               }
-                <div className={styles.plus}>
+                {/* <div className={styles.plus}>
                   <AiOutlinePlus className={styles.plus__icon} size={30} onClick={orderAddHandler}/>
+                </div> */}
+                <div className={styles.plus} onClick={orderAddHandler}>
+                  <div className={styles.plus__icon}>
+                    <img src='./plus.svg' alt="plus"/>
+                  </div>
+                  <div className={styles.plus__text}>
+                    Добавить еще груз
+                  </div>
                 </div>
+                <div className={styles.overall}>
+                  {  
+                    totalVolume > 0 &&
+                      <div className={styles.price}>
+                        Общий объем доставки: <span>{totalVolume} м3</span>
+                      </div> 
+                  }
                 {  
                   price > 0 &&
                     <div className={styles.price}>
                       Цена: <span>{getPrice(price)}</span>
                     </div>
                 }
-                {  
-                  totalVolume > 0 &&
-                    <div className={styles.price}>
-                      Общий объем: <span>{totalVolume} м3</span>
-                    </div>
-                }
-                <Alert message="Если вы готовы заказать доставку, нажмите на кнопку снизу" className='mb-3' type="error"/>
-                <Button type='primary' className='w-100' onClick={createOrderHandler} disabled={buttonDisabled()}>Оформить заказ</Button>
+                </div>
+                {/* <Alert message="Если вы готовы заказать доставку, нажмите на кнопку снизу" className='mb-3' type="error"/> */}
+                <div className={styles.confirm__tip}>
+                  Чтобы отправить заказ, нажмите на кнопку “Оформить заказ”
+                </div>
+                <div className='confirm__button'>
+                  <button type='primary' onClick={createOrderHandler} disabled={buttonDisabled()}>Оформить заказ</button>
+                </div>
             </Form>
         </div>
     )

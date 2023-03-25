@@ -1,5 +1,5 @@
 import express from 'express';
-import { getOrders, createOrder, updateOrder, addRequest, changeStatusRequest, changeTrackCode, getOrderByTrackCode, getOrdersByAccountId, switchTrackCode  } from '../controllers/orders.js';
+import { getOrders, createOrder, updateOrder, addRequest, changeStatusRequest, changeTrackCode, getOrderByTrackCode, getOrdersByAccountId, switchTrackCode, getOrderById, acceptProduct, acceptChina, changePriceByAdmin  } from '../controllers/orders.js';
 
 const router = express.Router();
 
@@ -9,9 +9,13 @@ router.put("/:id", updateOrder)
 router.put("/add/request/:id", addRequest)
 router.put("/status/request/:id", changeStatusRequest)
 router.put("/tracker/change", changeTrackCode)
+router.put("/tracker/accept/china", acceptChina);
+router.put("/tracker/accept", acceptProduct)
 router.put("/tracker/return", switchTrackCode)
 router.get("/tracker/:trackCode", getOrderByTrackCode)
 router.get("/account/:id", getOrdersByAccountId);
+router.get("/:id", getOrderById)
+router.put("/price/:id", changePriceByAdmin)
 
 export default router;
 

@@ -1,4 +1,4 @@
-.wrapper{
+/* .wrapper{
     display: flex;
     max-width: 500px;
     margin: 0 auto;
@@ -40,5 +40,129 @@
     }
     .statuses{
         padding:0 20px;
+    }
+} */
+.tracking__title{
+    font-weight: 700;
+    font-size: 30px;
+    line-height: 34px;
+    color: #000000;
+    margin-top: 71px;
+    margin-bottom: 41px;
+}
+.tracking__left{
+    max-width: 570px;
+    width: 100%; 
+}
+.tracking__text{
+    font-weight: 300;
+    font-size: 14px;
+    line-height: 20px;
+    color: #000000;
+    max-width: 373px;
+    margin-bottom: 20px;
+}
+.tracking__form{
+    display: flex;
+}
+
+.tracking__button{
+    font-weight: 500;
+    font-size: 15px;
+    line-height: 17px;
+    text-align: center;
+    text-transform: uppercase;
+    color: #000000;
+    padding:24px 38px;
+    background: #FFAD32;
+    border-radius: 50px;
+    height: fit-content;
+    cursor: pointer;
+}
+.tracking__input {
+    max-width: 374px!important;
+    width: 100%!important;
+    margin-right: 22px;
+}
+.status__wrapper{
+    display: flex;
+    align-items: center;
+}
+.statuses{
+    padding-top: 90px;
+    margin-left: 119px;
+}
+.status::after{
+  content: '';
+  display: block;
+  height: 16px;
+  width: 2px;
+  background:#c8c8c8;
+  margin-left: 29px;
+}
+.status:last-child:after{
+    display: none;
+}
+.status__icon{
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 2px solid #c8c8c8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 18px;
+}
+.status__text{
+    font-weight: 500;
+    font-size: 18px;
+    line-height: 21px;
+    display: flex;
+    align-items: center;
+    color: #c8c8c8;
+}
+
+.active .status__icon{
+    border-color: #FFAD32;
+}
+.active .status__text{
+    color: #000;
+}
+.status img{
+    opacity: 0.3;
+}
+.active img{
+    opacity: 1;
+}
+.status.active:after{
+    background:#FFAD32;
+} 
+
+/* MEDIA */
+
+@media (max-width: 550px){
+    .tracking__title{
+        margin-top: 30px;
+        margin-bottom: 26px;
+        text-align: center;
+    }
+    .tracking__form{
+        display: block;
+    }
+    .tracking__input{
+        margin-bottom: 30px;
+    }
+   .tracking__button{
+        width: fit-content;
+        margin:0 auto;
+    }
+    .statuses{
+        margin-left: 0;
+        text-align: center;
+        width: fit-content;
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        margin:0 auto;
     }
 }

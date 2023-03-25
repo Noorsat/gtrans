@@ -1,20 +1,23 @@
 .price{
-    text-align: center;
-    font-size: 16px;
+    font-weight: 400;
+    font-size: 17px;
+    color: #000000;
     margin-bottom: 16px;
 }
 .price span{
-    font-size:20px;
     font-weight: 700;
+    font-size: 20px;
+    color: #000000;
 }
 .ind{
-    color:red;
-    margin-bottom: 20px;
-    font-size:24px;
+    font-weight: 400;
+    font-size: 17px;
+    color: #000000;
+    margin-bottom: 11px;
 }
+
 .ind span{
-    font-weight: 700;
-    font-size: 30px;
+    color:#FFAD32;
 }
 .volume{
     text-align: center;
@@ -24,14 +27,105 @@
     color:#1890ff;
     font-weight: 700;
 }
-.plus{
-    text-align: center;
-    margin-bottom: 16px;
-}
 
 .plus__icon{
-    background:lightblue; 
+    background: #FFAD32;
+    padding:10px 15px;
     border-radius: 50%;
-    padding: 3px;
-    cursor: pointer;
+    margin-right: 18px;
+}
+.title{
+    margin-top: 60px;
+    margin-bottom: 22px;
+}
+@media (max-width:500px){
+    .title{
+        text-align: center;
+    }
+    .plus{
+        top:0!important;
+        justify-content: center!important;
+        margin-bottom: 27px;
+    }
+    .overall{
+        text-align: center;
+    }
+    .confirm__tip{
+        text-align: center;
+    }
+    .ind{
+        text-align: left!important;
+    }
+    .modal__tips{
+        padding:10px!important;
+    }
+}
+.tip{
+    font-weight:300;
+    font-size: 17px;
+    color: #000000;
+}
+.tips{
+    margin-bottom: 40px;
+}
+.inputs{
+    gap:20px;
+    margin-bottom: 35px!important;
+}
+.input{
+    width:100%;
+}
+.inputs__wrapper{
+    gap:20px;
+    margin-bottom: 20px;
+}  
+.overall{
+    margin-bottom: 40px;
+}
+.confirm__tip{
+    font-weight: 400;
+    font-size: 14px;
+    color: #B9B9B9;
+    margin-bottom: 21px;
+}
+.plus{
+    display: flex;
+    align-items: center;
+    position: relative;
+    top:-30px;
+}
+.plus__text{
+    font-weight: 500;
+    font-size: 18px;
+    color: #000000;
+}
+.remove__button{
+    font-weight: 500;
+    font-size: 15px;
+    line-height: 17px;
+    color: #000000;
+    background: #E1E9F4;
+    border-radius: 10px;
+    padding:14px 24px;
+    height: fit-content;
+}
+.item{
+    margin-bottom: 25px;
+}
+.modal__title{
+    font-weight: 700;
+    font-size: 30px;
+    color: #000000;
+    margin-top: 44px;
+    margin-bottom: 38px;
+}
+.inds{
+    margin-bottom: 45px;
+}
+.modal__tips{
+    max-width: 491px;
+    background: #FFAD32;    
+    border-radius: 10px;
+    padding: 22px 0px 27px 29px;
+    margin-bottom: 52px;
 }

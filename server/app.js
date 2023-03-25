@@ -56,16 +56,16 @@ app.use("/user", userRoutes)
 // к примеру, HTTP-статус ответа операции
 //console.log(result.response.statusCode);
 
-mongoose.connect("mongodb://127.0.0.1:27017/?retryWrites=true&w=majority", {
-    useNewUrlParser: true, 
-    useUnifiedTopology: true 
-}).then(() => app.listen(5100, () => console.log("Server launched")))
-
-
-// mongoose.connect("mongodb+srv://user:qwerty123@cluster0.bfy5yoo.mongodb.net/?retryWrites=true&w=majority", {
+// mongoose.connect("mongodb://127.0.0.1:27017/?retryWrites=true&w=majority", {
 //     useNewUrlParser: true, 
 //     useUnifiedTopology: true 
 // }).then(() => app.listen(5100, () => console.log("Server launched")))
+
+
+mongoose.connect("mongodb+srv://user:qwerty123@cluster0.bfy5yoo.mongodb.net/?retryWrites=true&w=majority", {
+    useNewUrlParser: true, 
+    useUnifiedTopology: true 
+}).then(() => app.listen(5100, () => console.log("Server launched")))
 
     
 

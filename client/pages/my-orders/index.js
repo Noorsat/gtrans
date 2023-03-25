@@ -1,6 +1,6 @@
 import { Table, Button, Modal, Input, notification } from 'antd';
 import {useState, useEffect} from 'react';
-import { acceptRequest, addTrackerCode, changeStatusRequest, getOrders } from '../../http/orders';
+import { acceptRequest, addTrackerCode, changeStatusRequest, getOrders, getOrdersByAccountId } from '../../http/orders';
 import moment from 'moment'
 import { getRequests } from '../../http/request';
 import { useRouter } from 'next/router';
@@ -23,23 +23,24 @@ const MyOrders = ( ) => {
     const [requests, setRequests] = useState();
 
     useEffect(() => {
-        getOrders().then((res) => {
-          let repeatedOrders = [];
-          let newOrders = res.data.map((order, index) => {
-            if (!repeatedOrders.includes(order?.individualCode)){
-              order.rowSpan = res.data.filter((item, i) => item?.individualCode === order?.individualCode).length;
-            }
-            repeatedOrders.push(order?.individualCode);
-            return order;
-          })
-          setOrders(newOrders)
-        })
-        getRequests().then((res) => {
-            setRequests(res.data);
-        })
         const user = JSON.parse(localStorage.getItem("user"))
         if (user){
             var decoded = jwt_decode(user?.token);
+            const id = decoded?._id
+            getOrdersByAccountId(id).then((res) => {
+              // let repeatedOrders = [];
+              // let newOrders = res.data.map((order, index) => {
+              //   if (!repeatedOrders.includes(order?.individualCode)){
+              //     order.rowSpan = res.data.filter((item, i) => item?.individualCode === order?.individualCode).length;
+              //   }
+              //   repeatedOrders.push(order?.individualCode);
+              //   return order;
+              // })
+              setOrders(res.data)
+            })
+            // getRequests().then((res) => {
+            //     setRequests(res.data);
+            // })
             setUser(decoded);
         }else{
             router.push("/login")
@@ -130,6 +131,10 @@ const MyOrders = ( ) => {
       setOrderId(item._id);
       setOrderIndividualCode(item?.individualCode);
       setTrackerCodeModal(true);
+    }
+
+    const openOrderDetail = (id) => {
+      router.push("/order/"+id)      
     }
 
     const columns = [
@@ -314,8 +319,27 @@ const MyOrders = ( ) => {
 
       ]
     return (
-        <div>
-            <Table dataSource={orders?.filter(order => order?.accountId === user?._id)} columns={columns}  title={() => `Мои заказы`} scroll={{x:800}} pagination={false}/>
+        <div className={styles.my__orders}>
+          <div className='container'>
+            <div className={styles.my__orders_title}>
+              Мои заказы
+            </div>
+            <div className={styles.my__orders_items}>
+              {
+                orders?.filter(order => order?.accountId === user?._id).map(item => (
+                  <div className={styles.my__orders_item} onClick={() => openOrderDetail(item?._id)}>
+                  <div className={styles.my__orders_item_title}>
+                    {item.type}
+                  </div>
+                  <div className={styles.my__orders_item_trackCode}>
+                    Трек-код: {item.individualCode}
+                  </div>
+                </div> 
+                ))
+              }
+            </div>
+          </div>
+            {/* <Table dataSource={orders?.filter(order => order?.accountId === user?._id)} columns={columns}  title={() => `Мои заказы`} scroll={{x:800}} pagination={false}/> */}
             <Modal title="Посмотреть заявки" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}
               width={850}
               footer={

@@ -7,3 +7,65 @@
     font-weight: 400;
     color:#1890ff;
 }
+.title{
+    font-weight: 700;
+    font-size: 30px;
+    line-height: 34px;
+    padding-top:71px;
+    margin-bottom: 70px;
+}
+.account__items{
+    display: flex;
+    gap:20px;
+}
+.account__item{
+    max-width: 376px;
+    width: 100%;
+    border-bottom: 1px solid #B9B9B9;
+    padding-bottom: 16px;
+    margin-bottom: 34px;
+}
+.account__item_title{
+    font-weight: 300;
+    font-size: 12px;
+    line-height: 14px;
+    margin-bottom: 8px;
+}
+.account__item_text{
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 18px;
+}
+.account__button{
+    font-weight: 500;
+    font-size: 15px;
+    line-height: 17px;
+    text-align: center;
+    text-transform: uppercase;
+    color: #000000;
+    padding:16px 35px;
+    background: #FFAD32;
+    border-radius: 50px;
+    width: fit-content;
+    margin-top: 25px;
+}
+
+/* MEDIA */
+
+@media (max-width: 550px){
+    .account__items{
+        display: block;
+    }
+    .account__item{
+        max-width: 100%;
+        width: 100%;
+    }
+    .title{
+        padding-top: 30px;
+        margin-bottom: 49px;
+        text-align: center;
+    }
+    .account__button{
+        margin:0 auto;
+    }
+}

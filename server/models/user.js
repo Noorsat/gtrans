@@ -16,6 +16,18 @@ const userSchema = new Schema({
         type: String,
         required: true
     },
+    name: {
+        type: String,
+        required: true
+    },
+    surname: {
+        type: String,
+        required: true
+    },
+    dateOfBirth: {
+        type: Date,
+        required: true
+    },
     companyName:{
         type:String,
     },
@@ -43,7 +55,7 @@ userSchema.plugin(autoIncrement.plugin, {
     startAt:1
 })
 
-userSchema.statics.signup = async function(email, password, companyName, phoneNumber){
+userSchema.statics.signup = async function(email, password, companyName, phoneNumber, name, surname, dateOfBirth){
     if (!email || !password){
         throw Error("Все поля должны быть заполнены")
     }
@@ -61,7 +73,7 @@ userSchema.statics.signup = async function(email, password, companyName, phoneNu
     const salt = await bcrypt.genSalt(10)
     const hash = await bcrypt.hash(password, salt);
 
-    const user = await this.create({email, password: hash, companyName, phoneNumber})
+    const user = await this.create({email, password: hash, companyName, phoneNumber, name, surname, dateOfBirth})
 
     return user 
 }

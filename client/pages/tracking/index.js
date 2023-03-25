@@ -63,11 +63,94 @@ const Tracking = () => {
         })
     }
 
-    console.log(status)
+    console.log(diff)
 
     return (
-        <div>
-            <div className={styles.wrapper}>
+        <div className='container'>
+            <div className='d-md-flex d-block'>
+                <div className={styles.tracking__left}>
+                    <div className={styles.tracking__title}>
+                        Отследить заказ
+                    </div>
+                    <div className={styles.tracking__text}>
+                        Для отслеживания местонахождения вашего товара укажите свой трек-код, полученный от поставщика.
+                    </div>
+                    <div className={styles.tracking__form}>
+                        <div className={`input  tracking__input ${styles.tracking__input}`}>
+                            <Input placeholder='Ваш трек код' value={trackerCode} onChange={(e) => setTrackerCode(e.target.value)}/>
+                        </div>
+                        <div className={styles.tracking__button} onClick={searchOrder}>
+                            Проверить
+                        </div>
+                    </div>
+                </div>
+                {
+                    order &&
+                    <div className={styles.statuses}>
+                    <div className={`${styles.status} ${styles.active}`}>
+                        <div className={styles.status__wrapper}>
+                            <div className={styles.status__icon}>
+                                <img src='./tracking-1.svg' />
+                            </div>
+                            <div className={styles.status__text}>
+                                В пути на склад Гуанжоу
+                            </div>
+                        </div>
+                    </div>
+                <div className={`${styles.status} ${(status === 1 || status === 2) && styles.active}`}>
+                        <div className={styles.status__wrapper}>
+                            <div className={styles.status__icon}>
+                                <img src='./tracking-2.svg' />
+                            </div>
+                            <div className={styles.status__text}>
+                                Прибыл на склад в Гуанжоу
+                            </div>
+                        </div>
+                    </div>
+                    <div className={`${styles.status} ${((diff > 7 && status === 1) || status === 2) && styles.active}`}>
+                        <div className={styles.status__wrapper}>
+                            <div className={styles.status__icon}>
+                                <img src='./tracking-3.svg' />
+                            </div>
+                            <div className={styles.status__text}>
+                                Упаковано для отправки
+                            </div>
+                        </div>
+                    </div>
+                    <div className={`${styles.status} ${((diff > 15 && status === 1) || status === 2) && styles.active}`}>
+                        <div className={styles.status__wrapper}>
+                            <div className={styles.status__icon}>
+                                <img src='./tracking-4-5.svg' />
+                            </div>
+                            <div className={styles.status__text}>
+                                На пути к границе
+                            </div>
+                        </div>
+                    </div>
+                    <div className={`${styles.status} ${((diff > 18 && status === 1) || status === 2) && styles.active}`}>
+                        <div className={styles.status__wrapper}>
+                            <div className={styles.status__icon}>
+                                <img src='./tracking-4-5.svg' />
+                            </div>
+                            <div className={styles.status__text}>
+                                На пути к складу
+                            </div>
+                        </div>
+                    </div>
+                    <div className={`${styles.status} ${(status === 2) && styles.active}`}>
+                        <div className={styles.status__wrapper}>
+                            <div className={styles.status__icon}>
+                                <img src='./tracking-6.svg' />
+                            </div>
+                            <div className={styles.status__text}>
+                                Склад в Алматы
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                }
+            </div>
+            {/* <div className={styles.wrapper}>
                 <Input placeholder='Ваш трек код' value={trackerCode} onChange={(e) => setTrackerCode(e.target.value)}/>
                 <Button type='primary' onClick={searchOrder}>
                     Проверить
@@ -127,7 +210,7 @@ const Tracking = () => {
                     </div>
                 </div>
             }
-            
+             */}
         </div>
 
     )

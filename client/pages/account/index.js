@@ -4,6 +4,7 @@ import jwt_decode from "jwt-decode";
 import styles from '../../styles/Account.module.css';
 import { useRouter } from 'next/router';
 import { getId } from '../../components/validation';
+import moment from 'moment';
 
 
 const Account = () => {
@@ -21,6 +22,8 @@ const Account = () => {
         }
     }, [])
 
+    console.log(user);
+
     const exitHandler = () => {
         localStorage.removeItem("user")
         router.push("/login")
@@ -28,7 +31,71 @@ const Account = () => {
 
     return (
         <>
-            <Card title="Мой аккаунт" style={{ maxWidth:600, margin:"0 auto", marginTop:50}}>
+            <div className='container'>
+                <div className={styles.title}>
+                    Мои данные
+                </div>
+                <div className={styles.account__items}>
+                    <div className={styles.account__item}>
+                        <div className={styles.account__item_title}>
+                            Имя 
+                        </div>
+                        <div className={styles.account__item_text}>
+                            {user?.name}
+                        </div>
+                    </div>
+                    <div className={styles.account__item}>
+                        <div className={styles.account__item_title}>
+                            Фамилия 
+                        </div>
+                        <div className={styles.account__item_text}>
+                            {user?.surname}
+                        </div>
+                    </div>
+                    <div className={styles.account__item}>
+                        <div className={styles.account__item_title}>
+                            Дата рождения 
+                        </div>
+                        <div className={styles.account__item_text}>
+                            {moment(user?.dateOfBirth).format('YYYY-MM-DD') }
+                        </div>
+                    </div>
+                </div>
+                <div className={styles.account__items}>
+                    <div className={styles.account__item}>
+                        <div className={styles.account__item_title}>
+                            E-mail 
+                        </div>
+                        <div className={styles.account__item_text}>
+                            {user?.email}
+                        </div>
+                    </div>
+                    <div className={styles.account__item}>
+                        <div className={styles.account__item_title}>
+                            Телефон 
+                        </div>
+                        <div className={styles.account__item_text}>
+                            {user?.phoneNumber}
+                        </div>
+                    </div>
+                </div>
+                <div className={styles.account__items}>
+                    <div className={styles.account__item}>
+                        <div className={styles.account__item_title}>
+                            Адрес склада
+                        </div>
+                        <div className={styles.account__item_text}>
+                            广东省广州市白云区石门街道，窖心大道2号007库房创胜新天地后侧停车场
+                            手机号码: 13930311979
+                            所在地区
+                        </div>
+                    </div>
+                </div>
+                <div onClick={exitHandler} className={styles.account__button}>
+                    Выйти
+                </div>
+            </div>
+            {/* <Card title="Мой аккаунт" style={{ maxWidth:600, margin:"0 auto", marginTop:50}}>
                 <div className={styles.item}>
                     Email: <span className={styles.text}>{user?.email}</span>
                 </div>
@@ -41,13 +108,13 @@ const Account = () => {
                 {/* <div className={styles.item}>
                     Инд код: <span className={styles.text}>SM215-{getId(user?.id)}</span>
                 </div> */}
-                <div className="text-center">
+                {/* <div className="text-center">
                     <Button type='primary' onClick={exitHandler}>
                         Выйти
                     </Button>
                 </div>
-            </Card>
-        </>
+            </Card> */}
+        </> 
     )
 }
 

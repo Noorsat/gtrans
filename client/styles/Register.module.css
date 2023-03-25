@@ -1,0 +1,116 @@
+.register{
+    padding-top: 110px;
+    padding-bottom: 20px;
+}
+.wrapper{
+    display: flex;
+    align-items: center;
+    gap:118px;
+}
+.form__title{
+    font-weight: 700;
+    font-size: 30px;
+    color: #000000;
+    margin-bottom: 40px;
+}
+.form{
+    width: 100%;
+}
+.instruction{
+    background: #E1E9F4;
+    border-radius: 5px;
+    padding:37px 81px 53px 34px;
+    width: 100%;
+    height: fit-content;
+}
+.instruction__title{
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 23px;
+    color: #000000;  
+    margin-bottom: 45px;
+}
+.instruction__items{
+    margin-left: 8px;
+}
+.instruction__item{
+    display: flex;
+    align-items: center;
+    margin-bottom: 24px;
+}
+.instruction__item_number{
+    font-weight: 500;
+    font-size: 25px;
+    line-height: 29px;
+    color: #000000;
+    padding:14px 21px;
+    background: #FFFFFF;
+    border-radius: 60px;
+    margin-right: 19px;
+}
+.instruction__item_text{
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 20px;
+    color: #000000;
+}
+.register__button button{
+    font-weight: 500;
+    font-size: 15px;
+    text-transform: uppercase;
+    color: #000000;
+    background: #FFAD32;
+    border-radius: 50px;
+    padding:15px 25px;
+    outline: none;
+    border: none;
+    margin-right: 64px;
+}
+.login__link a{
+    color: #000000;
+}
+.instruction__mobile{
+    display: none;
+    background: #E1E9F4;
+    border-radius: 3px;
+    padding:20px 15px 25px 20px;
+    margin-bottom: 28px;
+}
+@media (max-width:500px){
+    .instruction{
+        display: none;
+    }
+    .instruction__mobile{
+        display: block;
+    }
+    .wrapper{
+        display: block;
+    }
+    .instruction__items{
+        display: flex;
+        gap:17px;
+    }
+    .instruction__item{
+        display: block;
+    }
+    .instruction__item_number{
+        margin-bottom: 7px;
+        width: fit-content;
+    }
+    .instruction__item_text{
+        font-size: 13px!important;
+    }
+    .form__title{
+        text-align:center;
+    }
+    .register__button button{
+        margin-right: 0;
+        margin-bottom: 15px;
+    }
+    .login__link{
+        margin-bottom: 30px;
+    }
+}
+.instruction__title_mobile{
+    text-align: center;
+}

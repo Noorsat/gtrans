@@ -5,8 +5,8 @@ import Order from '../models/order.js'
 import nodemailer from 'nodemailer';
 import validator from 'validator';
 
-const createToken = (_id, companyName, phoneNumber, email, id, secret) => {
-    return jwt.sign({_id, companyName, phoneNumber, email, id}, secret ? secret : process.env.SECRET, {expiresIn: '3d'})
+const createToken = (_id, companyName, phoneNumber, email, id, name, surname, dateOfBirth, secret) => {
+    return jwt.sign({_id, companyName, phoneNumber, email, id, name, surname, dateOfBirth}, secret ? secret : process.env.SECRET, {expiresIn: '3d'})
 }
 
 export const loginUser = async (req, res) => {
@@ -14,7 +14,7 @@ export const loginUser = async (req, res) => {
     try{
         const user = await User.login(email.toLowerCase(), password)
 
-        const token = createToken(user._id, user.companyName, user.phoneNumber, user.email, String(user.id));
+        const token = createToken(user._id, user.companyName, user.phoneNumber, user.email, String(user.id), user?.name, user?.surname, user?.dateOfBirth);
 
         res.status(200).json({email, token, role: user?.role})
     }catch(error){
@@ -24,12 +24,12 @@ export const loginUser = async (req, res) => {
 } 
 
 export const signupUser = async (req, res) => {
-    const {email, password, companyName, phoneNumber} = req.body;
+    const {email, password, companyName, phoneNumber, name, surname, dateOfBirth} = req.body;
 
     try{
-        const user = await User.signup(email.toLowerCase(), password, companyName, phoneNumber)
+        const user = await User.signup(email.toLowerCase(), password, companyName, phoneNumber, name, surname, dateOfBirth)
 
-        const token = createToken(user._id, user.companyName, user.phoneNumber, user.email, String(user.id));
+        const token = createToken(user._id, user.companyName, user.phoneNumber, user.email, String(user.id), user?.name, user?.surname, user?.dateOfBirth);
 
         res.status(200).json({email, token})
     }catch(error){

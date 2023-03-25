@@ -1,6 +1,7 @@
 import { Button, Checkbox, Form, Input, notification } from 'antd';
 import Link from 'next/link'
 import { useRouter } from 'next/router';
+import styles from './../../styles/Login.module.css';
 import {useState, useEffect} from 'react';
 import { login } from '../../http/auth';
 
@@ -31,9 +32,13 @@ const Login = () => {
       };
     
       return (
-        <Form
+        <div className={styles.login}> 
+          <div className={styles.login__title}>
+            Войти в личный кабинет
+          </div>
+          <Form
           name="basic"
-          className="mt-5 pt-5 w-50 ms-auto me-auto"
+          className={`ms-auto me-auto input ${styles.form}`}
           initialValues={{
             remember: true,
           }}
@@ -42,7 +47,6 @@ const Login = () => {
           autoComplete="off"
         >
           <Form.Item
-            label="Email"
             name="email"
             labelCol={{span:3}}
             rules={[
@@ -51,12 +55,12 @@ const Login = () => {
                 message: 'Пожалуйста, введите свой адрес электронной почты!', 
               },
             ]}
+            className='email-input'
           >
-            <Input onChange={(e) => setUser({...user, email: e.target.value})} value={user?.email}/>
+            <Input onChange={(e) => setUser({...user, email: e.target.value})} value={user?.email} placeholder="E-mail"/>
           </Form.Item>
     
           <Form.Item
-            label="Пароль"
             name="password"
             labelCol={{span:3}}
             rules={[
@@ -65,17 +69,28 @@ const Login = () => {
                 message: 'Пожалуйста, введите ваш пароль!',
               },
             ]}
+            className="input"
           >
-            <Input.Password onChange={(e) => setUser({...user, password: e.target.value})} value={user?.password}/>
+            <Input type='password' onChange={(e) => setUser({...user, password: e.target.value})} value={user?.password} placeholder="Пароль"/>
           </Form.Item>
         <Form.Item
             name="remember"
             valuePropName="checked"
-            style={{marginBottom:"12px!important"}}
+            style={{textAlign:"center"}}
         >
-            <Checkbox>Запомнить меня</Checkbox>
+            <Checkbox className='remember__label'>Запомнить меня</Checkbox>
         </Form.Item>
-        <Form.Item
+        <div className='d-flex justify-content-center align-items-center'>
+          <div className={styles.login__button}>
+            <button type="primary" htmlType="submit">
+              Войти
+            </button>
+          </div>
+          <div className={styles.register__link}>
+            <Link href={"/register"}>Регистрация</Link>
+          </div>
+        </div>
+        {/* <Form.Item
             style={{marginBottom:0}}
         >
             <Link href={"/register"}>Регистрация</Link>
@@ -86,13 +101,13 @@ const Login = () => {
           <Link href={"/forgot"}>Забыли пароль?</Link>
       </Form.Item>
           <Form.Item
-            
           >
             <Button type="primary" htmlType="submit">
                 Войти
             </Button>
-          </Form.Item>
+          </Form.Item> */}
         </Form>
+        </div>
       );
 }
 
