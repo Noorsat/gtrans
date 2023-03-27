@@ -42,6 +42,15 @@
         font-size:10px;
         padding-bottom: 100px!important;
     }
+    .datepicker{
+        padding-left: 13px!important;
+        height: 40px!important;
+    }
+    #basic_dateOfBirth{
+        padding-left: 0;
+        font-size: 10px!important;
+        height:40px!important;
+    }
 }
 .comment input{
     padding-bottom: 184px;
@@ -119,7 +128,7 @@
     width: 100%!important;
 }
 .datepicker{
-    height: 64px!important;
+    height: 64px;
     padding-left: 0px;
     border-radius: 5px!important;
 }

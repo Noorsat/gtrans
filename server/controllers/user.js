@@ -78,8 +78,8 @@ export const forgotPassword = async (req, res) => {
             return res.status(404).json({message: "Пользователь не существует!"})
         }
         const secret = process.env.SECRET + oldUser?.password;
-        const token = createToken(oldUser._id, oldUser.companyName, oldUser.phoneNumber, oldUser.email, secret);
-        const link = `https://frontend.gtrans.kz/reset/${oldUser?._id}/${token}`
+        const token = createToken(oldUser._id, oldUser.companyName, oldUser.phoneNumber, oldUser.email, String(oldUser?.id), oldUser?.name, oldUser?.surname, oldUser?.dateOfBirth, secret);
+        const link = `http://localhost:3000/reset/${oldUser?._id}/${token}`
         var transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -132,9 +132,6 @@ export const resetPasswordPost = async (req, res) => {
     const oldUser = await User.findOne({_id:id})
     if (!oldUser){
         return res.status(404).json({message: "Пользователь не существует!"})
-    }
-    if (!validator.isStrongPassword(password)){
-        return res.status(404).json({message: "Пароль недостаточно надежный"})
     }
     const secret = process.env.SECRET + oldUser?.password; 
     try{

@@ -77,7 +77,9 @@ const Order = () => {
               <button className='track__button' onClick={trackcodeAcceptHandler}>
                 Сохранить
               </button>
-            ]}>
+            ]}
+            onCancel={() => setModal(false)}
+            >
                 <div className={styles.order__detail_item_title} style={{fontSize:16, marginBottom: 20, marginTop:20}}>
                     Укажите трек код полученный от поставщика/завода
                 </div>

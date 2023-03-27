@@ -80,6 +80,13 @@ const Login = () => {
         >
             <Checkbox className='remember__label'>Запомнить меня</Checkbox>
         </Form.Item>
+        <Form.Item
+          style={{textAlign:"center"}}
+        > 
+          <div className={styles.register__link}>
+            <Link href={"/forgot"}>Забыли пароль?</Link>
+          </div>
+      </Form.Item>
         <div className='d-flex justify-content-center align-items-center'>
           <div className={styles.login__button}>
             <button type="primary" htmlType="submit">
@@ -94,13 +101,9 @@ const Login = () => {
             style={{marginBottom:0}}
         >
             <Link href={"/register"}>Регистрация</Link>
-        </Form.Item>
-        <Form.Item
-          style={{marginBottom:8}}
-        >
-          <Link href={"/forgot"}>Забыли пароль?</Link>
-      </Form.Item>
-          <Form.Item
+        </Form.Item> */}
+        
+          {/* <Form.Item
           >
             <Button type="primary" htmlType="submit">
                 Войти

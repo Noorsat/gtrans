@@ -134,7 +134,7 @@ const Tracking = () => {
                             </div>
                             <div className={styles.status__text}>
                                 На пути к складу
-                            </div>
+                        </div>
                         </div>
                     </div>
                     <div className={`${styles.status} ${(status === 2) && styles.active}`}>
