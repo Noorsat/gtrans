@@ -79,7 +79,7 @@ export const forgotPassword = async (req, res) => {
         }
         const secret = process.env.SECRET + oldUser?.password;
         const token = createToken(oldUser._id, oldUser.companyName, oldUser.phoneNumber, oldUser.email, String(oldUser?.id), oldUser?.name, oldUser?.surname, oldUser?.dateOfBirth, secret);
-        const link = `http://localhost:3000/reset/${oldUser?._id}/${token}`
+        const link = `https://frontend.gtrans.kz/reset/${oldUser?._id}/${token}`
         var transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
