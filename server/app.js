@@ -7,6 +7,7 @@ import ordersRoutes from './routes/orders.js'
 import requestsRoutes from './routes/requests.js'
 import userRoutes from './routes/user.js'
 import safePhoneRoutes from './routes/safePhoneUser.js';
+import pricesRoutes from './routes/prices.js';
 //import { Client } from 'amocrm-js'
 
 dotenv.config();
@@ -23,6 +24,7 @@ app.use("/safe-phone", safePhoneRoutes)
 app.use('/orders', ordersRoutes)
 app.use('/requests', requestsRoutes)
 app.use("/user", userRoutes)
+app.use("/prices", pricesRoutes)
 
 // const client = new Client({
 //     // логин пользователя в портале, где адрес портала domain.amocrm.ru
@@ -56,16 +58,16 @@ app.use("/user", userRoutes)
 // к примеру, HTTP-статус ответа операции
 //console.log(result.response.statusCode);
 
-mongoose.connect("mongodb://127.0.0.1:27017/?retryWrites=true&w=majority", {
-    useNewUrlParser: true, 
-    useUnifiedTopology: true 
-}).then(() => app.listen(5100, () => console.log("Server launched")))
-
-
-// mongoose.connect("mongodb+srv://user:qwerty123@cluster0.bfy5yoo.mongodb.net/?retryWrites=true&w=majority", {
+// mongoose.connect("mongodb://127.0.0.1:27017/?retryWrites=true&w=majority", {
 //     useNewUrlParser: true, 
 //     useUnifiedTopology: true 
 // }).then(() => app.listen(5100, () => console.log("Server launched")))
+
+
+mongoose.connect("mongodb+srv://user:qwerty123@cluster0.bfy5yoo.mongodb.net/?retryWrites=true&w=majority", {
+    useNewUrlParser: true, 
+    useUnifiedTopology: true 
+}).then(() => app.listen(5100, () => console.log("Server launched")))
 
     
 

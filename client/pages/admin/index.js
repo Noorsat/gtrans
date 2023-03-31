@@ -2,7 +2,8 @@ import {
     UserOutlined,
     DropboxOutlined,
     MenuUnfoldOutlined,
-    MenuFoldOutlined
+    MenuFoldOutlined,
+    MoneyCollectOutlined,
   } from '@ant-design/icons';
 import { Button, Checkbox, Input, Menu, Modal, notification, Table } from 'antd';
 import { useState, useEffect } from 'react';
@@ -12,6 +13,7 @@ import { acceptProduct, addTrackerCode, changePriceByAdmin, getOrders, getOrders
 import styles from './Admin.module.css';
 import { getId } from '../../components/validation';
 import { useRouter } from 'next/router';
+import { changePrice, getPrices } from '../../http/price';
 
   function getItem(label, key, icon, children, type) {
     return {
@@ -26,6 +28,7 @@ import { useRouter } from 'next/router';
   const items = [
     getItem('Пользователи', 'Пользователи', <UserOutlined />),
     getItem('Заказы', 'Заказы', <DropboxOutlined />),
+    getItem('Цены', 'Цены', <MoneyCollectOutlined />)
   ];
 
 
@@ -46,10 +49,11 @@ import { useRouter } from 'next/router';
     const [selectedPriceId, setSelectedPriceId] = useState();
     const [selectedPriceValue, setSelectedPriceValue] = useState();
     const [priceModal, setPriceModal] = useState(false);
+    const [hoz, setHoz] = useState();
+    const [tnp, setTnp] = useState();
+    const [priceId, setPriceId] = useState();
 
     const router = useRouter();
-
-    console.log(selectedPriceValue)
 
     useEffect(() => {
         const user = JSON.parse(localStorage.getItem("user"))
@@ -59,6 +63,11 @@ import { useRouter } from 'next/router';
         }else{
             router.push("/login")
         }
+        getPrices().then((res) => {
+          setHoz(res.data[0]?.hoz);
+          setTnp(res.data[0]?.tnp);
+          setPriceId(res.data[0]?._id);
+        })
     }, [])
 
     const toggleCollapsed = () => {
@@ -242,6 +251,32 @@ import { useRouter } from 'next/router';
       setPriceModal(false);
     }
 
+    const hozInputHandler = (value, name) => {
+      setHoz({...hoz, [name]: value === '' ? '' : parseFloat(value)})
+    }
+
+    const tnpInputHandler = (value, name) => {
+      setTnp({...tnp, [name]: value === '' ? '' : parseFloat(value)})
+    }
+
+    const savePriceHandler = () => {
+      const body = {
+        hoz: hoz,
+        tnp:tnp
+      }
+      changePrice(priceId, body).then((res) => {
+        if (res.status === 200){
+          notification['success']({
+            message:"Вы изменили цену"
+          })
+        }else{
+          notification['error']({
+            message:'Не удалось поменять цены'
+          })
+        }
+      })
+    } 
+
 
     const menuChangeHandler = (e) => {
         if (e.key === "Пользователи"){
@@ -395,6 +430,8 @@ import { useRouter } from 'next/router';
                     },
                 ]
             )
+        }else if (e.key === 'Цены'){
+          setDashboardMode('Цены')
         }
     }
     return (
@@ -462,7 +499,241 @@ import { useRouter } from 'next/router';
             dashboardMode === "Пользователи" && 
             <Input placeholder="Поиск по номеру телефона" className={styles.input} phoneInput={phoneInput} onChange={(e) => phoneInputHandler(e)}/>
           }
+          {
+            (dashboardMode === "Пользователи" || dashboardMode === 'Заказы') && 
             <Table columns={dashboardColumns} dataSource={dashboardData} style={{width:"100%"}} pagination={false}/>
+          }
+          {
+            dashboardMode === 'Цены' && (
+              <>
+                <table className={styles.tablesss}>
+                  <thead>
+                    <th>
+                      Вес в 1 кубе (плотность)
+                    </th>
+                    <th>  
+                      Цена ($) за 1 кг <br></br>Хозка  
+                    </th>
+                    <th>
+                      Цена ($) за 1 кг <br></br>ТНП  
+                    </th>
+                  </thead>
+                  <tr>
+                    <td>
+                      1000 и выше
+                    </td>
+                    <td>  
+                      <input type='number' value={hoz?.more1000} onChange={(e) => hozInputHandler(e.target.value, 'more1000')}/>
+                    </td>
+                    <td>
+                      <input type='number' value={tnp?.more1000} onChange={(e) => tnpInputHandler(e.target.value, 'more1000')}/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      800-1000
+                    </td>
+                    <td>  
+                      <input type='number'  value={hoz?.more800Less1000} onChange={(e) => hozInputHandler(e.target.value, 'more800Less1000')}/>
+                    </td>
+                    <td>
+                      <input type='number' value={tnp?.more800Less1000} onChange={(e) => tnpInputHandler(e.target.value, 'more800Less1000')}/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      600-800
+                    </td>
+                    <td>  
+                      <input type='number' value={hoz?.more600Less800} onChange={(e) => hozInputHandler(e.target.value, 'more600Less800')}/>
+                    </td>
+                    <td>
+                      <input type='number' value={tnp?.more600Less800} onChange={(e) => tnpInputHandler(e.target.value, 'more600Less800')}/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      400-600
+                    </td>
+                    <td>  
+                      <input type='number' value={hoz?.more400Less600} onChange={(e) => hozInputHandler(e.target.value, 'more400Less600')}/>
+                    </td>
+                    <td>
+                      <input type='number' value={tnp?.more400Less600} onChange={(e) => tnpInputHandler(e.target.value, 'more400Less600')}/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      350-400
+                    </td>
+                    <td>  
+                      <input type='number' value={hoz?.more350Less400} onChange={(e) => hozInputHandler(e.target.value, 'more350Less400')}/>
+                    </td>
+                    <td>
+                      <input type='number' value={tnp?.more350Less400} onChange={(e) => tnpInputHandler(e.target.value, 'more350Less400')}/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      300-350
+                    </td>
+                    <td>  
+                      <input type='number' value={hoz?.more300Less350} onChange={(e) => hozInputHandler(e.target.value, 'more300Less350')}/>
+                    </td>
+                    <td>
+                      <input type='number' value={tnp?.more300Less350} onChange={(e) => tnpInputHandler(e.target.value, 'more300Less350')}/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      250-300
+                    </td>
+                    <td>  
+                      <input type='number' value={hoz?.more250Less300} onChange={(e) => hozInputHandler(e.target.value, 'more250Less300')}/>
+                    </td>
+                    <td>
+                      <input type='number' value={tnp?.more250Less300} onChange={(e) => tnpInputHandler(e.target.value, 'more250Less300')}/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      200-250
+                    </td>
+                    <td>  
+                      <input type='number' value={hoz?.more200Less250} onChange={(e) => hozInputHandler(e.target.value, 'more200Less250')}/>
+                    </td>
+                    <td>
+                      <input type='number' value={tnp?.more200Less250} onChange={(e) => tnpInputHandler(e.target.value, 'more200Less250')}/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      190-200
+                    </td>
+                    <td>  
+                      <input type='number' value={hoz?.more190Less200} onChange={(e) => hozInputHandler(e.target.value, 'more190Less200')}/>
+                    </td>
+                    <td>
+                      <input type='number' value={tnp?.more190Less200} onChange={(e) => tnpInputHandler(e.target.value, 'more190Less200')}/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      180-190
+                    </td>
+                    <td>  
+                      <input type='number' value={hoz?.more180Less190} onChange={(e) => hozInputHandler(e.target.value, 'more180Less190')}/>
+                    </td>
+                    <td>
+                      <input type='number' value={tnp?.more180Less190} onChange={(e) => tnpInputHandler(e.target.value, 'more180Less190')}/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      170-180
+                    </td>
+                    <td>  
+                      <input type='number' value={hoz?.more170Less180} onChange={(e) => hozInputHandler(e.target.value, 'more170Less180')}/>
+                    </td>
+                    <td>
+                      <input type='number' value={tnp?.more170Less180} onChange={(e) => tnpInputHandler(e.target.value, 'more170Less180')}/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      160-170
+                    </td>
+                    <td>  
+                      <input type='number' value={hoz?.more160Less170} onChange={(e) => hozInputHandler(e.target.value, 'more160Less170')}/>
+                    </td>
+                    <td>
+                      <input type='number' value={tnp?.more160Less170} onChange={(e) => tnpInputHandler(e.target.value, 'more160Less170')}/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      150-160
+                    </td>
+                    <td>  
+                      <input type='number' value={hoz?.more150Less160} onChange={(e) => hozInputHandler(e.target.value, 'more150Less160')}/>
+                    </td>
+                    <td>
+                      <input type='number' value={tnp?.more150Less160} onChange={(e) => tnpInputHandler(e.target.value, 'more150Less160')}/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      140-150
+                    </td>
+                    <td>  
+                      <input type='number' value={hoz?.more140Less150} onChange={(e) => hozInputHandler(e.target.value, 'more140Less150')}/>
+                    </td>
+                    <td>
+                      <input type='number' value={tnp?.more140Less150} onChange={(e) => tnpInputHandler(e.target.value, 'more140Less150')}/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      130-140
+                    </td>
+                    <td>  
+                      <input type='number' value={hoz?.more130Less140} onChange={(e) => hozInputHandler(e.target.value, 'more130Less140')}/>
+                    </td>
+                    <td>
+                      <input type='number' value={tnp?.more130Less140} onChange={(e) => tnpInputHandler(e.target.value, 'more130Less140')}/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      120-130
+                    </td>
+                    <td>  
+                      <input type='number' value={hoz?.more120Less130} onChange={(e) => hozInputHandler(e.target.value, 'more120Less130')}/>
+                    </td>
+                    <td>
+                      <input type='number' value={tnp?.more120Less130} onChange={(e) => tnpInputHandler(e.target.value, 'more120Less130')}/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      110-120
+                    </td>
+                    <td>  
+                      <input type='number' value={hoz?.more110Less120} onChange={(e) => hozInputHandler(e.target.value, 'more110Less120')}/>
+                    </td>
+                    <td>
+                      <input type='number' value={tnp?.more110Less120} onChange={(e) => tnpInputHandler(e.target.value, 'more110Less120')}/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      100-110
+                    </td>
+                    <td>  
+                      <input type='number' value={hoz?.more100Less110} onChange={(e) => hozInputHandler(e.target.value, 'more100Less110')}/>
+                    </td>
+                    <td>
+                      <input type='number' value={tnp?.more100Less110} onChange={(e) => tnpInputHandler(e.target.value, 'more100Less110')}/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      100 и ниже
+                    </td>
+                    <td>  
+                      <input type='number' value={hoz?.less100} onChange={(e) => hozInputHandler(e.target.value, 'less100')}/>
+                    </td>
+                    <td>
+                      <input type='number' value={tnp?.less100} onChange={(e) => tnpInputHandler(e.target.value, 'less100')}/>
+                    </td>
+                  </tr>
+                </table>
+                <Button type='primary' className={styles.button} onClick={savePriceHandler}>
+                  Сохранить
+                </Button>
+              </>
+            )
+          }
         </div>
       </div>
     );

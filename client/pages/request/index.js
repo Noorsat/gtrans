@@ -8,6 +8,7 @@ import { useRouter } from 'next/router';
 import { getId } from '../../components/validation';
 import { height } from '@mui/system';
 import Link from 'next/link';
+import { getPrices } from '../../http/price';
 
 
 const Request = () => {
@@ -39,6 +40,8 @@ const Request = () => {
     const [indCode, setIndCode] = useState();
     const [volumeModal, setVolumeModal] = useState(false);
     const [mobile, setMobile] = useState(false);
+    const [hoz, setHoz] = useState();
+    const [tnp, setTnp] = useState();
 
     useEffect(() => {
         const user = JSON.parse(localStorage.getItem("user"))
@@ -51,6 +54,10 @@ const Request = () => {
         if (window.innerWidth < 500){
           setMobile(true);
         }
+        getPrices().then((res) => {
+          setHoz(res.data[0]?.hoz);
+          setTnp(res.data[0]?.tnp);
+        })
     }, [])
 
       const createOrderHandler = () => {
@@ -127,84 +134,84 @@ const Request = () => {
             if (order?.type === "first"){
                 if (density < 100){
                   const cup = (Number(order?.len) * Number(order?.width) * Number(order?.height))
-                  totalPrice += (cup* 490)* order?.count
+                  totalPrice += (cup * hoz?.less100)* order?.count
                 }else if (density > 100 && density <= 110){
-                  totalPrice += 4.4 * Number(order?.weight) * order?.count
+                  totalPrice += hoz?.more100Less110 * Number(order?.weight) * order?.count
                 }else if (density > 110 && density <= 120){
-                  totalPrice += 4.3 * Number(order?.weight) * order?.count
+                  totalPrice += hoz?.more110Less120 * Number(order?.weight) * order?.count
                 }else if (density > 120 && density <= 130){
-                  totalPrice += 4.2 * Number(order?.weight) * order?.count
+                  totalPrice += hoz?.more120Less130 * Number(order?.weight) * order?.count
                 }else if (density > 130 && density <= 140){
-                  totalPrice += 4.1 * Number(order?.weight) * order?.count
+                  totalPrice += hoz?.more130Less140 * Number(order?.weight) * order?.count
                 }else if (density > 140 && density <= 150){
-                  totalPrice += 4 * Number(order?.weight) * order?.count
+                  totalPrice += hoz?.more140Less150 * Number(order?.weight) * order?.count
                 }else if (density > 150 && density <= 160){
-                  totalPrice += 3.9 * Number(order?.weight) * order?.count
+                  totalPrice += hoz?.more150Less160 * Number(order?.weight) * order?.count
                 }else if(density > 160 && density <= 170){
-                  totalPrice += 3.8 * Number(order?.weight) * order?.count
+                  totalPrice += hoz?.more150Less160 * Number(order?.weight) * order?.count
                 }else if(density > 170 && density <= 180){
-                  totalPrice += 3.7 * Number(order?.weight)* order?.count
+                  totalPrice += hoz?.more170Less180 * Number(order?.weight)* order?.count
                 }else if(density > 180 && density <= 190){
-                  totalPrice += (3.6 * Number(order?.weight))* order?.count
+                  totalPrice += (hoz?.more180Less190 * Number(order?.weight))* order?.count
                 }else if(density > 190 && density <= 200){
-                  totalPrice += (3.5 * Number(order?.weight))* order?.count
+                  totalPrice += (hoz?.more190Less200 * Number(order?.weight))* order?.count
                 }else if (density > 200 && density <= 250){
-                  totalPrice += (3.4 * Number(order?.weight))* order?.count
+                  totalPrice += (hoz?.more200Less250 * Number(order?.weight))* order?.count
                 }else if (density > 250 && density <= 300){
-                  totalPrice += (3.3 * Number(order?.weight))* order?.count
+                  totalPrice += (hoz?.more250Less300 * Number(order?.weight))* order?.count
                 }else if (density > 300 && density <= 350){
-                  totalPrice += (3.2 * Number(order?.weight))* order?.count
+                  totalPrice += (hoz?.more300Less350 * Number(order?.weight))* order?.count
                 }else if (density > 350 && density <= 400){
-                  totalPrice += (3.1 * Number(order?.weight))* order?.count
+                  totalPrice += (hoz?.more350Less400 * Number(order?.weight))* order?.count
                 }else if (density > 400 && density <= 600){
-                  totalPrice += (3 * Number(order?.weight))* order?.count
+                  totalPrice += (hoz?.more400Less600 * Number(order?.weight))* order?.count
                 }else if (density > 600 && density <= 800){
-                  totalPrice += (2.9 * Number(order?.weight))* order?.count
+                  totalPrice += (hoz?.more600Less800 * Number(order?.weight))* order?.count
                 }else if (density > 800 && density <= 1000){
-                  totalPrice += (2.8 * Number(order?.weight))* order?.count
+                  totalPrice += (hoz?.more800Less1000 * Number(order?.weight))* order?.count
                 }else if (density > 1000){
-                  totalPrice += (2.7 * Number(order?.weight))* order?.count
+                  totalPrice += (hoz?.more1000 * Number(order?.weight))* order?.count
                 }
           }else if(order?.type === "second"){
             if (density < 100){
               const cup = (Number(order?.len) * Number(order?.width) * Number(order?.height))
-              totalPrice += (cup * 580)* order?.count
+              totalPrice += (cup * tnp?.less100)* order?.count
             }else if (density >= 100 && density <= 110){
-              totalPrice += (5.5 * Number(order?.weight))* order?.count
+              totalPrice += (tnp?.more100Less110 * Number(order?.weight))* order?.count
             }else if (density > 110 && density <= 120){
-              totalPrice += (5.4 * Number(order?.weight)) * order?.count
+              totalPrice += (tnp?.more110Less120 * Number(order?.weight)) * order?.count
             }else if (density > 120 && density <= 130){
-              totalPrice += (5.3 * Number(order?.weight))* order?.count
+              totalPrice += (tnp?.more120Less130 * Number(order?.weight))* order?.count
             }else if (density > 130 && density <= 140){
-              totalPrice += (5.2 * Number(order?.weight))* order?.count
+              totalPrice += (tnp?.more130Less140 * Number(order?.weight))* order?.count
             }else if (density > 140 && density <= 150){
-              totalPrice += (5.1 * Number(order?.weight))* order?.count
+              totalPrice += (tnp?.more140Less150 * Number(order?.weight))* order?.count
             }else if (density > 150 && density <= 160){
-              totalPrice += (5 * Number(order?.weight))* order?.count
+              totalPrice += (tnp?.more150Less160 * Number(order?.weight))* order?.count
             }else if(density > 160 && density <= 170){
-              totalPrice += (4.9 * Number(order?.weight))* order?.count
+              totalPrice += (tnp?.more160Less170 * Number(order?.weight))* order?.count
             }else if(density > 170 && density <= 180){
-              totalPrice += (4.8 * Number(order?.weight))* order?.count
+              totalPrice += (tnp?.more170Less180 * Number(order?.weight))* order?.count
             }else if(density > 180 && density <= 190){
-              totalPrice += (4.7 * Number(order?.weight))* order?.count
+              totalPrice += (tnp?.more180Less190 * Number(order?.weight))* order?.count
             }else if(density > 190 && density <= 200){
-              totalPrice += (4.6 * Number(order?.weight))* order?.count
+              totalPrice += (tnp?.more190Less200 * Number(order?.weight))* order?.count
             }else if (density > 200 && density <= 250){
-              totalPrice += (4.5 * Number(order?.weight))* order?.count
+              totalPrice += (tnp?.more200Less250 * Number(order?.weight))* order?.count
             }else if (density > 250 && density <= 300){
-              totalPrice += (4.4 * Number(order?.weight))* order?.count
+              totalPrice += (tnp?.more250Less300 * Number(order?.weight))* order?.count
             }else if (density > 300 && density <= 350){
-              totalPrice += (4.3 * Number(order?.weight))* order?.count
+              totalPrice += (tnp?.more300Less350 * Number(order?.weight))* order?.count
             }else if (density > 350 && density <= 400){
-              totalPrice += (4.2 * Number(order?.weight))* order?.count
+              totalPrice += (tnp?.more350Less400 * Number(order?.weight))* order?.count
             }else if (density > 400 && density <= 600){
-              totalPrice += (4.1 * Number(order?.weight))* order?.count
+              totalPrice += (tnp?.more400Less600 * Number(order?.weight))* order?.count
             }else if (density > 600 && density <= 800){
-              totalPrice += (4.1 * Number(order?.weight))* order?.count
+              totalPrice += (tnp?.more600Less800 * Number(order?.weight))* order?.count
             }else if (density > 800 && density <= 1000){
-              totalPrice += (4.1 * Number(order?.weight))* order?.count
+              totalPrice += (tnp?.more800Less1000 * Number(order?.weight))* order?.count
             }else if (density > 1000){
-              totalPrice += (4.1 * Number(order?.weight))* order?.count
+              totalPrice += (tnp?.more1000 * Number(order?.weight))* order?.count
             }
           }
           }
