@@ -14,6 +14,7 @@ import styles from './Admin.module.css';
 import { getId } from '../../components/validation';
 import { useRouter } from 'next/router';
 import { changePrice, getPrices } from '../../http/price';
+import moment from 'moment';
 
   function getItem(label, key, icon, children, type) {
     return {
@@ -53,6 +54,10 @@ import { changePrice, getPrices } from '../../http/price';
     const [tnp, setTnp] = useState();
     const [priceId, setPriceId] = useState();
 
+    const [allOrders, setAllOrders] = useState();
+    const [individualCodeInput, setIndividualCodeInput] = useState("");
+    const [trackCodeInput, setTrackCodeInput] = useState('');
+
     const router = useRouter();
 
     useEffect(() => {
@@ -69,6 +74,26 @@ import { changePrice, getPrices } from '../../http/price';
           setPriceId(res.data[0]?._id);
         })
     }, [])
+
+    useEffect(() => {
+      if (individualCodeInput.length === 0){
+        setDashboardData(allOrders);
+      }
+      if (individualCodeInput?.length > 0){
+        setTrackCodeInput("");
+        setDashboardData(allOrders?.filter(item => item?.individualCode?.includes(individualCodeInput)))
+      }
+    }, [individualCodeInput])
+
+    useEffect(() => {
+      if (trackCodeInput.length === 0){
+        setDashboardData(allOrders);
+      }
+      if (trackCodeInput?.length > 0){
+        setDashboardData(allOrders?.filter(item => item?.trackCode?.includes(trackCodeInput)))
+      }
+
+    }, [trackCodeInput])
 
     const toggleCollapsed = () => {
       setCollapsed(!collapsed);
@@ -320,10 +345,23 @@ import { changePrice, getPrices } from '../../http/price';
                 repeatedOrders.push(order?.individualCode);
                 return order;
               })
+              setAllOrders(newOrders)
               setDashboardData(newOrders)
             })
             setDashboardColumns(
                 [
+                  {
+                    title: 'Дата создание заказа',
+                    onCell: (_, index) => ({
+                      rowSpan: _.rowSpan ? _.rowSpan : 0
+                    }),
+                    render: (e, item) => (
+                      <>
+                        {moment(item?.createdAt).format("YYYY-MM-DD HH:mm:ss")}
+                      </>
+                    ),
+                    sorter: (a, b) => moment(a?.createdAt).date() - moment(b?.createdAt).date()
+                  },
                   {
                     title:"Прибыло на склад",
                     onCell: (_, index) => ({
@@ -333,7 +371,7 @@ import { changePrice, getPrices } from '../../http/price';
                       <div className='d-flex justify-content-center'>
                         <Checkbox onChange={(e) => trackerHandler(e, item)} defaultChecked={item?.status >= 1} />
                       </div>
-                    )
+                    ),
                   }, 
                   {
                     title:"Прибыло в Алмату",
@@ -357,7 +395,7 @@ import { changePrice, getPrices } from '../../http/price';
                         <div>
                           {item?.trackCode}
                         </div>
-                    )
+                    ),
                   },
                   {
                     title:"Наименование груза",
@@ -400,9 +438,9 @@ import { changePrice, getPrices } from '../../http/price';
                     key: 'individualCode',
                     onCell: (_, index) => ({
                       rowSpan: _.rowSpan ? _.rowSpan : 0
-                    })
+                    }),
                   },
-                  {
+                  { 
                     title:'Цена',
                     dataIndex:'price',
                     key:'price',
@@ -419,7 +457,8 @@ import { changePrice, getPrices } from '../../http/price';
                           setPriceModal(true)                          
                         }}>Изменить цену</Button>
                       </>
-                    )
+                    ),
+                    sorter: (a,b) => a.price - b.price
                   },
                     {
                         title:"Заказщик",
@@ -498,6 +537,14 @@ import { changePrice, getPrices } from '../../http/price';
           {
             dashboardMode === "Пользователи" && 
             <Input placeholder="Поиск по номеру телефона" className={styles.input} phoneInput={phoneInput} onChange={(e) => phoneInputHandler(e)}/>
+          }
+          {
+            dashboardMode === 'Заказы' &&
+            <>
+              <Input placeholder='Поиск по инд коду' className={styles.input} value={individualCodeInput} onChange={(e) => setIndividualCodeInput(e.target.value)} />
+              <Input placeholder='Поиск по трекингу' className={styles.input} value={trackCodeInput} onChange={(e) => setTrackCodeInput(e.target.value)} />
+            </>
+
           }
           {
             (dashboardMode === "Пользователи" || dashboardMode === 'Заказы') && 
