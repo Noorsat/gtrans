@@ -50,6 +50,9 @@ const Request = () => {
             setUser(decoded);
         }else{
           router.push("/login")
+          notification['warning']({
+            message:'Чтобы использовать калькулятор вам надо авторизоваться' 
+          })
         }
         if (window.innerWidth < 500){
           setMobile(true);

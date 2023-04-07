@@ -54,7 +54,7 @@ const Header = ({user, openDrawer, closeDrawer, drawer}) => {
             <div className={styles.account__link}>
               {
                 user ? 
-                <Link href="/account">Войти в личный кабинет</Link> 
+                <Link href="/account">Личный кабинет</Link> 
                 :
                 <Link href="/login">Войти в личный кабинет</Link> 
               }
@@ -109,7 +109,7 @@ const Header = ({user, openDrawer, closeDrawer, drawer}) => {
                 <div className={styles.account__link}>
                 {
                   user ? 
-                  <Link href="/account">Войти в личный кабинет</Link> 
+                  <Link href="/account">Личный кабинет</Link> 
                   :
                   <Link href="/login">Войти в личный кабинет</Link> 
                 }

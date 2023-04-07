@@ -35,17 +35,21 @@ const Layout = ({children}) => {
         !drawer ? 
         children:
         <div>
-          <div className={styles.login__button}>
+          <div className={styles.login__button} onClick={closeDrawer}>
             {
               user ? 
-              <Link href="/account">Войти в личный кабинет</Link> 
+              <Link href="/account">Личный кабинет</Link> 
               :
               <Link href="/login">Войти в личный кабинет</Link> 
             }
           </div>
-          <div className={styles.register__link}>
-            <Link href="/register">Зарегистрироваться</Link>
-          </div>
+          {
+            !user && 
+            <div className={styles.register__link} onClick={closeDrawer}>
+              <Link href="/register">Зарегистрироваться</Link>
+            </div>
+          }
+      
           <div className={styles.phone__number}>
             <a href='tel:87273337050'>+7 (727) 333 70 50</a>
           </div>
