@@ -16,6 +16,98 @@ export const createOrder = async (req, res) => {
     const order = req.body;
 
     await Order.insertMany(order).then(function() {
+        var transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+              user: 'itsnursat@gmail.com',
+              pass: 'pdlfyedtkldiqrik'
+            }
+          });
+          
+          var mailOptions = {
+            from: 'itsnursat@gmail.com',
+            to: 'info@gtrans.kz',
+            subject: 'Новый заказ',
+            html: `
+                <div>
+                    <div style="text-align: center; font-weight:700; font-size: 20px; margin-bottom:20px">
+                        Поступил новый заказ
+                    </div>
+                    <div style="text-align: center; font-weight:700; font-size: 20px; margin-bottom:20px">
+                        Данные этого заказа
+                    </div>
+                    <div>
+                        <table border="1">
+                            <tr> 
+                                <td>
+                                    Наименование груза
+                                </td>
+                                <td>
+                                    Вес одной коробки (кг)
+                                </td>
+                                <td>
+                                    Длина одной коробки (м)
+                                </td>
+                                <td>
+                                    Ширина одной коробки (м)
+                                </td>
+                                <td>
+                                    Высота одной коробки (м)
+                                </td>
+                                <td>
+                                    Количество коробок
+                                </td>
+                                <td>
+                                    Комментарии
+                                </td>
+                                <td>
+                                    Цена
+                                </td>
+                            </tr>
+                            ${
+                                order?.map((item) => (
+                                    `
+                                    <tr> 
+                                        <td>
+                                            ${item?.type}
+                                        </td>
+                                        <td>
+                                            ${item?.weight}
+                                        </td>
+                                        <td>
+                                            ${item?.len}
+                                        </td>
+                                        <td>
+                                           ${item?.width}
+                                        </td>
+                                        <td>
+                                            ${item?.height}
+                                        </td>
+                                        <td>
+                                            ${item?.count}
+                                        </td>
+                                        <td>
+                                            ${item?.comment}
+                                        </td>
+                                        <td>
+                                            ${item?.price}
+                                        </td>
+                                    </tr>
+                                    `
+                                ))
+                            }
+                        </table>
+                    </div>
+                </div>
+            `
+          };
+          transporter.sendMail(mailOptions, function(error, info){
+            if (error) {
+            } else {
+                
+                return res.status(200).json(orders);
+            }
+          });
         res.status(201).json(order)
     }).catch(function(error) {
         res.status(409).json({message: error.message})
@@ -215,5 +307,4 @@ export const changePriceByAdmin = async (req, res) => {
             return res.status(200).json(orders);
         }
       });
-
 } 
