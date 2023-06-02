@@ -5,7 +5,7 @@ export const getPrices = async () => {
     return response;
 }
 
-export const changePrice = async (id, body) => {
-    const response = await myAxios.put('/prices/change/'+id, body);
+export const changePrice = async (body) => {
+    const response = await myAxios.put('/prices/change', body);
     return response;
 }

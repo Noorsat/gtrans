@@ -1,12 +1,26 @@
-.price{
+.price span{
     font-weight: 400;
     font-size: 17px;
     color: #000000;
+    position: relative;
+    top:2px;
+}
+.overall__item{
+    font-weight: 400;
+    font-size: 17px;
+    color: #000000;   
+}
+.overall__item span{
+    font-weight: 700!important;
+    font-size: 20px!important;
+    color: #000000;
+}
+.price{
     margin-bottom: 16px;
 }
-.price span{
-    font-weight: 700;
-    font-size: 20px;
+.price__bold{
+    font-weight: 700!important;
+    font-size: 20px!important;
     color: #000000;
 }
 .ind{
@@ -27,7 +41,20 @@
     color:#1890ff;
     font-weight: 700;
 }
-
+.account__item_text{
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 18px;
+}
+.account__item_text span{
+    font-weight: 700;
+}
+.account__item_text div{
+    margin-bottom: 24px;
+}
+.plus{
+    width: fit-content;
+}
 .plus__icon{
     background: #FFAD32;
     padding:10px 15px;
@@ -81,6 +108,10 @@
 }  
 .overall{
     margin-bottom: 40px;
+    border:1px solid #d9d9d9;
+    width: 100%;
+    padding:20px;
+    border-radius: 4px;
 }
 .confirm__tip{
     font-weight: 400;
@@ -128,4 +159,17 @@
     border-radius: 10px;
     padding: 22px 0px 27px 29px;
     margin-bottom: 52px;
+}
+.label{
+    width:350px;
+    font-size: 16px;
+}
+.label__input{
+    width: 100%;
+}
+.switch{
+    margin-left: 10px;
+    position: relative;
+    top:2px;
+    font-size: 16px;
 }

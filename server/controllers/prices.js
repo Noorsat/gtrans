@@ -12,13 +12,27 @@ export const getPrices =  async (req, res) => {
 
 export const changePrices = async (req, res) => {
     try {
-        const price = await Price.findById(req.params.id);
+        const { prices } = req.body;
 
-        if (!price) return res.status(404).json({message: 'нету'})
+        let count = 0;
+        let newArr = [];
 
-        const updatedPrice = await Price.findByIdAndUpdate(req.params.id, req.body);
+        for (let i = 0; i < prices.length; i++) {
+            const price = await Price.findById(prices[i]._id);
 
-        res.status(200).json(updatedPrice);
+            if (!price) return res.status(404).json({message: 'нету'});
+
+            const updatedPrice = await Price.findByIdAndUpdate(price?._id, prices[i]).then((res) => {
+                count++;
+                return res;
+            });
+
+            newArr.push(prices[i]);
+        }
+        
+        if (count == prices.length){
+          return res.status(200).json(newArr);
+        }
     }catch (error){
         res.status(404).json({message: error.message})
     }

@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 const priceSchema = mongoose.Schema({
+    title: String,
     hoz: {
         more1000: Number,
         more800Less1000: Number,

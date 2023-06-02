@@ -104,7 +104,6 @@ export const createOrder = async (req, res) => {
           transporter.sendMail(mailOptions, function(error, info){
             if (error) {
             } else {
-                
                 return res.status(200).json(orders);
             }
           });
@@ -148,7 +147,6 @@ export const changeStatusRequest = async (req, res ) => {
     if (!order) return res.status(404).json({message: "Order not found..."})
 
     const newOrder = req.body;
-
 
     const updatedOrder = await Order.findByIdAndUpdate(
         req.params.id,

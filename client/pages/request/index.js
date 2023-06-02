@@ -1,4 +1,4 @@
-import { Button, DatePicker, Form, Input, Select, Table, notification, Modal, Alert} from 'antd';
+import { Button, DatePicker, Form, Input, Select, Table, notification, Modal, Alert, Switch, Radio} from 'antd';
 import {useState, useEffect} from 'react';
 import {createOrder, getOrders, getOrdersByAccountId} from './../../http/orders';
 import styles from './../../styles/Request.module.css';
@@ -20,7 +20,9 @@ const Request = () => {
       width:"",
       height:""
     });
-    const [totalVolume, setTotalVolume] = useState();
+    const [totalVolume, setTotalVolume] = useState(0);
+    const [totalWeight, setTotalWeight] = useState(0);
+    const [totalDensity, setTotalDensity] = useState(0)
     const [user, setUser] = useState();
     const [orders, setOrders] = useState(
       [
@@ -31,15 +33,23 @@ const Request = () => {
         height:"",
         weight:"",
         count:"",
-        comment:""
+        comment:"",
+        volume: "",
+        totalWeight: "",
+        totalVolume: "",
+        switch: false
        } 
       ]
     );
-    const [price, setPrice] = useState();
+    const [price1, setPrice1] = useState();
+    const [price2, setPrice2] = useState();
+    const [price3, setPrice3] = useState();
+    const [price4, setPrice4] = useState();
     const [modal, setModal] = useState(false);
     const [indCode, setIndCode] = useState();
     const [volumeModal, setVolumeModal] = useState(false);
     const [mobile, setMobile] = useState(false);
+    const [prices, setPrices] = useState();
     const [hoz, setHoz] = useState();
     const [tnp, setTnp] = useState();
 
@@ -58,6 +68,7 @@ const Request = () => {
           setMobile(true);
         }
         getPrices().then((res) => {
+          setPrices(res?.data);
           setHoz(res.data[0]?.hoz);
           setTnp(res.data[0]?.tnp);
         })
@@ -125,116 +136,259 @@ const Request = () => {
      }
     
       useEffect(() => {
-          let totalPrice = 0;
-          orders?.map(order => {
-          if (order?.weight.length > 0 && order?.len.length > 0 && order?.width.length > 0 && order?.height.length > 0 && order?.count.length >0){
-            const totalWeight = Number(order?.weight)*Number(order?.count); 
-            const totalVolume = (Number(order?.len) * Number(order?.width) * Number(order?.height)) * Number(order.count);
+          let totalPrice1 = 0;
+          let totalPrice2 = 0;
+          let totalPrice3 = 0;
+          let totalPrice4 = 0;
+
+          orders?.map((order, index) => {
+          if ((Number(order?.weight) > 0 && Number(order?.len) > 0 && Number(order?.width) > 0 && Number(order?.height) > 0 && Number(order?.count) >0) || (Number(order?.totalVolume) > 0 && Number(order?.totalWeight) > 0)){
+            const totalWeight = order?.switch ? Number(order?.totalWeight) :  Number(order?.weight)*Number(order?.count); 
+            const totalVolume = order?.switch ? Number(order?.totalVolume) : (Number(order?.len) * Number(order?.width) * Number(order?.height)) * Number(order.count);
             const density = totalWeight / totalVolume;
+            const active = order?.switch;
+            setTotalVolume(totalVolume);
+            setTotalWeight(totalWeight);
+            setTotalDensity(totalWeight / totalVolume);
+
           if (totalWeight <= 30 && totalVolume <= 0.2){
-            totalPrice += 7 * order?.weight* order?.count;
+            totalPrice1 += 7 * totalWeight;
+            totalPrice2 += 7 * totalWeight;
+            totalPrice3 += 7 * totalWeight;
+            totalPrice4 += 7 * totalWeight;
           }else{ 
             if (order?.type === "first"){
                 if (density < 100){
-                  const cup = (Number(order?.len) * Number(order?.width) * Number(order?.height))
-                  totalPrice += (cup * hoz?.less100)* order?.count
+                  totalPrice1 += (Number(totalVolume) * prices[0].hoz?.less100);
+                  totalPrice2 += (Number(totalVolume) * prices[1].hoz?.less100);
+                  totalPrice3 += (Number(totalVolume) * prices[2].hoz?.less100);
+                  totalPrice4 += (Number(totalVolume) * prices[3].hoz?.less100);
                 }else if (density > 100 && density <= 110){
-                  totalPrice += hoz?.more100Less110 * Number(order?.weight) * order?.count
+                  totalPrice1 += prices[0]?.hoz?.more100Less110 * totalWeight;
+                  totalPrice2 += prices[1]?.hoz?.more100Less110 * totalWeight;
+                  totalPrice3 += prices[2]?.hoz?.more100Less110 * totalWeight;
+                  totalPrice4 += prices[3]?.hoz?.more100Less110 * totalWeight;
                 }else if (density > 110 && density <= 120){
-                  totalPrice += hoz?.more110Less120 * Number(order?.weight) * order?.count
+                  totalPrice1 += prices[0]?.hoz?.more110Less120 * totalWeight;
+                  totalPrice2 += prices[1]?.hoz?.more110Less120 * totalWeight;
+                  totalPrice3 += prices[2]?.hoz?.more110Less120 * totalWeight;
+                  totalPrice4 += prices[3]?.hoz?.more110Less120 * totalWeight;
                 }else if (density > 120 && density <= 130){
-                  totalPrice += hoz?.more120Less130 * Number(order?.weight) * order?.count
+                  totalPrice1 += prices[0]?.hoz?.more120Less130 * totalWeight;
+                  totalPrice2 += prices[1]?.hoz?.more120Less130 * totalWeight;
+                  totalPrice3 += prices[2]?.hoz?.more120Less130 * totalWeight;
+                  totalPrice4 += prices[3]?.hoz?.more120Less130 * totalWeight;
                 }else if (density > 130 && density <= 140){
-                  totalPrice += hoz?.more130Less140 * Number(order?.weight) * order?.count
+                  totalPrice1 += prices[0]?.hoz?.more130Less140 * totalWeight;
+                  totalPrice2 += prices[1]?.hoz?.more130Less140 * totalWeight;
+                  totalPrice3 += prices[2]?.hoz?.more130Less140 * totalWeight;
+                  totalPrice4 += prices[3]?.hoz?.more130Less140 * totalWeight;
                 }else if (density > 140 && density <= 150){
-                  totalPrice += hoz?.more140Less150 * Number(order?.weight) * order?.count
+                  totalPrice1 += prices[0]?.hoz?.more140Less150 * totalWeight;
+                  totalPrice2 += prices[1]?.hoz?.more140Less150 * totalWeight;
+                  totalPrice3 += prices[2]?.hoz?.more140Less150 * totalWeight;
+                  totalPrice4 += prices[3]?.hoz?.more140Less150 * totalWeight;
                 }else if (density > 150 && density <= 160){
-                  totalPrice += hoz?.more150Less160 * Number(order?.weight) * order?.count
+                  totalPrice1 += prices[0]?.hoz?.more150Less160 * totalWeight;
+                  totalPrice2 += prices[1]?.hoz?.more150Less160 * totalWeight;
+                  totalPrice3 += prices[2]?.hoz?.more150Less160 * totalWeight;
+                  totalPrice4 += prices[3]?.hoz?.more150Less160 * totalWeight;
                 }else if(density > 160 && density <= 170){
-                  totalPrice += hoz?.more150Less160 * Number(order?.weight) * order?.count
+                  totalPrice1 += prices[0]?.hoz?.more150Less160 * totalWeight;
+                  totalPrice2 += prices[1]?.hoz?.more150Less160 * totalWeight;
+                  totalPrice3 += prices[2]?.hoz?.more150Less160 * totalWeight;
+                  totalPrice4 += prices[3]?.hoz?.more150Less160 * totalWeight;
                 }else if(density > 170 && density <= 180){
-                  totalPrice += hoz?.more170Less180 * Number(order?.weight)* order?.count
+                  totalPrice1 += prices[0]?.hoz?.more170Less180 * totalWeight;
+                  totalPrice2 += prices[1]?.hoz?.more170Less180 * totalWeight;
+                  totalPrice3 += prices[2]?.hoz?.more170Less180 * totalWeight;
+                  totalPrice4 += prices[3]?.hoz?.more170Less180 * totalWeight;
                 }else if(density > 180 && density <= 190){
-                  totalPrice += (hoz?.more180Less190 * Number(order?.weight))* order?.count
+                  totalPrice1 += prices[0]?.hoz?.more180Less190 * totalWeight;
+                  totalPrice2 += prices[1]?.hoz?.more180Less190 * totalWeight;
+                  totalPrice3 += prices[2]?.hoz?.more180Less190 * totalWeight;
+                  totalPrice4 += prices[3]?.hoz?.more180Less190 * totalWeight;
                 }else if(density > 190 && density <= 200){
-                  totalPrice += (hoz?.more190Less200 * Number(order?.weight))* order?.count
+                  totalPrice1 += prices[0]?.hoz?.more190Less200 * totalWeight;
+                  totalPrice2 += prices[1]?.hoz?.more190Less200 * totalWeight;
+                  totalPrice3 += prices[2]?.hoz?.more190Less200 * totalWeight;
+                  totalPrice4 += prices[3]?.hoz?.more190Less200 * totalWeight;
                 }else if (density > 200 && density <= 250){
-                  totalPrice += (hoz?.more200Less250 * Number(order?.weight))* order?.count
+                  totalPrice1 += prices[0]?.hoz?.more200Less250 * totalWeight;
+                  totalPrice2 += prices[1]?.hoz?.more200Less250 * totalWeight;
+                  totalPrice3 += prices[2]?.hoz?.more200Less250 * totalWeight;
+                  totalPrice4 += prices[3]?.hoz?.more200Less250 * totalWeight;
                 }else if (density > 250 && density <= 300){
-                  totalPrice += (hoz?.more250Less300 * Number(order?.weight))* order?.count
+                  totalPrice1 += prices[0]?.hoz?.more250Less300 * totalWeight;
+                  totalPrice2 += prices[1]?.hoz?.more250Less300 * totalWeight;
+                  totalPrice3 += prices[2]?.hoz?.more250Less300 * totalWeight;
+                  totalPrice4 += prices[3]?.hoz?.more250Less300 * totalWeight;
                 }else if (density > 300 && density <= 350){
-                  totalPrice += (hoz?.more300Less350 * Number(order?.weight))* order?.count
+                  totalPrice1 += prices[0]?.hoz?.more300Less350 * totalWeight;
+                  totalPrice2 += prices[1]?.hoz?.more300Less350 * totalWeight;
+                  totalPrice3 += prices[2]?.hoz?.more300Less350 * totalWeight;
+                  totalPrice4 += prices[3]?.hoz?.more300Less350 * totalWeight;
                 }else if (density > 350 && density <= 400){
-                  totalPrice += (hoz?.more350Less400 * Number(order?.weight))* order?.count
+                  totalPrice1 += prices[0]?.hoz?.more350Less400 * totalWeight;
+                  totalPrice2 += prices[1]?.hoz?.more350Less400 * totalWeight;
+                  totalPrice3 += prices[2]?.hoz?.more350Less400 * totalWeight;
+                  totalPrice4 += prices[3]?.hoz?.more350Less400 * totalWeight;
                 }else if (density > 400 && density <= 600){
-                  totalPrice += (hoz?.more400Less600 * Number(order?.weight))* order?.count
+                  totalPrice1 += prices[0]?.hoz?.more400Less600 * totalWeight;
+                  totalPrice2 += prices[1]?.hoz?.more400Less600 * totalWeight;
+                  totalPrice3 += prices[2]?.hoz?.more400Less600 * totalWeight;
+                  totalPrice4 += prices[3]?.hoz?.more400Less600 * totalWeight;
                 }else if (density > 600 && density <= 800){
-                  totalPrice += (hoz?.more600Less800 * Number(order?.weight))* order?.count
+                  totalPrice1 += prices[0]?.hoz?.more600Less800 * totalWeight;
+                  totalPrice2 += prices[1]?.hoz?.more600Less800 * totalWeight;
+                  totalPrice3 += prices[2]?.hoz?.more600Less800 * totalWeight;
+                  totalPrice4 += prices[3]?.hoz?.more600Less800 * totalWeight;
                 }else if (density > 800 && density <= 1000){
-                  totalPrice += (hoz?.more800Less1000 * Number(order?.weight))* order?.count
+                  totalPrice1 += prices[0]?.hoz?.more800Less1000 * totalWeight;
+                  totalPrice2 += prices[1]?.hoz?.more800Less1000 * totalWeight;
+                  totalPrice3 += prices[2]?.hoz?.more800Less1000 * totalWeight;
+                  totalPrice4 += prices[3]?.hoz?.more800Less1000 * totalWeight;
                 }else if (density > 1000){
-                  totalPrice += (hoz?.more1000 * Number(order?.weight))* order?.count
+                  totalPrice1 += prices[0]?.hoz?.more1000 * totalWeight;
+                  totalPrice2 += prices[1]?.hoz?.more1000 * totalWeight;
+                  totalPrice3 += prices[2]?.hoz?.more1000 * totalWeight;
+                  totalPrice4 += prices[3]?.hoz?.more1000 * totalWeight;
                 }
           }else if(order?.type === "second"){
             if (density < 100){
-              const cup = (Number(order?.len) * Number(order?.width) * Number(order?.height))
-              totalPrice += (cup * tnp?.less100)* order?.count
+              totalPrice1 += totalVolume * prices[0]?.tnp?.less100;
+              totalPrice2 += totalVolume * prices[1]?.tnp?.less100;
+              totalPrice3 += totalVolume * prices[2]?.hoz?.less100;
+              totalPrice4 += totalVolume * prices[3]?.hoz?.less100;
             }else if (density >= 100 && density <= 110){
-              totalPrice += (tnp?.more100Less110 * Number(order?.weight))* order?.count
+              totalPrice1 += prices[0]?.tnp?.more100Less110 * totalWeight;
+              totalPrice2 += prices[1]?.tnp?.more100Less110 * totalWeight;
+              totalPrice3 += prices[2]?.hoz?.more100Less110 * totalWeight;
+              totalPrice4 += prices[3]?.hoz?.more100Less110 * totalWeight;
             }else if (density > 110 && density <= 120){
-              totalPrice += (tnp?.more110Less120 * Number(order?.weight)) * order?.count
+              totalPrice1 += prices[0]?.tnp?.more110Less120 * totalWeight;
+              totalPrice2 += prices[1]?.tnp?.more110Less120 * totalWeight;
+              totalPrice3 += prices[2]?.hoz?.more110Less120 * totalWeight;
+              totalPrice4 += prices[3]?.hoz?.more110Less120 * totalWeight;
             }else if (density > 120 && density <= 130){
-              totalPrice += (tnp?.more120Less130 * Number(order?.weight))* order?.count
+              totalPrice1 += prices[0]?.tnp?.more120Less130 * totalWeight;
+              totalPrice2 += prices[1]?.tnp?.more120Less130 * totalWeight;
+              totalPrice3 += prices[2]?.hoz?.more120Less130 * totalWeight;
+              totalPrice4 += prices[3]?.hoz?.more120Less130 * totalWeight;
             }else if (density > 130 && density <= 140){
-              totalPrice += (tnp?.more130Less140 * Number(order?.weight))* order?.count
+              totalPrice1 += prices[0]?.tnp?.more130Less140 * totalWeight;
+              totalPrice2 += prices[1]?.tnp?.more130Less140 * totalWeight;
+              totalPrice3 += prices[2]?.hoz?.more130Less140 * totalWeight;
+              totalPrice4 += prices[3]?.hoz?.more130Less140 * totalWeight;
             }else if (density > 140 && density <= 150){
-              totalPrice += (tnp?.more140Less150 * Number(order?.weight))* order?.count
+              totalPrice1 += prices[0]?.tnp?.more140Less150 * totalWeight;
+              totalPrice2 += prices[1]?.tnp?.more140Less150 * totalWeight;
+              totalPrice3 += prices[2]?.hoz?.more140Less150 * totalWeight;
+              totalPrice4 += prices[3]?.hoz?.more140Less150 * totalWeight;
             }else if (density > 150 && density <= 160){
-              totalPrice += (tnp?.more150Less160 * Number(order?.weight))* order?.count
+              totalPrice1 += prices[0]?.tnp?.more150Less160 * totalWeight;
+              totalPrice2 += prices[1]?.tnp?.more150Less160 * totalWeight;
+              totalPrice3 += prices[2]?.hoz?.more150Less160 * totalWeight;
+              totalPrice4 += prices[3]?.hoz?.more150Less160 * totalWeight;
             }else if(density > 160 && density <= 170){
-              totalPrice += (tnp?.more160Less170 * Number(order?.weight))* order?.count
+              totalPrice1 += prices[0]?.tnp?.more150Less160 * totalWeight;
+              totalPrice2 += prices[1]?.tnp?.more150Less160 * totalWeight;
+              totalPrice3 += prices[2]?.hoz?.more150Less160 * totalWeight;
+              totalPrice4 += prices[3]?.hoz?.more150Less160 * totalWeight;
             }else if(density > 170 && density <= 180){
-              totalPrice += (tnp?.more170Less180 * Number(order?.weight))* order?.count
+              totalPrice1 += prices[0]?.tnp?.more170Less180 * totalWeight;
+              totalPrice2 += prices[1]?.tnp?.more170Less180 * totalWeight;
+              totalPrice3 += prices[2]?.hoz?.more170Less180 * totalWeight;
+              totalPrice4 += prices[3]?.hoz?.more170Less180 * totalWeight;
             }else if(density > 180 && density <= 190){
-              totalPrice += (tnp?.more180Less190 * Number(order?.weight))* order?.count
+              totalPrice1 += prices[0]?.tnp?.more180Less190 * totalWeight;
+              totalPrice2 += prices[1]?.tnp?.more180Less190 * totalWeight;
+              totalPrice3 += prices[2]?.hoz?.more180Less190 * totalWeight;
+              totalPrice4 += prices[3]?.hoz?.more180Less190 * totalWeight;
             }else if(density > 190 && density <= 200){
-              totalPrice += (tnp?.more190Less200 * Number(order?.weight))* order?.count
+              totalPrice1 += prices[0]?.tnp?.more190Less200 * totalWeight;
+              totalPrice2 += prices[1]?.tnp?.more190Less200 * totalWeight;
+              totalPrice3 += prices[2]?.hoz?.more190Less200 * totalWeight;
+              totalPrice4 += prices[3]?.hoz?.more190Less200 * totalWeight;
             }else if (density > 200 && density <= 250){
-              totalPrice += (tnp?.more200Less250 * Number(order?.weight))* order?.count
+              totalPrice1 += prices[0]?.tnp?.more200Less250 * totalWeight;
+              totalPrice2 += prices[1]?.tnp?.more200Less250 * totalWeight;
+              totalPrice3 += prices[2]?.hoz?.more200Less250 * totalWeight;
+              totalPrice4 += prices[3]?.hoz?.more200Less250 * totalWeight;
             }else if (density > 250 && density <= 300){
-              totalPrice += (tnp?.more250Less300 * Number(order?.weight))* order?.count
+              totalPrice1 += prices[0]?.tnp?.more250Less300 * totalWeight;
+              totalPrice2 += prices[1]?.tnp?.more250Less300 * totalWeight;
+              totalPrice3 += prices[2]?.hoz?.more250Less300 * totalWeight;
+              totalPrice4 += prices[3]?.hoz?.more250Less300 * totalWeight;
             }else if (density > 300 && density <= 350){
-              totalPrice += (tnp?.more300Less350 * Number(order?.weight))* order?.count
+              totalPrice1 += prices[0]?.tnp?.more300Less350 * totalWeight;
+              totalPrice2 += prices[1]?.tnp?.more300Less350 * totalWeight;
+              totalPrice3 += prices[2]?.hoz?.more300Less350 * totalWeight;
+              totalPrice4 += prices[3]?.hoz?.more300Less350 * totalWeight;
             }else if (density > 350 && density <= 400){
-              totalPrice += (tnp?.more350Less400 * Number(order?.weight))* order?.count
+              totalPrice1 += prices[0]?.tnp?.more350Less400 * totalWeight;
+              totalPrice2 += prices[1]?.tnp?.more350Less400 * totalWeight;
+              totalPrice3 += prices[2]?.hoz?.more350Less400 * totalWeight;
+              totalPrice4 += prices[3]?.hoz?.more350Less400 * totalWeight;
             }else if (density > 400 && density <= 600){
-              totalPrice += (tnp?.more400Less600 * Number(order?.weight))* order?.count
+              totalPrice1 += prices[0]?.tnp?.more400Less600 * totalWeight;
+              totalPrice2 += prices[1]?.tnp?.more400Less600 * totalWeight;
+              totalPrice3 += prices[2]?.hoz?.more400Less600 * totalWeight;
+              totalPrice4 += prices[3]?.hoz?.more400Less600 * totalWeight;
             }else if (density > 600 && density <= 800){
-              totalPrice += (tnp?.more600Less800 * Number(order?.weight))* order?.count
+              totalPrice1 += prices[0]?.tnp?.more600Less800 * totalWeight;
+              totalPrice2 += prices[1]?.tnp?.more600Less800 * totalWeight;
+              totalPrice3 += prices[2]?.hoz?.more600Less800 * totalWeight;
+              totalPrice4 += prices[3]?.hoz?.more600Less800 * totalWeight;
             }else if (density > 800 && density <= 1000){
-              totalPrice += (tnp?.more800Less1000 * Number(order?.weight))* order?.count
+              totalPrice1 += prices[0]?.tnp?.more800Less1000 * totalWeight;
+              totalPrice2 += prices[1]?.tnp?.more800Less1000 * totalWeight;
+              totalPrice3 += prices[2]?.hoz?.more800Less1000 * totalWeight;
+              totalPrice4 += prices[3]?.hoz?.more800Less1000 * totalWeight;
             }else if (density > 1000){
-              totalPrice += (tnp?.more1000 * Number(order?.weight))* order?.count
+              totalPrice1 += prices[0]?.tnp?.more1000 * totalWeight;
+              totalPrice2 += prices[1]?.tnp?.more1000 * totalWeight;
+              totalPrice3 += prices[2]?.hoz?.more1000 * totalWeight;
+              totalPrice4 += prices[3]?.hoz?.more1000 * totalWeight;
             }
           }
           }
           }else{
-            setPrice(0);
+            setPrice1(0);
+            setPrice2(0);
+            setPrice3(0);
+            setPrice4(0);
           }
           })
-          if (totalPrice !== 0){
-            if (totalPrice < 30){
-              setPrice(30);
+          if (totalPrice1 !== 0){
+            if (totalPrice1 < 30){
+              setPrice1(30);
             }else{
-              setPrice(Math.round(totalPrice))
+              setPrice1(Math.round(totalPrice1))
             }
           }
-          setTotalVolume(orders.reduce((total, order) => {
-            let density = Number(order?.len) * Number(order?.height) * Number(order?.width)*order?.count;
-            return total += density;
-          }, 0));
-     }
-     , [orders])
+          if (totalPrice2 !== 0){
+            if (totalPrice2 < 30){
+              setPrice2(30);
+            }else{
+              setPrice2(Math.round(totalPrice2))
+            }
+          }
+          if (totalPrice3 !== 0){
+            if (totalPrice3 < 30){
+              setPrice3(30);
+            }else{
+              setPrice3(Math.round(totalPrice3))
+            }
+          }
+          if (totalPrice4 !== 0){
+            if (totalPrice4 < 30){
+              setPrice4(30);
+            }else{
+              setPrice4(Math.round(totalPrice4))
+            }
+          }
+     }, [orders])
 
      const weightHandler = (value) => {
       setOrder({...order, weight:value});
@@ -272,13 +426,9 @@ const Request = () => {
       
       setOrders(orders.map((order, index) => {
         if (index === i){
-          if ((param === "weight" || param === "len" || param === "width" || param === "height" || param === "count")){
             if (value === '' || re.test(value)){
               order[param] = value.replace(",",'.');
             }
-          }else if (param === "comment"){
-            order[param] = value;
-          }
         }
         return order;
       }))
@@ -340,9 +490,43 @@ const Request = () => {
           comment:""
         }])
       }
+
+      const switchHandler = (index) => {
+        setTotalWeight(0);
+        setTotalVolume(0);
+        setTotalDensity(0);
+        setOrders(orders?.map((order, i) => {
+          if (i === index){
+            if (order?.switch){
+              order.totalVolume = "";
+              order.totalWeight = "";
+            }else{
+              order.height = "";
+              order.len = "";
+              order.width = "";
+              order.weight = "";
+              order.count = "";
+            }
+            order.switch = !order?.switch          
+          }
+          return order;
+        }))
+      }
       
       const deleteProductHandler = (index) => {
-        setOrders(orders?.filter((order, i) => index !== i))
+        if (orders?.find((order, i) => index === i)){
+          setOrders(orders?.filter((order, i) => index !== i))
+        }else{
+          setOrders([...orders, {
+            type:"",
+            len:"",
+            width:"",
+            height:"",
+            weight:"",
+            count:"",
+            comment:""
+          }])
+        }
       }
 
       const buttonDisabled = () => {
@@ -366,7 +550,17 @@ const Request = () => {
               </div>
               <div className={styles.inds}>
                 <div className={styles.ind}>Код вашего отправления: <span>{indCode}</span></div>
-                <div className={styles.ind}>Адрес склада: <span>广东省广州市白云区石门街道，窖心大道2号007库房创胜新天地后侧停车场手机号码: 13930311979所在地区</span></div>
+                <div className={styles.ind}>
+                  Адрес склада:
+                  <div className={styles.account__item_text}>
+                      <div>
+                          <span>Гуанчжоу: </span> &nbsp;&nbsp;北京603公司广州分公司地址：广州市白云区荔德路汇富国际商贸中心A26栋103号603公司18594056603
+                      </div>
+                      <div>
+                          <span>Иу:</span> &nbsp;&nbsp;地址：浙江省 义乌市 北苑街道 莲塘二区3栋3单元一层  电话 13305898683
+                      </div>
+                  </div>
+                </div>
               </div>
               <div className={styles.modal__tips}>
                 <div>
@@ -404,85 +598,178 @@ const Request = () => {
             <Form className={`w-100 ms-auto me-auto ${styles.form}`}>
               {
                 orders.map((order, index) => (
-                  <div className={styles.item}>
-                  <div className={`mb-3`}>
-                    <Select placeholder="Наименование груза" className={`w-100 select`} style={{width:"100%"}}
-                      
-                      onChange={(e, label) => typeHandler(e, label, index)}
-                      options={
-                        [
-                          {
-                            label:"Одежда и обувь",
-                            value:"second"
-                          },
-                          {
-                            label:"Остальное (хоз товары)",
-                            value:"first"
-                          }
-                        ]
-                      }
-                    >
-                    </Select>
-                </div>
-                <div className={`d-block mb-0 mb-md-3 d-md-flex justify-between ${styles.inputs}`}>
-                  <div className={`input ${styles.input}`}>
-                    <div className={`d-flex ${styles.inputs__wrapper}`}>
-                      <Input placeholder='Вес одной коробки (кг)' onChange={(e) => changeOrderInfo(index, "weight",  e.target.value)} value={order?.weight}/>
-                      <Input placeholder='Длина одной коробки (м)'  onChange={(e) => changeOrderInfo(index, "len", e.target.value)} value={order?.len}/>
+                  <div className='mb-3'>
+                  <div className='d-flex gap-3'>
+                    <div style={{width: '50%'}}>
+                      <div className={styles.item}>
+                        <div className={`mb-3`}>
+                          <Select placeholder="Наименование груза" className={`w-100 select`} style={{width:"100%"}}
+                            
+                            onChange={(e, label) => typeHandler(e, label, index)}
+                            options={
+                              [
+                                {
+                                  label:"Одежда и обувь",
+                                  value:"second"
+                                },
+                                {
+                                  label:"Остальное (хоз товары)",
+                                  value:"first"
+                                }
+                              ]
+                            }
+                          >
+                          </Select>
+                      </div>
+                      <div className={`d-block mb-0 mb-md-3 d-md-flex justify-between ${styles.inputs}`}>
+                        <div className={`input ${styles.input}`}>
+                          <div className={`${styles.inputs__wrapper}`}>
+                            <div className='mb-3'>
+                              {
+                                !order?.switch ?
+                                <>
+                                <div className='d-flex align-items-center mb-3'>
+                                  <div className={styles.label}>
+                                    Вес одной коробки (кг)
+                                  </div>
+                                  <div className={styles.label__input}>
+                                    <Input onChange={(e) => changeOrderInfo(index, "weight",  e.target.value)} value={order?.weight}/>
+                                  </div>
+                                </div>
+                                <div className='d-flex align-items-center mb-3 gap-1'>
+                                  <div className={styles.label}>
+                                    Длина одной коробки (cм)
+                                  </div>
+                                  <div className={styles.label__input}>
+                                    <Input onChange={(e) => changeOrderInfo(index, "len", e.target.value)} value={order?.len}/>
+                                  </div>
+                                </div>
+                                <div className='d-flex align-items-center mb-3 gap-1'>
+                                  <div className={styles.label}>
+                                    Ширина одной коробки (cм)
+                                  </div>
+                                  <div className={styles.label__input}>
+                                    <Input onChange={(e) => changeOrderInfo(index, "width", e.target.value)} value={order?.width}/>
+                                  </div>
+                                </div>
+                                <div className='d-flex align-items-center mb-3 gap-1'>
+                                  <div className={styles.label}>
+                                    Высота одной коробки (cм)
+                                  </div>
+                                  <div className={styles.label__input}>
+                                    <Input onChange={(e) => changeOrderInfo(index, "height", e.target.value)} value={order?.height}/>
+                                  </div>
+                                </div>
+                                <div className='d-flex align-items-center mb-3 gap-1'>
+                                  <div className={styles.label}>
+                                    Количество коробок
+                                  </div>
+                                  <div className={styles.label__input}>
+                                    <Input onChange={(e) => changeOrderInfo(index, "count", e.target.value)} value={order?.count}/>
+                                  </div>
+                                </div>
+                                </>
+                                :
+                                <>
+                                  <div className='d-flex align-items-center mb-3 gap-1'>
+                                    <div className={styles.label}>
+                                      Общий вес
+                                    </div>
+                                    <div className={styles.label__input}>
+                                      <Input onChange={(e) => changeOrderInfo(index, "totalWeight", e.target.value)} value={order?.totalWeight}/>
+                                    </div>
+                                  </div>
+                                  <div className='d-flex align-items-center mb-3 gap-1'>
+                                    <div className={styles.label}>
+                                      Объем
+                                    </div>
+                                    <div className={styles.label__input}>
+                                      <Input onChange={(e) => changeOrderInfo(index, "totalVolume", e.target.value)} value={order?.totalVolume}/>
+                                    </div>
+                                  </div>
+                                </>
+                              }
+                            </div>
+                            <div>
+                              <Switch value={order?.switch} onChange={() => switchHandler(index)} />
+                              <span className={styles.switch}>У меня есть общий вес и объем</span>
+                            </div>
+                          </div>
+                          {/* <div className={`comment ${styles.input}`}>
+                           <Input placeholder='Комментарии' onChange={(e) => changeOrderInfo(index, "comment", e.target.value)} value={order?.comment}/>
+                          </div> */}
+                        </div>
+                      </div>
                     </div>
-                    <div className={`d-flex ${styles.inputs__wrapper}`}>
-                    <Input placeholder='Ширина одной коробки (м)' onChange={(e) => changeOrderInfo(index, "width", e.target.value)} value={order?.width}/>
-                    <Input placeholder='Высота одной коробки (м)' onChange={(e) => changeOrderInfo(index, "height", e.target.value)} value={order?.height}/>
-                    </div>
-                    <Input className='mb-3 mb-md-0' placeholder='Количество коробок' onChange={(e) => changeOrderInfo(index, "count", e.target.value)} value={order?.count}/>
                   </div>
-                  <div className={`comment ${styles.input}`}>
-                   <Input placeholder='Комментарии' onChange={(e) => changeOrderInfo(index, "comment", e.target.value)} value={order?.comment}/>
+                  <div style={{width:'50%'}}>
+                    <div className={styles.overall}>
+                      <div className={styles.overall__item}>
+                        Общий объем доставки: <span>{totalVolume} м3</span>
+                      </div> 
+                      <div className={styles.overall__item}>
+                        Вес: <span>{totalWeight} кг</span>
+                      </div> 
+                      <div className={`${styles.overall__item} mb-3`}>
+                        Плотность: <span>{totalDensity} кг/куб</span>    
+                      </div>
+                      <div className={styles.overall__item}>
+                        Вы должны выбрать цену для перевозки. У вас несколько вариантов:
+                      </div>
+                      <Radio.Group>
+                        <div className={styles.price}>
+                          <Radio value="Экспресс (8-10 дней)">
+                            Экспресс (8-10 дней): <span className={styles.price__bold}>{getPrice(price1)}</span>
+                          </Radio>
+                        </div>
+                        <div className={styles.price}>
+                          <Radio value="Экспресс (15-20 дней)">
+                            Экспресс (15-20 дней): <span className={styles.price__bold}>{getPrice(price2)}</span>
+                          </Radio>
+                        </div>
+                        <div className={styles.price}>
+                          <Radio value="Авто (18-25 дней)">
+                            Авто (18-25 дней) : <span className={styles.price__bold}>{getPrice(price3)}</span>
+                          </Radio>
+                        </div>
+                        <div className={styles.price}>
+                          <Radio value="ЖД (30-35 дней)">
+                            ЖД (30-35 дней) : <span className={styles.price__bold}>{getPrice(price4)}</span>
+                          </Radio>
+                        </div>
+                      </Radio.Group>
+                    </div>
                   </div>
                 </div>
-                <div className='d-flex justify-content-md-end justify-content-center mb-md-0 align-items-center w-100'> 
+                {/* <div className='d-flex justify-content-md-end justify-content-center mb-md-0 align-items-center w-100'> 
                   <div className={styles.remove__button} onClick={() => deleteProductHandler(index)}>
                     Удалить расчет
                   </div> 
-                </div>
+                </div> */}
                 {/* {
                   orders?.length > 1 &&
                   <Button type="danger" className='w-100 mb-3' onClick={() => deleteProductHandler(index)}>Удалить товар</Button>
                 } */}
-                </div>  
+                </div> 
                 ))
               }
                 {/* <div className={styles.plus}>
                   <AiOutlinePlus className={styles.plus__icon} size={30} onClick={orderAddHandler}/>
                 </div> */}
-                <div className={styles.plus} onClick={orderAddHandler}>
+                {/* <div className={styles.plus} onClick={orderAddHandler}>
                   <div className={styles.plus__icon}>
                     <img src='./plus.svg' alt="plus"/>
                   </div>
                   <div className={styles.plus__text}>
-                    Добавить еще груз
+                    Еще
                   </div>
-                </div>
-                <div className={styles.overall}>
-                  {  
-                    totalVolume > 0 &&
-                      <div className={styles.price}>
-                        Общий объем доставки: <span>{totalVolume} м3</span>
-                      </div> 
-                  }
-                {  
-                  price > 0 &&
-                    <div className={styles.price}>
-                      Цена: <span>{getPrice(price)}</span>
-                    </div>
-                }
-                </div>
+                </div> */}
                 {/* <Alert message="Если вы готовы заказать доставку, нажмите на кнопку снизу" className='mb-3' type="error"/> */}
                 <div className={styles.confirm__tip}>
                   Чтобы отправить заказ, нажмите на кнопку “Оформить заказ”
                 </div>
                 <div className='confirm__button'>
-                  <button type='primary' onClick={createOrderHandler} disabled={buttonDisabled()}>Оформить заказ</button>
+                  <button type='primary' onClick={createOrderHandler}>Оформить заказ</button>
                 </div>
             </Form>
         </div>

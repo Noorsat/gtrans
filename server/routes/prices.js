@@ -4,7 +4,7 @@ import { changePrices, createPrice, getPrices } from '../controllers/prices.js';
 const router = express.Router();
 
 router.get('/', getPrices);
-router.put('/change/:id', changePrices);
+router.put('/change', changePrices);
 router.post('/create', createPrice)
 
 export default router;
