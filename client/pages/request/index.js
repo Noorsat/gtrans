@@ -35,8 +35,7 @@ const Request = () => {
         count:"",
         comment:"",
         volume: "",
-        totalWeight: "",
-        totalVolume: "",
+        deliveryType:"",
         switch: false
        } 
       ]
@@ -45,6 +44,7 @@ const Request = () => {
     const [price2, setPrice2] = useState();
     const [price3, setPrice3] = useState();
     const [price4, setPrice4] = useState();
+    const [selectedPrice, setSelectedPrice] = useState();
     const [modal, setModal] = useState(false);
     const [indCode, setIndCode] = useState();
     const [volumeModal, setVolumeModal] = useState(false);
@@ -74,23 +74,22 @@ const Request = () => {
         })
     }, [])
 
-      const createOrderHandler = () => {
-        getOrdersByAccountId(user?._id).then((res) => {
-          let code = getIndividualCode(user?.id).charAt(0);
-          let count = 0;
-          res.data.map(item => {
-            if (item.individualCode.charAt(0) === code){
-              count++;
-            }
+      const createOrderHandler = () => { 
+        if (!(totalVolume && totalWeight && selectedPrice)){
+          notification["error"]({
+            message: "Заполните все поля"
           })
+        }else{
+        getOrders().then((res) => {
+          let count = res.data.length;
           const body = orders.map(order => {
-            return {...order, accountId : user?._id, type: order?.name, individualCode: getIndividualCode(user?.id)+"-"+(count+1), price: price, volume: Math.round((Number(order?.len) * Number(order?.width) * Number(order?.height)) * Number(order.count))}
+            return {...order, accountId : user?._id, type: order?.name, individualCode: "GT-2023-"+(count+1), price: selectedPrice, volume: totalVolume, totalWeight: totalWeight}
           })
     
           createOrder(body).then((res) => {
             if (res?.status === 201){
               setModal(true)
-              setIndCode(getIndividualCode(user?.id)+"-"+(count+1))
+              setIndCode("GT-2023-"+(count+1))
               // notification["success"]({
               //   message:'Ваш заказ создан',
               // })
@@ -100,12 +99,13 @@ const Request = () => {
           })
         }).catch((res) => {
           const body = orders.map(order => {
-            return {...order, accountId : user?._id, type: order?.name, individualCode: getIndividualCode(user?.id)+"-1", price: price, volume: Math.round((Number(order?.len) * Number(order?.width) * Number(order?.height)) * Number(order.count))}
+            return {...order, accountId : user?._id, type: order?.name, individualCode: "GT-2023-"+(count+1), price: selectedPrice, volume: totalVolume, totalWeight: totalWeight}
           })
+    
           createOrder(body).then((res) => {
             if (res?.status === 201){
               setModal(true)
-              setIndCode(getIndividualCode(user?.id)+"-1")
+              setIndCode("GT-2023-"+(count+1))
               // notification["success"]({
               //   message:'Ваш заказ создан',
               // })
@@ -114,6 +114,7 @@ const Request = () => {
             }
           })
         })
+      }
      }
      
      const onCancel = () => {
@@ -125,14 +126,7 @@ const Request = () => {
      }
 
      const getIndividualCode = (id) => {
-      let totalWeight = orders.reduce((total, order) => {
-        return total += order.count * order.weight;
-      }, 0);
-      if (totalWeight >= 100){
-        return "H792-" + getId(id);
-      }else if (totalWeight < 100){
-        return "SM215-" + getId(id);
-      }
+      return "GT-2023-" + getId(id);
      }
     
       useEffect(() => {
@@ -224,7 +218,7 @@ const Request = () => {
                   totalPrice3 += prices[2]?.hoz?.more250Less300 * totalWeight;
                   totalPrice4 += prices[3]?.hoz?.more250Less300 * totalWeight;
                 }else if (density > 300 && density <= 350){
-                  totalPrice1 += prices[0]?.hoz?.more300Less350 * totalWeight;
+                  totalPrice1 += prices[0]?.hoz?.more300Les  * totalWeight;
                   totalPrice2 += prices[1]?.hoz?.more300Less350 * totalWeight;
                   totalPrice3 += prices[2]?.hoz?.more300Less350 * totalWeight;
                   totalPrice4 += prices[3]?.hoz?.more300Less350 * totalWeight;
@@ -539,6 +533,15 @@ const Request = () => {
         return checkButton
       } 
 
+    const priceSelectHandler = (e, price) => {
+      setOrders(orders.map(order => {
+        order.deliveryType = e.target.value;
+        return order;
+      })
+      )
+      setSelectedPrice(price);
+    }
+
     return (
         <div className='container'>
             <Modal open={modal} footer={null}
@@ -602,7 +605,7 @@ const Request = () => {
                   <div className='d-md-flex gap-3 d-block'>
                     <div className={styles.selects__wrapper}>
                       <div className={styles.item}>
-                        <div className={`mb-3`}>
+                        <div className={`mb-md-3 mb-2`}>
                           <Select placeholder="Наименование груза" className={`w-100 select`} style={{width:"100%"}}
                             
                             onChange={(e, label) => typeHandler(e, label, index)}
@@ -624,11 +627,11 @@ const Request = () => {
                       <div className={`d-block mb-0 mb-md-3 d-md-flex justify-between ${styles.inputs}`}>
                         <div className={`input ${styles.input}`}>
                           <div className={`${styles.inputs__wrapper}`}>
-                            <div className='mb-3'>
+                            <div className='mb-md-3 mb-2'>
                               {
                                 !order?.switch ?
                                 <>
-                                <div className='d-flex align-items-center mb-3'>
+                                <div className='d-flex align-items-center mb-md-3 mb-2'>
                                   <div className={styles.label}>
                                     Вес одной коробки (кг)
                                   </div>
@@ -636,7 +639,7 @@ const Request = () => {
                                     <Input onChange={(e) => changeOrderInfo(index, "weight",  e.target.value)} value={order?.weight}/>
                                   </div>
                                 </div>
-                                <div className='d-flex align-items-center mb-3 gap-1'>
+                                <div className='d-flex align-items-center mb-md-3 mb-2 gap-1'>
                                   <div className={styles.label}>
                                     Длина одной коробки (cм)
                                   </div>
@@ -644,7 +647,7 @@ const Request = () => {
                                     <Input onChange={(e) => changeOrderInfo(index, "len", e.target.value)} value={order?.len}/>
                                   </div>
                                 </div>
-                                <div className='d-flex align-items-center mb-3 gap-1'>
+                                <div className='d-flex align-items-center mb-md-3 mb-2 gap-1'>
                                   <div className={styles.label}>
                                     Ширина одной коробки (cм)
                                   </div>
@@ -652,7 +655,7 @@ const Request = () => {
                                     <Input onChange={(e) => changeOrderInfo(index, "width", e.target.value)} value={order?.width}/>
                                   </div>
                                 </div>
-                                <div className='d-flex align-items-center mb-3 gap-1'>
+                                <div className='d-flex align-items-center mb-md-3 mb-2 gap-1'>
                                   <div className={styles.label}>
                                     Высота одной коробки (cм)
                                   </div>
@@ -660,7 +663,7 @@ const Request = () => {
                                     <Input onChange={(e) => changeOrderInfo(index, "height", e.target.value)} value={order?.height}/>
                                   </div>
                                 </div>
-                                <div className='d-flex align-items-center mb-3 gap-1'>
+                                <div className='d-flex align-items-center mb-md-3 mb-2 gap-1'>
                                   <div className={styles.label}>
                                     Количество коробок
                                   </div>
@@ -671,7 +674,7 @@ const Request = () => {
                                 </>
                                 :
                                 <>
-                                  <div className='d-flex align-items-center mb-3 gap-1'>
+                                  <div className='d-flex align-items-center mb-md-3 mb-2 gap-1'>
                                     <div className={styles.label}>
                                       Общий вес
                                     </div>
@@ -679,7 +682,7 @@ const Request = () => {
                                       <Input onChange={(e) => changeOrderInfo(index, "totalWeight", e.target.value)} value={order?.totalWeight}/>
                                     </div>
                                   </div>
-                                  <div className='d-flex align-items-center mb-3 gap-1'>
+                                  <div className='d-flex align-items-center mb-md-3 mb-2 gap-1'>
                                     <div className={styles.label}>
                                       Объем
                                     </div>
@@ -710,30 +713,30 @@ const Request = () => {
                       <div className={styles.overall__item}>
                         Вес: <span>{totalWeight} кг</span>
                       </div> 
-                      <div className={`${styles.overall__item} mb-3`}>
+                      <div className={`${styles.overall__item} mb-md-3 mb-0`}>
                         Плотность: <span>{totalDensity} кг/куб</span>    
                       </div>
                       <div className={styles.overall__item}>
-                        Вы должны выбрать цену для перевозки. У вас несколько вариантов:
+                        Выберите вариант:
                       </div>
-                      <Radio.Group>
+                      <Radio.Group value={orders[0]?.deliveryType}> 
                         <div className={styles.price}>
-                          <Radio value="Экспресс (8-10 дней)">
+                          <Radio value="Экспресс (8-10 дней)" onChange={(e) => priceSelectHandler(e, price1)}>
                             Экспресс (8-10 дней): <span className={styles.price__bold}>{getPrice(price1)}</span>
                           </Radio>
                         </div>
                         <div className={styles.price}>
-                          <Radio value="Экспресс (15-20 дней)">
+                          <Radio value="Экспресс (15-20 дней)" onChange={(e) => priceSelectHandler(e, price2)}>
                             Экспресс (15-20 дней): <span className={styles.price__bold}>{getPrice(price2)}</span>
                           </Radio>
                         </div>
                         <div className={styles.price}>
-                          <Radio value="Авто (18-25 дней)">
+                          <Radio value="Авто (18-25 дней)" onChange={(e) => priceSelectHandler(e, price2)}>
                             Авто (18-25 дней) : <span className={styles.price__bold}>{getPrice(price3)}</span>
                           </Radio>
                         </div>
-                        <div className={styles.price}>
-                          <Radio value="ЖД (30-35 дней)">
+                        <div className={styles.price} >
+                          <Radio value="ЖД (30-35 дней)" onChange={(e) => priceSelectHandler(e, price2)}>
                             ЖД (30-35 дней) : <span className={styles.price__bold}>{getPrice(price4)}</span>
                           </Radio>
                         </div>

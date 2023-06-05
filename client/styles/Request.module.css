@@ -188,3 +188,52 @@
         width: 100%;
     }
 }
+
+@media (max-width:500px){
+    .title{
+        margin-top: 10px;
+    }
+    .title h4{
+        font-size: 18px!important;
+    }
+    .tip{
+        font-size: 15px;
+    }
+    .tips{
+        margin-bottom: 10px;
+    }
+    .label{
+        font-size: 14px;
+    }
+    .switch{
+        font-size: 14px;
+    }
+    .inputs__wrapper{
+        margin-bottom: 0;
+    }
+    .inputs{
+        margin-bottom: 10px!important;
+    }
+    .item{
+        margin-bottom: 0px!important;
+    }
+    .overall{
+        padding:10px;
+    }
+    .overall__item{
+        font-size: 14px;
+    }
+    .overall__item span{
+        font-size: 16px!important;
+    }
+    .price span{
+        font-size: 14px;
+    }
+    .price__bold{
+        font-size: 16px;
+    }
+    .confirm__tip{
+        font-size: 12px;
+        margin-bottom: 7px;
+    }
+}

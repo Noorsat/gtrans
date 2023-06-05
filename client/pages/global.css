@@ -27,7 +27,7 @@
 @media (max-width: 500px){
     .input input{
         font-size: 10px;
-        height:40px!important;
+        height:32px!important;
         padding-left: 13px;
     }
     .select .ant-select-selector{
@@ -85,6 +85,9 @@
 @media (max-width:500px){
     .confirm__button{
         text-align: center;
+    }
+    .confirm__button button{
+        padding: 10px 20px;
     }
 }
 .email-input input{

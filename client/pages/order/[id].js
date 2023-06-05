@@ -107,9 +107,7 @@ const Order = () => {
                                 Цена заказа
                             </div>
                             <div className={styles.order__detail_item_value}>
-                                {
-                                    order?.price 
-                                } $                           
+                                {order?.deliveryType} - {order?.price } $                           
                             </div>
                         </div>
                         <div className={styles.order__detail_item}>
@@ -118,7 +116,7 @@ const Order = () => {
                             </div>
                             <div className={styles.order__detail_item_value}>
                                 {
-                                    order?.volume ? order?.volume : Math.round((Number(order?.len) * Number(order?.width) * Number(order?.height)) * Number(order?.count)) 
+                                    order?.volume
                                 } м3
                             </div>
                         </div>
