@@ -62,8 +62,8 @@
     margin-right: 18px;
 }
 .title{
-    margin-top: 60px;
-    margin-bottom: 22px;
+    margin-top: 30px;
+    margin-bottom: 11px;
 }
 @media (max-width:500px){
     .title{
@@ -93,7 +93,7 @@
     color: #000000;
 }
 .tips{
-    margin-bottom: 40px;
+    margin-bottom: 20px;
 }
 .inputs{
     gap:20px;
@@ -107,7 +107,7 @@
     margin-bottom: 20px;
 }  
 .overall{
-    margin-bottom: 40px;
+    margin-bottom: 20px;
     border:1px solid #d9d9d9;
     width: 100%;
     padding:20px;
@@ -172,4 +172,19 @@
     position: relative;
     top:2px;
     font-size: 16px;
+}
+.selects__wrapper{
+    width: 50%;
+}
+.overall__wrapper{
+    width: 50%;
+}
+
+@media (max-width:768px){
+    .selects__wrapper{
+        width: 100%;
+    }
+    .overall__wrapper{
+        width: 100%;
+    }
 }

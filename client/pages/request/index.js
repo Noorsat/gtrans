@@ -144,7 +144,7 @@ const Request = () => {
           orders?.map((order, index) => {
           if ((Number(order?.weight) > 0 && Number(order?.len) > 0 && Number(order?.width) > 0 && Number(order?.height) > 0 && Number(order?.count) >0) || (Number(order?.totalVolume) > 0 && Number(order?.totalWeight) > 0)){
             const totalWeight = order?.switch ? Number(order?.totalWeight) :  Number(order?.weight)*Number(order?.count); 
-            const totalVolume = order?.switch ? Number(order?.totalVolume) : (Number(order?.len) * Number(order?.width) * Number(order?.height)) * Number(order.count);
+            const totalVolume = order?.switch ? Number(order?.totalVolume) : ((Number(order?.len)/100) * (Number(order?.width)/100) * (Number(order?.height)/100)) * Number(order.count);
             const density = totalWeight / totalVolume;
             const active = order?.switch;
             setTotalVolume(totalVolume);
@@ -599,8 +599,8 @@ const Request = () => {
               {
                 orders.map((order, index) => (
                   <div className='mb-3'>
-                  <div className='d-flex gap-3'>
-                    <div style={{width: '50%'}}>
+                  <div className='d-md-flex gap-3 d-block'>
+                    <div className={styles.selects__wrapper}>
                       <div className={styles.item}>
                         <div className={`mb-3`}>
                           <Select placeholder="Наименование груза" className={`w-100 select`} style={{width:"100%"}}
@@ -702,7 +702,7 @@ const Request = () => {
                       </div>
                     </div>
                   </div>
-                  <div style={{width:'50%'}}>
+                  <div className={styles.overall__wrapper}>
                     <div className={styles.overall}>
                       <div className={styles.overall__item}>
                         Общий объем доставки: <span>{totalVolume} м3</span>
@@ -738,6 +738,12 @@ const Request = () => {
                           </Radio>
                         </div>
                       </Radio.Group>
+                      <div className={styles.confirm__tip}>
+                        Чтобы отправить заказ, нажмите на кнопку “Оформить заказ”
+                      </div>
+                      <div className='confirm__button'>
+                        <button type='primary' onClick={createOrderHandler}>Оформить заказ</button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -765,12 +771,6 @@ const Request = () => {
                   </div>
                 </div> */}
                 {/* <Alert message="Если вы готовы заказать доставку, нажмите на кнопку снизу" className='mb-3' type="error"/> */}
-                <div className={styles.confirm__tip}>
-                  Чтобы отправить заказ, нажмите на кнопку “Оформить заказ”
-                </div>
-                <div className='confirm__button'>
-                  <button type='primary' onClick={createOrderHandler}>Оформить заказ</button>
-                </div>
             </Form>
         </div>
     )
