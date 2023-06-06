@@ -11,20 +11,15 @@ import Link from 'next/link';
 import { getPrices } from '../../http/price';
 
 
-const Request = () => {
+const Request = ({order, setOrder}) => {
     const { Option } = Select;
     const router = useRouter();
 
-    const [order, setOrder] = useState({
-      len:"",
-      width:"",
-      height:""
-    });
-    const [totalVolume, setTotalVolume] = useState(0);
-    const [totalWeight, setTotalWeight] = useState(0);
-    const [totalDensity, setTotalDensity] = useState(0)
+    const [totalVolume, setTotalVolume] = useState(order && order[0]?.totalVolume || 0);
+    const [totalWeight, setTotalWeight] = useState(order && order[0]?.totalWeight || 0);;
+    const [totalDensity, setTotalDensity] = useState(order && order[0]?.totalDensity || 0);
     const [user, setUser] = useState();
-    const [orders, setOrders] = useState(
+    const [orders, setOrders] = useState(order ||
       [
        {
         type:"",
@@ -40,10 +35,10 @@ const Request = () => {
        } 
       ]
     );
-    const [price1, setPrice1] = useState();
-    const [price2, setPrice2] = useState();
-    const [price3, setPrice3] = useState();
-    const [price4, setPrice4] = useState();
+    const [price1, setPrice1] = useState(order && order[0]?.price1 || 0);
+    const [price2, setPrice2] = useState(order && order[0]?.price2 || 0);
+    const [price3, setPrice3] = useState(order && order[0]?.price3 || 0);
+    const [price4, setPrice4] = useState(order && order[0]?.price4 || 0);
     const [selectedPrice, setSelectedPrice] = useState();
     const [modal, setModal] = useState(false);
     const [indCode, setIndCode] = useState();
@@ -55,15 +50,8 @@ const Request = () => {
 
     useEffect(() => {
         const user = JSON.parse(localStorage.getItem("user"))
-        if (user){
-            var decoded = jwt_decode(user?.token);
-            setUser(decoded);
-        }else{
-          router.push("/login")
-          notification['warning']({
-            message:'Чтобы использовать калькулятор вам надо авторизоваться' 
-          })
-        }
+        var decoded = user && jwt_decode(user?.token);
+        decoded && setUser(decoded);
         if (window.innerWidth < 500){
           setMobile(true);
         }
@@ -75,17 +63,37 @@ const Request = () => {
     }, [])
 
       const createOrderHandler = () => { 
-        if (!(totalVolume && totalWeight && selectedPrice)){
+        if (!(totalVolume && totalWeight)){
           notification["error"]({
             message: "Заполните все поля"
           })
+        }else if (!orders[0]?.deliveryType){
+          notification["error"]({
+            message: "Выберите тип доставки"
+          })
         }else{
+          if (!user){
+            router.push("/register")
+            notification['warning']({
+              message:'Чтобы использовать калькулятор вам надо авторизоваться' 
+            })
+            setOrder(orders.map(order => {
+              order.price1 = price1;
+              order.price2 = price2;
+              order.price3 = price3;
+              order.price4 = price4;
+              order.totalVolume = totalVolume;
+              order.totalDensity = totalDensity;
+              order.totalWeight = totalWeight;
+              return order;
+            }))
+          }else{
         getOrders().then((res) => {
           let count = res.data.length;
           const body = orders.map(order => {
             return {...order, accountId : user?._id, type: order?.name, individualCode: "GT-2023-"+(count+1), price: selectedPrice, volume: totalVolume, totalWeight: totalWeight}
           })
-    
+          
           createOrder(body).then((res) => {
             if (res?.status === 201){
               setModal(true)
@@ -115,13 +123,27 @@ const Request = () => {
           })
         })
       }
+      }
      }
      
      const onCancel = () => {
       notification["success"]({
         message:'Ваш заказ создан',
       })
-      setOrder({})
+      setOrder([
+        {
+         type:"",
+         len:"",
+         width:"",
+         height:"",
+         weight:"",
+         count:"",
+         comment:"",
+         volume: "",
+         deliveryType:"",
+         switch: false
+        } 
+       ])
       router.push("/my-orders")
      }
 
@@ -135,15 +157,15 @@ const Request = () => {
           let totalPrice3 = 0;
           let totalPrice4 = 0;
 
-          orders?.map((order, index) => {
+          prices && orders?.map((order, index) => {
           if ((Number(order?.weight) > 0 && Number(order?.len) > 0 && Number(order?.width) > 0 && Number(order?.height) > 0 && Number(order?.count) >0) || (Number(order?.totalVolume) > 0 && Number(order?.totalWeight) > 0)){
             const totalWeight = order?.switch ? Number(order?.totalWeight) :  Number(order?.weight)*Number(order?.count); 
             const totalVolume = order?.switch ? Number(order?.totalVolume) : ((Number(order?.len)/100) * (Number(order?.width)/100) * (Number(order?.height)/100)) * Number(order.count);
             const density = totalWeight / totalVolume;
             const active = order?.switch;
-            setTotalVolume(totalVolume);
-            setTotalWeight(totalWeight);
-            setTotalDensity(totalWeight / totalVolume);
+            setTotalVolume(parseFloat(totalVolume.toFixed(2)));
+            setTotalWeight(parseFloat(totalWeight.toFixed(2)));
+            setTotalDensity(parseFloat(density.toFixed(2)));
 
           if (totalWeight <= 30 && totalVolume <= 0.2){
             totalPrice1 += 7 * totalWeight;
@@ -178,10 +200,10 @@ const Request = () => {
                   totalPrice3 += prices[2]?.hoz?.more130Less140 * totalWeight;
                   totalPrice4 += prices[3]?.hoz?.more130Less140 * totalWeight;
                 }else if (density > 140 && density <= 150){
-                  totalPrice1 += prices[0]?.hoz?.more140Less150 * totalWeight;
-                  totalPrice2 += prices[1]?.hoz?.more140Less150 * totalWeight;
-                  totalPrice3 += prices[2]?.hoz?.more140Less150 * totalWeight;
-                  totalPrice4 += prices[3]?.hoz?.more140Less150 * totalWeight;
+                  totalPrice1 += (prices[0] && prices[0]?.hoz?.more140Less150 * totalWeight);
+                  totalPrice2 += (prices[1] && prices[1]?.hoz?.more140Less150 * totalWeight);
+                  totalPrice3 += (prices[2] && prices[2]?.hoz?.more140Less150 * totalWeight);
+                  totalPrice4 += (prices[3] && prices[3]?.hoz?.more140Less150 * totalWeight);
                 }else if (density > 150 && density <= 160){
                   totalPrice1 += prices[0]?.hoz?.more150Less160 * totalWeight;
                   totalPrice2 += prices[1]?.hoz?.more150Less160 * totalWeight;
@@ -275,10 +297,10 @@ const Request = () => {
               totalPrice3 += prices[2]?.hoz?.more130Less140 * totalWeight;
               totalPrice4 += prices[3]?.hoz?.more130Less140 * totalWeight;
             }else if (density > 140 && density <= 150){
-              totalPrice1 += prices[0]?.tnp?.more140Less150 * totalWeight;
-              totalPrice2 += prices[1]?.tnp?.more140Less150 * totalWeight;
-              totalPrice3 += prices[2]?.hoz?.more140Less150 * totalWeight;
-              totalPrice4 += prices[3]?.hoz?.more140Less150 * totalWeight;
+              totalPrice1 += (prices[0] && prices[0]?.tnp?.more140Less150 * totalWeight);
+              totalPrice2 += (prices[1] && prices[1]?.tnp?.more140Less150 * totalWeight);
+              totalPrice3 += (prices[2] && prices[2]?.hoz?.more140Less150 * totalWeight);
+              totalPrice4 += (prices[3] && prices[3]?.hoz?.more140Less150 * totalWeight);
             }else if (density > 150 && density <= 160){
               totalPrice1 += prices[0]?.tnp?.more150Less160 * totalWeight;
               totalPrice2 += prices[1]?.tnp?.more150Less160 * totalWeight;
@@ -352,6 +374,9 @@ const Request = () => {
             setPrice2(0);
             setPrice3(0);
             setPrice4(0);
+            setTotalDensity(0);
+            setTotalVolume(0);
+            setTotalWeight(0);
           }
           })
           if (totalPrice1 !== 0){
@@ -533,7 +558,7 @@ const Request = () => {
         return checkButton
       } 
 
-    const priceSelectHandler = (e, price) => {
+  const priceSelectHandler = (e, price) => {
       setOrders(orders.map(order => {
         order.deliveryType = e.target.value;
         return order;
@@ -549,7 +574,7 @@ const Request = () => {
               width={!mobile ?  "80%" : '95%'}
             > 
               <div className={styles.modal__title}>
-                Ваша заявка
+                Ваш код
               </div>
               <div className={styles.inds}>
                 <div className={styles.ind}>Код вашего отправления: <span>{indCode}</span></div>
@@ -586,29 +611,29 @@ const Request = () => {
               </div>
             </Modal> */}
             <div className={`${styles.title}`}>
-                <h4>Калькулятор</h4>
+                <h4>Калькулятор карго (пиндуо/1688 и др)</h4>
             </div>
-            <div className={styles.tips}>
+            {/* <div className={styles.tips}>
               <div className={styles.tip}>
                 1. Заполните параметры товара.
               </div>
               <div className={styles.tip}>
                 2. Стоимость доставки появится автоматически, когда вы введете информацию груза (вес, длина, ширина, высота, количество)
               </div>
-            </div>
+            </div> */}
             {/* <Alert message="Укажите параметры товара" type="info" className='w-75 ms-auto me-auto mb-3' showIcon />
             <Alert message="Цена появится автоматически когда введете информацию про груз (вес, длина, ширина, высота, количество)" className='w-75 ms-auto me-auto mb-3' type="warning" showIcon /> */}
             <Form className={`w-100 ms-auto me-auto ${styles.form}`}>
               {
-                orders.map((order, index) => (
+                orders && orders?.map((order, index) => (
                   <div className='mb-3'>
                   <div className='d-md-flex gap-3 d-block'>
                     <div className={styles.selects__wrapper}>
                       <div className={styles.item}>
                         <div className={`mb-md-3 mb-2`}>
                           <Select placeholder="Наименование груза" className={`w-100 select`} style={{width:"100%"}}
-                            
                             onChange={(e, label) => typeHandler(e, label, index)}
+                            value={order?.type}
                             options={
                               [
                                 {
@@ -708,13 +733,13 @@ const Request = () => {
                   <div className={styles.overall__wrapper}>
                     <div className={styles.overall}>
                       <div className={styles.overall__item}>
-                        Общий объем доставки: <span>{totalVolume} м3</span>
+                        Общий объем доставки: <span>{order?.totalVolume || totalVolume} м3</span>
                       </div> 
                       <div className={styles.overall__item}>
-                        Вес: <span>{totalWeight} кг</span>
+                        Вес: <span>{order?.totalWeight || totalWeight} кг</span>
                       </div> 
                       <div className={`${styles.overall__item} mb-md-3 mb-0`}>
-                        Плотность: <span>{totalDensity} кг/куб</span>    
+                        Плотность: <span>{order?.totalDensity || totalDensity} кг/куб</span>    
                       </div>
                       <div className={styles.overall__item}>
                         Выберите вариант:
@@ -742,10 +767,10 @@ const Request = () => {
                         </div>
                       </Radio.Group>
                       <div className={styles.confirm__tip}>
-                        Чтобы отправить заказ, нажмите на кнопку “Оформить заказ”
+                        Чтобы отправить заказ, нажмите на кнопку “Получить код”
                       </div>
                       <div className='confirm__button'>
-                        <button type='primary' onClick={createOrderHandler}>Оформить заказ</button>
+                        <button type='primary' onClick={createOrderHandler}>Получить код</button>
                       </div>
                     </div>
                   </div>
