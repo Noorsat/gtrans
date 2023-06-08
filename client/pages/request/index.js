@@ -161,12 +161,16 @@ const Request = ({order, setOrder}) => {
           if ((Number(order?.weight) > 0 && Number(order?.len) > 0 && Number(order?.width) > 0 && Number(order?.height) > 0 && Number(order?.count) >0) || (Number(order?.totalVolume) > 0 && Number(order?.totalWeight) > 0)){
             const totalWeight = order?.switch ? Number(order?.totalWeight) :  Number(order?.weight)*Number(order?.count); 
             const totalVolume = order?.switch ? Number(order?.totalVolume) : ((Number(order?.len)/100) * (Number(order?.width)/100) * (Number(order?.height)/100)) * Number(order.count);
+            console.log(totalVolume)
             const density = totalWeight / totalVolume;
             const active = order?.switch;
             setTotalVolume(parseFloat(totalVolume.toFixed(2)));
             setTotalWeight(parseFloat(totalWeight.toFixed(2)));
             setTotalDensity(parseFloat(density.toFixed(2)));
-
+            const priceByDensity = prices?.map(price => {
+              return price?.items.filter((item) => item?.from < density && item?.to >= density);
+            }).flatMap(arr => arr);
+            console.log(priceByDensity)
           if (totalWeight <= 30 && totalVolume <= 0.2){
             totalPrice1 += 7 * totalWeight;
             totalPrice2 += 7 * totalWeight;
@@ -174,199 +178,15 @@ const Request = ({order, setOrder}) => {
             totalPrice4 += 7 * totalWeight;
           }else{ 
             if (order?.type === "first"){
-                if (density < 100){
-                  totalPrice1 += (Number(totalVolume) * prices[0].hoz?.less100);
-                  totalPrice2 += (Number(totalVolume) * prices[1].hoz?.less100);
-                  totalPrice3 += (Number(totalVolume) * prices[2].hoz?.less100);
-                  totalPrice4 += (Number(totalVolume) * prices[3].hoz?.less100);
-                }else if (density > 100 && density <= 110){
-                  totalPrice1 += prices[0]?.hoz?.more100Less110 * totalWeight;
-                  totalPrice2 += prices[1]?.hoz?.more100Less110 * totalWeight;
-                  totalPrice3 += prices[2]?.hoz?.more100Less110 * totalWeight;
-                  totalPrice4 += prices[3]?.hoz?.more100Less110 * totalWeight;
-                }else if (density > 110 && density <= 120){
-                  totalPrice1 += prices[0]?.hoz?.more110Less120 * totalWeight;
-                  totalPrice2 += prices[1]?.hoz?.more110Less120 * totalWeight;
-                  totalPrice3 += prices[2]?.hoz?.more110Less120 * totalWeight;
-                  totalPrice4 += prices[3]?.hoz?.more110Less120 * totalWeight;
-                }else if (density > 120 && density <= 130){
-                  totalPrice1 += prices[0]?.hoz?.more120Less130 * totalWeight;
-                  totalPrice2 += prices[1]?.hoz?.more120Less130 * totalWeight;
-                  totalPrice3 += prices[2]?.hoz?.more120Less130 * totalWeight;
-                  totalPrice4 += prices[3]?.hoz?.more120Less130 * totalWeight;
-                }else if (density > 130 && density <= 140){
-                  totalPrice1 += prices[0]?.hoz?.more130Less140 * totalWeight;
-                  totalPrice2 += prices[1]?.hoz?.more130Less140 * totalWeight;
-                  totalPrice3 += prices[2]?.hoz?.more130Less140 * totalWeight;
-                  totalPrice4 += prices[3]?.hoz?.more130Less140 * totalWeight;
-                }else if (density > 140 && density <= 150){
-                  totalPrice1 += (prices[0] && prices[0]?.hoz?.more140Less150 * totalWeight);
-                  totalPrice2 += (prices[1] && prices[1]?.hoz?.more140Less150 * totalWeight);
-                  totalPrice3 += (prices[2] && prices[2]?.hoz?.more140Less150 * totalWeight);
-                  totalPrice4 += (prices[3] && prices[3]?.hoz?.more140Less150 * totalWeight);
-                }else if (density > 150 && density <= 160){
-                  totalPrice1 += prices[0]?.hoz?.more150Less160 * totalWeight;
-                  totalPrice2 += prices[1]?.hoz?.more150Less160 * totalWeight;
-                  totalPrice3 += prices[2]?.hoz?.more150Less160 * totalWeight;
-                  totalPrice4 += prices[3]?.hoz?.more150Less160 * totalWeight;
-                }else if(density > 160 && density <= 170){
-                  totalPrice1 += prices[0]?.hoz?.more150Less160 * totalWeight;
-                  totalPrice2 += prices[1]?.hoz?.more150Less160 * totalWeight;
-                  totalPrice3 += prices[2]?.hoz?.more150Less160 * totalWeight;
-                  totalPrice4 += prices[3]?.hoz?.more150Less160 * totalWeight;
-                }else if(density > 170 && density <= 180){
-                  totalPrice1 += prices[0]?.hoz?.more170Less180 * totalWeight;
-                  totalPrice2 += prices[1]?.hoz?.more170Less180 * totalWeight;
-                  totalPrice3 += prices[2]?.hoz?.more170Less180 * totalWeight;
-                  totalPrice4 += prices[3]?.hoz?.more170Less180 * totalWeight;
-                }else if(density > 180 && density <= 190){
-                  totalPrice1 += prices[0]?.hoz?.more180Less190 * totalWeight;
-                  totalPrice2 += prices[1]?.hoz?.more180Less190 * totalWeight;
-                  totalPrice3 += prices[2]?.hoz?.more180Less190 * totalWeight;
-                  totalPrice4 += prices[3]?.hoz?.more180Less190 * totalWeight;
-                }else if(density > 190 && density <= 200){
-                  totalPrice1 += prices[0]?.hoz?.more190Less200 * totalWeight;
-                  totalPrice2 += prices[1]?.hoz?.more190Less200 * totalWeight;
-                  totalPrice3 += prices[2]?.hoz?.more190Less200 * totalWeight;
-                  totalPrice4 += prices[3]?.hoz?.more190Less200 * totalWeight;
-                }else if (density > 200 && density <= 250){
-                  totalPrice1 += prices[0]?.hoz?.more200Less250 * totalWeight;
-                  totalPrice2 += prices[1]?.hoz?.more200Less250 * totalWeight;
-                  totalPrice3 += prices[2]?.hoz?.more200Less250 * totalWeight;
-                  totalPrice4 += prices[3]?.hoz?.more200Less250 * totalWeight;
-                }else if (density > 250 && density <= 300){
-                  totalPrice1 += prices[0]?.hoz?.more250Less300 * totalWeight;
-                  totalPrice2 += prices[1]?.hoz?.more250Less300 * totalWeight;
-                  totalPrice3 += prices[2]?.hoz?.more250Less300 * totalWeight;
-                  totalPrice4 += prices[3]?.hoz?.more250Less300 * totalWeight;
-                }else if (density > 300 && density <= 350){
-                  totalPrice1 += prices[0]?.hoz?.more300Les  * totalWeight;
-                  totalPrice2 += prices[1]?.hoz?.more300Less350 * totalWeight;
-                  totalPrice3 += prices[2]?.hoz?.more300Less350 * totalWeight;
-                  totalPrice4 += prices[3]?.hoz?.more300Less350 * totalWeight;
-                }else if (density > 350 && density <= 400){
-                  totalPrice1 += prices[0]?.hoz?.more350Less400 * totalWeight;
-                  totalPrice2 += prices[1]?.hoz?.more350Less400 * totalWeight;
-                  totalPrice3 += prices[2]?.hoz?.more350Less400 * totalWeight;
-                  totalPrice4 += prices[3]?.hoz?.more350Less400 * totalWeight;
-                }else if (density > 400 && density <= 600){
-                  totalPrice1 += prices[0]?.hoz?.more400Less600 * totalWeight;
-                  totalPrice2 += prices[1]?.hoz?.more400Less600 * totalWeight;
-                  totalPrice3 += prices[2]?.hoz?.more400Less600 * totalWeight;
-                  totalPrice4 += prices[3]?.hoz?.more400Less600 * totalWeight;
-                }else if (density > 600 && density <= 800){
-                  totalPrice1 += prices[0]?.hoz?.more600Less800 * totalWeight;
-                  totalPrice2 += prices[1]?.hoz?.more600Less800 * totalWeight;
-                  totalPrice3 += prices[2]?.hoz?.more600Less800 * totalWeight;
-                  totalPrice4 += prices[3]?.hoz?.more600Less800 * totalWeight;
-                }else if (density > 800 && density <= 1000){
-                  totalPrice1 += prices[0]?.hoz?.more800Less1000 * totalWeight;
-                  totalPrice2 += prices[1]?.hoz?.more800Less1000 * totalWeight;
-                  totalPrice3 += prices[2]?.hoz?.more800Less1000 * totalWeight;
-                  totalPrice4 += prices[3]?.hoz?.more800Less1000 * totalWeight;
-                }else if (density > 1000){
-                  totalPrice1 += prices[0]?.hoz?.more1000 * totalWeight;
-                  totalPrice2 += prices[1]?.hoz?.more1000 * totalWeight;
-                  totalPrice3 += prices[2]?.hoz?.more1000 * totalWeight;
-                  totalPrice4 += prices[3]?.hoz?.more1000 * totalWeight;
-                }
+              totalPrice1 += (Number(totalVolume) * priceByDensity[0]?.hoz)
+              totalPrice2 += (Number(totalVolume) * priceByDensity[1]?.hoz)
+              totalPrice3 += (Number(totalVolume) * priceByDensity[2]?.hoz)
+              totalPrice4 += (Number(totalVolume) * priceByDensity[2]?.hoz)
           }else if(order?.type === "second"){
-            if (density < 100){
-              totalPrice1 += totalVolume * prices[0]?.tnp?.less100;
-              totalPrice2 += totalVolume * prices[1]?.tnp?.less100;
-              totalPrice3 += totalVolume * prices[2]?.hoz?.less100;
-              totalPrice4 += totalVolume * prices[3]?.hoz?.less100;
-            }else if (density >= 100 && density <= 110){
-              totalPrice1 += prices[0]?.tnp?.more100Less110 * totalWeight;
-              totalPrice2 += prices[1]?.tnp?.more100Less110 * totalWeight;
-              totalPrice3 += prices[2]?.hoz?.more100Less110 * totalWeight;
-              totalPrice4 += prices[3]?.hoz?.more100Less110 * totalWeight;
-            }else if (density > 110 && density <= 120){
-              totalPrice1 += prices[0]?.tnp?.more110Less120 * totalWeight;
-              totalPrice2 += prices[1]?.tnp?.more110Less120 * totalWeight;
-              totalPrice3 += prices[2]?.hoz?.more110Less120 * totalWeight;
-              totalPrice4 += prices[3]?.hoz?.more110Less120 * totalWeight;
-            }else if (density > 120 && density <= 130){
-              totalPrice1 += prices[0]?.tnp?.more120Less130 * totalWeight;
-              totalPrice2 += prices[1]?.tnp?.more120Less130 * totalWeight;
-              totalPrice3 += prices[2]?.hoz?.more120Less130 * totalWeight;
-              totalPrice4 += prices[3]?.hoz?.more120Less130 * totalWeight;
-            }else if (density > 130 && density <= 140){
-              totalPrice1 += prices[0]?.tnp?.more130Less140 * totalWeight;
-              totalPrice2 += prices[1]?.tnp?.more130Less140 * totalWeight;
-              totalPrice3 += prices[2]?.hoz?.more130Less140 * totalWeight;
-              totalPrice4 += prices[3]?.hoz?.more130Less140 * totalWeight;
-            }else if (density > 140 && density <= 150){
-              totalPrice1 += (prices[0] && prices[0]?.tnp?.more140Less150 * totalWeight);
-              totalPrice2 += (prices[1] && prices[1]?.tnp?.more140Less150 * totalWeight);
-              totalPrice3 += (prices[2] && prices[2]?.hoz?.more140Less150 * totalWeight);
-              totalPrice4 += (prices[3] && prices[3]?.hoz?.more140Less150 * totalWeight);
-            }else if (density > 150 && density <= 160){
-              totalPrice1 += prices[0]?.tnp?.more150Less160 * totalWeight;
-              totalPrice2 += prices[1]?.tnp?.more150Less160 * totalWeight;
-              totalPrice3 += prices[2]?.hoz?.more150Less160 * totalWeight;
-              totalPrice4 += prices[3]?.hoz?.more150Less160 * totalWeight;
-            }else if(density > 160 && density <= 170){
-              totalPrice1 += prices[0]?.tnp?.more150Less160 * totalWeight;
-              totalPrice2 += prices[1]?.tnp?.more150Less160 * totalWeight;
-              totalPrice3 += prices[2]?.hoz?.more150Less160 * totalWeight;
-              totalPrice4 += prices[3]?.hoz?.more150Less160 * totalWeight;
-            }else if(density > 170 && density <= 180){
-              totalPrice1 += prices[0]?.tnp?.more170Less180 * totalWeight;
-              totalPrice2 += prices[1]?.tnp?.more170Less180 * totalWeight;
-              totalPrice3 += prices[2]?.hoz?.more170Less180 * totalWeight;
-              totalPrice4 += prices[3]?.hoz?.more170Less180 * totalWeight;
-            }else if(density > 180 && density <= 190){
-              totalPrice1 += prices[0]?.tnp?.more180Less190 * totalWeight;
-              totalPrice2 += prices[1]?.tnp?.more180Less190 * totalWeight;
-              totalPrice3 += prices[2]?.hoz?.more180Less190 * totalWeight;
-              totalPrice4 += prices[3]?.hoz?.more180Less190 * totalWeight;
-            }else if(density > 190 && density <= 200){
-              totalPrice1 += prices[0]?.tnp?.more190Less200 * totalWeight;
-              totalPrice2 += prices[1]?.tnp?.more190Less200 * totalWeight;
-              totalPrice3 += prices[2]?.hoz?.more190Less200 * totalWeight;
-              totalPrice4 += prices[3]?.hoz?.more190Less200 * totalWeight;
-            }else if (density > 200 && density <= 250){
-              totalPrice1 += prices[0]?.tnp?.more200Less250 * totalWeight;
-              totalPrice2 += prices[1]?.tnp?.more200Less250 * totalWeight;
-              totalPrice3 += prices[2]?.hoz?.more200Less250 * totalWeight;
-              totalPrice4 += prices[3]?.hoz?.more200Less250 * totalWeight;
-            }else if (density > 250 && density <= 300){
-              totalPrice1 += prices[0]?.tnp?.more250Less300 * totalWeight;
-              totalPrice2 += prices[1]?.tnp?.more250Less300 * totalWeight;
-              totalPrice3 += prices[2]?.hoz?.more250Less300 * totalWeight;
-              totalPrice4 += prices[3]?.hoz?.more250Less300 * totalWeight;
-            }else if (density > 300 && density <= 350){
-              totalPrice1 += prices[0]?.tnp?.more300Less350 * totalWeight;
-              totalPrice2 += prices[1]?.tnp?.more300Less350 * totalWeight;
-              totalPrice3 += prices[2]?.hoz?.more300Less350 * totalWeight;
-              totalPrice4 += prices[3]?.hoz?.more300Less350 * totalWeight;
-            }else if (density > 350 && density <= 400){
-              totalPrice1 += prices[0]?.tnp?.more350Less400 * totalWeight;
-              totalPrice2 += prices[1]?.tnp?.more350Less400 * totalWeight;
-              totalPrice3 += prices[2]?.hoz?.more350Less400 * totalWeight;
-              totalPrice4 += prices[3]?.hoz?.more350Less400 * totalWeight;
-            }else if (density > 400 && density <= 600){
-              totalPrice1 += prices[0]?.tnp?.more400Less600 * totalWeight;
-              totalPrice2 += prices[1]?.tnp?.more400Less600 * totalWeight;
-              totalPrice3 += prices[2]?.hoz?.more400Less600 * totalWeight;
-              totalPrice4 += prices[3]?.hoz?.more400Less600 * totalWeight;
-            }else if (density > 600 && density <= 800){
-              totalPrice1 += prices[0]?.tnp?.more600Less800 * totalWeight;
-              totalPrice2 += prices[1]?.tnp?.more600Less800 * totalWeight;
-              totalPrice3 += prices[2]?.hoz?.more600Less800 * totalWeight;
-              totalPrice4 += prices[3]?.hoz?.more600Less800 * totalWeight;
-            }else if (density > 800 && density <= 1000){
-              totalPrice1 += prices[0]?.tnp?.more800Less1000 * totalWeight;
-              totalPrice2 += prices[1]?.tnp?.more800Less1000 * totalWeight;
-              totalPrice3 += prices[2]?.hoz?.more800Less1000 * totalWeight;
-              totalPrice4 += prices[3]?.hoz?.more800Less1000 * totalWeight;
-            }else if (density > 1000){
-              totalPrice1 += prices[0]?.tnp?.more1000 * totalWeight;
-              totalPrice2 += prices[1]?.tnp?.more1000 * totalWeight;
-              totalPrice3 += prices[2]?.hoz?.more1000 * totalWeight;
-              totalPrice4 += prices[3]?.hoz?.more1000 * totalWeight;
-            }
+            totalPrice1 += totalVolume * priceByDensity[0]?.tnp;
+            totalPrice2 += totalVolume * priceByDensity[1]?.tnp;
+            totalPrice3 += totalVolume * priceByDensity[2]?.hoz;
+            totalPrice4 += totalVolume * priceByDensity[3]?.hoz;
           }
           }
           }else{

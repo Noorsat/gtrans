@@ -279,19 +279,29 @@ import { style } from '@mui/system';
       setPriceModal(false);
     }
 
-    const hozInputHandler = (value, name, id) => {
+    const hozInputHandler = (value, from, to, id) => {
       setPrices(prices.map(price => {
         if (price._id == id){
-          price.hoz[name] = value === '' ? '' : parseFloat(value);
+          price.items = price.items?.map(item => {
+            if (item?.from == from && item?.to == to){
+              item.hoz = value;
+            }
+            return item;
+          })
         }
         return price;
       }))
     }
 
-    const tnpInputHandler = (value, name, id) => {
+    const tnpInputHandler = (value, from, to, id) => {
       setPrices(prices.map(price => {
         if (price._id == id){
-          price.tnp[name] = value === '' ? '' : parseFloat(value);
+          price.items = price.items?.map(item => {
+            if (item?.from == from && item?.to == to){
+              item.tnp = value;
+            }
+            return item;
+          })
         }
         return price;
       }))
@@ -566,294 +576,47 @@ import { style } from '@mui/system';
             dashboardMode === 'Цены' && (
               <div className={styles.table__items}>
                 {
-                  prices?.map(price => (
-                    <div className={styles.table__wrapper}>
-                  <div className={styles.admin__title}>
-                    {price?.title}
-                  </div>
-                  <table className={styles.tablesss}>
-                    <thead>
-                      <th>
-                        Вес в 1 кубе (плотность)
-                      </th>
-                      <th>  
-                        Цена ($) за 1 кг <br></br>Хозка  
-                      </th>
-                      {
-                        price?.tnp &&
-                        <th>
-                          Цена ($) за 1 кг <br></br>ТНП  
-                        </th>
-                      }
-                    </thead>
-                    <tr>
-                      <td>
-                        1000 и выше
-                      </td>
-                      <td>  
-                        <input type='number' value={price?.hoz?.more1000} onChange={(e) => hozInputHandler(e.target.value, 'more1000', price?._id)}/>
-                      </td>
-                      {
-                        price.tnp &&
-                        <td>
-                          <input type='number' value={price?.tnp?.more1000} onChange={(e) => tnpInputHandler(e.target.value, 'more1000', price?._id)}/>
-                        </td> 
-                      }
-                    </tr>
-                    <tr>
-                      <td>
-                        800-1000
-                      </td>
-                      <td>  
-                        <input type='number'  value={price?.hoz?.more800Less1000} onChange={(e) => hozInputHandler(e.target.value, 'more800Less1000', price?._id)}/>
-                      </td>
-                      {
-                        price.tnp &&
-                        <td>
-                          <input type='number' value={price?.tnp?.more800Less1000} onChange={(e) => tnpInputHandler(e.target.value, 'more800Less1000', price?._id)}/>
-                        </td>
-                      }
-                    </tr>
-                    <tr>
-                      <td>
-                        600-800
-                      </td>
-                      <td>  
-                        <input type='number' value={price?.hoz?.more600Less800} onChange={(e) => hozInputHandler(e.target.value, 'more600Less800', price?._id)}/>
-                      </td>
-                      {
-                        price.tnp &&
-                        <td>
-                          <input type='number' value={price?.tnp?.more600Less800} onChange={(e) => tnpInputHandler(e.target.value, 'more600Less800', price?._id)}/>
-                        </td>
-                      }
-                    </tr>
-                    <tr>
-                      <td>
-                        400-600
-                      </td>
-                      <td>  
-                        <input type='number' value={price?.hoz?.more400Less600} onChange={(e) => hozInputHandler(e.target.value, 'more400Less600', price?._id)}/>
-                      </td>
-                      {
-                        price.tnp &&
-                        <td>
-                          <input type='number' value={price?.tnp?.more400Less600} onChange={(e) => tnpInputHandler(e.target.value, 'more400Less600', price?._id)}/>
-                        </td>
-                      }
-                    </tr>
-                    <tr>
-                      <td>
-                        350-400
-                      </td>
-                      <td>  
-                        <input type='number' value={price?.hoz?.more350Less400} onChange={(e) => hozInputHandler(e.target.value, 'more350Less400', price?._id)}/>
-                      </td>
-                      {
-                        price.tnp &&
-                        <td>
-                          <input type='number' value={price?.tnp?.more350Less400} onChange={(e) => tnpInputHandler(e.target.value, 'more350Less400', price?._id)}/>
-                        </td>
-                      }
-                    </tr>
-                    <tr>
-                      <td>
-                        300-350
-                      </td>
-                      <td>  
-                        <input type='number' value={price?.hoz?.more300Less350} onChange={(e) => hozInputHandler(e.target.value, 'more300Less350', price?._id)}/>
-                      </td>
-                      {
-                        price.tnp &&
-                        <td>
-                          <input type='number' value={price?.tnp?.more300Less350} onChange={(e) => tnpInputHandler(e.target.value, 'more300Less350', price?._id)}/>
-                        </td>
-                      }
-                    </tr>
-                    <tr>
-                      <td>
-                        250-300
-                      </td>
-                      <td>  
-                        <input type='number' value={price?.hoz?.more250Less300} onChange={(e) => hozInputHandler(e.target.value, 'more250Less300', price?._id)}/>
-                      </td>
-                      {
-                        price.tnp &&
-                        <td>
-                          <input type='number' value={price?.tnp?.more250Less300} onChange={(e) => tnpInputHandler(e.target.value, 'more250Less300', price?._id)}/>
-                        </td>
-                      }
-                    </tr>
-                    <tr>
-                      <td>
-                        200-250
-                      </td>
-                      <td>  
-                        <input type='number' value={price?.hoz?.more200Less250} onChange={(e) => hozInputHandler(e.target.value, 'more200Less250', price?._id)}/>
-                      </td>
-                      {
-                        price.tnp &&
-                        <td>
-                          <input type='number' value={price?.tnp?.more200Less250} onChange={(e) => tnpInputHandler(e.target.value, 'more200Less250', price?._id)}/>
-                        </td>
-                      }
-                    </tr>
-                    <tr>
-                      <td>
-                        190-200
-                      </td>
-                      <td>  
-                        <input type='number' value={price?.hoz?.more190Less200} onChange={(e) => hozInputHandler(e.target.value, 'more190Less200', price?._id)}/>
-                      </td>
-                      {
-                        price.tnp &&
-                        <td>
-                          <input type='number' value={price?.tnp?.more190Less200} onChange={(e) => tnpInputHandler(e.target.value, 'more190Less200', price?._id)}/>
-                        </td>
-                      }
-                    </tr>
-                    <tr>
-                      <td>
-                        180-190
-                      </td>
-                      <td>  
-                        <input type='number' value={price?.hoz?.more180Less190} onChange={(e) => hozInputHandler(e.target.value, 'more180Less190', price?._id)}/>
-                      </td>
-                      {
-                        price.tnp &&
-                        <td>
-                          <input type='number' value={price?.tnp?.more180Less190} onChange={(e) => tnpInputHandler(e.target.value, 'more180Less190', price?._id)}/>
-                        </td>
-                      }
-                    </tr>
-                    <tr>
-                      <td>
-                        170-180
-                      </td>
-                      <td>  
-                        <input type='number' value={price?.hoz?.more170Less180} onChange={(e) => hozInputHandler(e.target.value, 'more170Less180', price?._id)}/>
-                      </td>
-                      {
-                        price.tnp &&
-                        <td>
-                          <input type='number' value={price?.tnp?.more170Less180} onChange={(e) => tnpInputHandler(e.target.value, 'more170Less180', price?._id)}/>
-                        </td>
-                      }
-                    </tr>
-                    <tr>
-                      <td>
-                        160-170
-                      </td>
-                      <td>  
-                        <input type='number' value={price?.hoz?.more160Less170} onChange={(e) => hozInputHandler(e.target.value, 'more160Less170', price?._id)}/>
-                      </td>
-                      {
-                        price.tnp &&
-                        <td>
-                          <input type='number' value={price?.tnp?.more160Less170} onChange={(e) => tnpInputHandler(e.target.value, 'more160Less170', price?._id)}/>
-                        </td>
-                      }
-                    </tr>
-                    <tr>
-                      <td>
-                        150-160
-                      </td>
-                      <td>  
-                        <input type='number' value={price?.hoz?.more150Less160} onChange={(e) => hozInputHandler(e.target.value, 'more150Less160', price?._id)}/>
-                      </td>
-                      {
-                        price.tnp &&
-                        <td>
-                          <input type='number' value={price?.tnp?.more150Less160} onChange={(e) => tnpInputHandler(e.target.value, 'more150Less160', price?._id)}/>
-                        </td>
-                      }
-                    </tr>
-                    <tr>
-                      <td>
-                        140-150
-                      </td>
-                      <td>  
-                        <input type='number' value={price?.hoz?.more140Less150} onChange={(e) => hozInputHandler(e.target.value, 'more140Less150', price?._id)}/>
-                      </td>
-                      {
-                        price.tnp &&
-                        <td>
-                          <input type='number' value={price?.tnp?.more140Less150} onChange={(e) => tnpInputHandler(e.target.value, 'more140Less150', price?._id)}/>
-                        </td>
-                      }
-                    </tr>
-                    <tr>
-                      <td>
-                        130-140
-                      </td>
-                      <td>  
-                        <input type='number' value={price?.hoz?.more130Less140} onChange={(e) => hozInputHandler(e.target.value, 'more130Less140', price?._id)}/>
-                      </td>
-                      {
-                        price.tnp &&
-                        <td>
-                          <input type='number' value={price?.tnp?.more130Less140} onChange={(e) => tnpInputHandler(e.target.value, 'more130Less140', price?._id)}/>
-                        </td>
-                      }
-                    </tr>
-                    <tr>
-                      <td>
-                        120-130
-                      </td>
-                      <td>  
-                        <input type='number' value={price?.hoz?.more120Less130} onChange={(e) => hozInputHandler(e.target.value, 'more120Less130', price?._id)}/>
-                      </td>
-                      {
-                        price.tnp &&
-                        <td>
-                          <input type='number' value={price?.tnp?.more120Less130} onChange={(e) => tnpInputHandler(e.target.value, 'more120Less130', price?._id)}/>
-                        </td>
-                      }
-                    </tr>
-                    <tr>
-                      <td>
-                        110-120
-                      </td>
-                      <td>  
-                        <input type='number' value={price?.hoz?.more110Less120} onChange={(e) => hozInputHandler(e.target.value, 'more110Less120', price?._id)}/>
-                      </td>
-                      {
-                        price.tnp && 
-                        <td>
-                          <input type='number' value={price?.tnp?.more110Less120} onChange={(e) => tnpInputHandler(e.target.value, 'more110Less120', price?._id)}/>
-                        </td>
-                      }
-                    </tr>
-                    <tr>
-                      <td>
-                        100-110
-                      </td>
-                      <td>  
-                        <input type='number' value={price?.hoz?.more100Less110} onChange={(e) => hozInputHandler(e.target.value, 'more100Less110', price?._id)}/>
-                      </td>
-                      {
-                        price.tnp &&
-                        <td>
-                          <input type='number' value={price?.tnp?.more100Less110} onChange={(e) => tnpInputHandler(e.target.value, 'more100Less110', price?._id)}/>
-                        </td> 
-                      }
-                    </tr>
-                    <tr>
-                      <td>
-                        100 и ниже
-                      </td>
-                      <td>  
-                        <input type='number' value={price?.hoz?.less100} onChange={(e) => hozInputHandler(e.target.value, 'less100', price?._id)}/>
-                      </td>
-                      {
-                        price.tnp && 
-                        <td>
-                          <input type='number' value={price?.tnp?.less100} onChange={(e) => tnpInputHandler(e.target.value, 'less100', price?._id)}/>
-                        </td>
-                      }
-                    </tr>
-                  </table>
-                  </div>
+                  prices && prices.map(price => (
+                    <div style={{width: 'fit-content', margin:'10px 0'}}>
+                      <div className={styles.admin__title}>
+                        {price?.title}
+                      </div>
+                      <table className={styles.tablesss}>
+                        <thead>
+                          <th>
+                            Вес в 1 кубе (плотность)
+                          </th>
+                          <th>  
+                            Цена ($) за 1 кг <br></br>Хозка  
+                          </th>
+                          {
+                            price?.title?.includes("Экспрес") &&
+                            <th>
+                              Цена ($) за 1 кг <br></br>ТНП  
+                            </th>
+                          }
+                        </thead>
+                        {
+                          price?.items?.map(item => (
+                            <tr>
+                              <td>
+                                {item?.from} - {item?.to == 999999999 ? '<' : item?.to}
+                              </td>
+                              <td>  
+                                <input type='number' value={item?.hoz} onChange={(e) => hozInputHandler(e.target.value, item?.from, item?.to, price?._id)}/>
+                              </td>
+                              {
+                                price?.title?.includes("Экспрес") &&
+                                <td>
+                                  <input type='number' value={item?.tnp} onChange={(e) => tnpInputHandler(e.target.value, item?.from, item?.to, price?._id)}/>
+                                </td>
+                              }
+                            </tr>
+                          ))
+                        }
+                      </table>
+                    </div>
+       
                   ))
                 }
               <Button type='primary' className={styles.button} onClick={savePriceHandler} style={{width:200}}>
