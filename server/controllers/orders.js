@@ -6,7 +6,7 @@ export const getOrders = async (req, res) => {
     try {
         const orders = await Order.find();
 
-        res.status(200).json(orders)
+        res.status(200).json(orders.reverse())
     }catch (error){
         res.status(404).json({message: error.message})
     }
@@ -249,7 +249,7 @@ export const getOrdersByAccountId = async (req, res) => {
 
     if (orders.length === 0) return res.status(404).json({message: "У этого пользователя нету заказов"})
 
-    return res.status(200).json(orders)
+    return res.status(200).json(orders.reverse())
 }
 
 export const getOrderById = async (req, res) => {
