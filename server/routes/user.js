@@ -1,5 +1,5 @@
 import express from 'express';
-import { forgotPassword, getAllUsers, getUserById, likeAdd, loginUser, resetPassword, resetPasswordPost, signupUser, unlikeAdd } from '../controllers/user.js';
+import { createUserByAdmin, forgotPassword, getAllUsers, getUserById, likeAdd, loginUser, resetPassword, resetPasswordPost, signupUser, unlikeAdd } from '../controllers/user.js';
 
 const router = express.Router();
 //login route
@@ -21,5 +21,7 @@ router.post("/reset-password/:id/:token", resetPasswordPost)
 router.get("/all", getAllUsers)
 
 router.get("/:id", getUserById)
+
+router.post("/admin/signup", createUserByAdmin);
 
 export default router;

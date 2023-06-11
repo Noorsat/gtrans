@@ -45,3 +45,8 @@ export const getUserById = (id) => {
     const response = myAxios.get("/user/"+id);
     return response;
 }
+
+export const signupUserByAdmin = (body) => {
+    const response = myAxios.post("/user/admin/signup", body);
+    return response;
+}

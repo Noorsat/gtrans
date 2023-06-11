@@ -5,10 +5,10 @@ import {
     MenuFoldOutlined,
     MoneyCollectOutlined,
   } from '@ant-design/icons';
-import { Button, Checkbox, Input, Menu, Modal, notification, Table } from 'antd';
+import { Button, Checkbox, Input, Menu, Modal, notification, Table, Form, DatePicker } from 'antd';
 import { useState, useEffect } from 'react';
 import jwt_decode from "jwt-decode";
-import { getAllUsers, getUserById } from '../../http/auth';
+import { getAllUsers, getUserById, signupUserByAdmin } from '../../http/auth';
 import { acceptProduct, addTrackerCode, changePriceByAdmin, getOrders, getOrdersByAccountId, removeTrackCode } from '../../http/orders';
 import styles from './Admin.module.css';
 import { getId } from '../../components/validation';
@@ -42,6 +42,7 @@ import { style } from '@mui/system';
     const [dashboardData, setDashboardData] = useState();
     const [dashboardColumns, setDashboardColumns] = useState();
     const [phoneInput, setPhoneInput] = useState();
+    const [createUserModal, setCreateUserModal] = useState();
     const [trackerModal, setTrackerModal] = useState();
     const [trackerSecondModal, setTrackerSecondModal] = useState();
     const [selectedIndCode, setSelectedIndCode] = useState();
@@ -59,16 +60,14 @@ import { style } from '@mui/system';
     const [allOrders, setAllOrders] = useState();
     const [individualCodeInput, setIndividualCodeInput] = useState("");
     const [trackCodeInput, setTrackCodeInput] = useState('');
+    const [registerUser, setRegisterUser] = useState({});
 
     const router = useRouter();
 
     useEffect(() => {
         const user = JSON.parse(localStorage.getItem("user"))
-        if (user){
-            var decoded = jwt_decode(user?.token);
-            setUser(decoded);
-        }else{
-            router.push("/login")
+        if (user?.role != "admin"){
+          router.push("/login")
         }
         getPrices().then((res) => {
           setPrices(res.data);
@@ -307,8 +306,6 @@ import { style } from '@mui/system';
       }))
     }
 
-    console.log(prices);
-    
     const savePriceHandler = () => {
       changePrice({prices:prices}).then((res) => {
         if (res.status === 200){
@@ -323,6 +320,47 @@ import { style } from '@mui/system';
         }
       })
     } 
+
+    const createUserModalCancel = () => {
+      setCreateUserModal(false);
+    }
+
+    const openCreateUserModal = () => {
+      setCreateUserModal(true);
+    }
+
+    const onFinish = () => {
+      if (registerUser.password !== registerUser.confirmPassword){
+        return notification["error"]({
+          message: "Пароли не одинаковые"
+        }) 
+      }
+
+      signupUserByAdmin(registerUser).then((res) => {
+        if (res.status === 200){
+          notification["success"]({
+            message:"Вы успешно создали пользователя"
+          })
+          setRegisterUser({})
+          setCreateUserModal(false)
+          getAllUsers().then((res) => {
+            setDashboardData(res.data)
+            setAllData(res.data)
+        })
+        }else{
+          notification["error"]({
+            message:"Ошибка"
+          })
+        }
+      }).catch((res) => {
+        notification["error"]({
+          message:"Ошибка"
+        })
+      })
+    };
+    const onFinishFailed = (errorInfo) => {
+      console.log('Failed:', errorInfo);
+    };
 
 
     const menuChangeHandler = (e) => {
@@ -495,6 +533,9 @@ import { style } from '@mui/system';
           setDashboardMode('Цены')
         }
     }
+
+    console.log(registerUser)
+
     return (
         <div className={styles.wrapper}>
             <div>
@@ -502,6 +543,119 @@ import { style } from '@mui/system';
                     <Table columns={userModalColumns} dataSource={userModalData} pagination={false} />
                 </Modal>
             </div>
+            <Modal open={createUserModal} footer={[]} onCancel={createUserModalCancel}>
+            <Form
+              name="basic"
+              style={{
+                maxWidth: 450,
+              }}
+              initialValues={{
+                remember: true,
+              }}
+              labelCol={{
+                span: 9,
+              }}
+              wrapperCol={{
+                span: 20,
+              }}
+              onFinish={onFinish}
+              onFinishFailed={onFinishFailed}
+              autoComplete="off"
+            >
+              <Form.Item
+                label="Email"
+                name="email"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Пожалуйста, введите адрес электронной почты!',
+                  },
+                ]}
+              >
+                <Input value={registerUser?.email} onChange={(e) => setRegisterUser({...registerUser, email: e.target.value})} />
+              </Form.Item>
+              <Form.Item
+                label="Имя"
+                name="name"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Пожалуйста, введите имя!',
+                  },
+                ]}
+              >
+                <Input value={registerUser?.name} onChange={(e) => setRegisterUser({...registerUser, name: e.target.value})}/>
+              </Form.Item>
+              <Form.Item
+                label="Фамилия"
+                name="surname"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Пожалуйста, введите фамилию!',
+                  },
+                ]}
+              >
+                <Input value={registerUser?.surname} onChange={(e) => setRegisterUser({...registerUser, surname: e.target.value})} />
+              </Form.Item>
+              <Form.Item
+                label="Дата рождения"
+                name="dateOfBirth"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Пожалуйста, введите дату рождения!',
+                  },
+                ]}
+              >
+                <DatePicker placeholder='' style={{width: '100%'}} value={registerUser?.dateOfBirth} onChange={(e, time) => setRegisterUser({...registerUser, dateOfBirth: time })}/>
+              </Form.Item>
+
+              <Form.Item
+                label="Телефон"
+                name="phoneNumber"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Пожалуйста, введите номер телефона!',
+                  },
+                ]}
+              >
+                <Input value={registerUser?.phoneNumber} onChange={(e) => setRegisterUser({...registerUser, phoneNumber: e.target.value})} />
+              </Form.Item>
+
+              <Form.Item
+                label="Пароль"
+                name="password"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Пожалуйста, введите пароль!',
+                  },
+                ]}
+              >
+                <Input.Password value={registerUser?.password} onChange={(e) => setRegisterUser({...registerUser, password: e.target.value})} />
+              </Form.Item>
+              <Form.Item
+                label="Подтвердите пароль"
+                name="confimPassword"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Пожалуйста, подтвердите пароль!',
+                  },
+                ]}
+              >
+                <Input.Password value={registerUser?.confirmPassword} onChange={(e) => setRegisterUser({...registerUser, confirmPassword: e.target.value})} />
+              </Form.Item>
+              <Form.Item
+              >
+                <Button type="primary" htmlType="submit" style={{marginTop:20}}>
+                  Создать пользователя
+                </Button>
+              </Form.Item>
+            </Form>
+            </Modal>
             <Modal open={trackerModal} footer={[
               <Button onClick={() =>  setTrackerModal(false)}>
                 Назад
@@ -557,8 +711,15 @@ import { style } from '@mui/system';
         </div>
         <div className={styles.table}>
           {
-            dashboardMode === "Пользователи" && 
-            <Input placeholder="Поиск по номеру телефона" className={styles.input} phoneInput={phoneInput} onChange={(e) => phoneInputHandler(e)}/>
+            dashboardMode === "Пользователи" &&
+            <div className='d-flex align-items-center gap-3'>
+              <div>
+                <Input placeholder="Поиск по номеру телефона" className={styles.input} phoneInput={phoneInput} onChange={(e) => phoneInputHandler(e)}/>
+              </div>
+              <div>
+                <Button type='primary' onClick={openCreateUserModal}>Добавить пользователя</Button>
+              </div>
+            </div>
           }
           {
             dashboardMode === 'Заказы' &&

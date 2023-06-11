@@ -173,3 +173,51 @@ export const getUserById = async (req, res) => {
 
     return res.status(200).json(user);
 }
+
+export const createUserByAdmin = async (req, res) => {
+    const body = req.body;
+
+
+    try{
+        
+        const salt = await bcrypt.genSalt(10)
+        const hash = await bcrypt.hash(body.password, salt);
+
+                
+            const exists = await User.findOne({email:body.email});
+
+            if (exists){
+                throw Error("Этот электронный адрес уже занят");
+            }
+    
+        const user = new User({...body, password: hash})
+        
+        await user.save();
+
+        var transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+              user: 'itsnursat@gmail.com',
+              pass: 'pdlfyedtkldiqrik'
+            }
+          });
+          
+          var mailOptions = {
+            from: 'itsnursat@gmail.com',
+            to: body.email,
+            subject: 'Данные для авторизации на cabinet.gtrans.kz',
+            html: `Email: ${body.email} <br>
+                   Пароль: ${body.password}     
+            `
+          };
+          transporter.sendMail(mailOptions, function(error, info){
+            if (error) {
+            } else {
+            }
+          });
+        
+        return res.status(200).json(user);
+    }catch (err){
+        return res.status(500).json(err);
+    }
+}
