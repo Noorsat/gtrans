@@ -161,7 +161,7 @@ export const getAllUsers = async (req, res) => {
         return res.status(404).json({message:"Нету пользователей"})
     }
 
-    return res.status(200).json(users)
+    return res.status(200).json(users.reverse())
 }
 
 export const getUserById = async (req, res) => {
