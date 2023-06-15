@@ -14,7 +14,7 @@ const Login = () => {
         login(user).then((res) => {
             localStorage.setItem("user", JSON.stringify(res.data))
             if (res.data.role === "admin" || res?.data?.role === "superadmin"){
-              router.push("/admins")
+              router.push("/admin")
             }else{
               router.push("/request");
             }
