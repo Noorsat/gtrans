@@ -1,8 +1,7 @@
 import express from 'express';
-import { createUserByAdmin, forgotPassword, getAllUsers, getUserById, likeAdd, loginUser, resetPassword, resetPasswordPost, signupUser, unlikeAdd } from '../controllers/user.js';
+import { changeRoleToAdmin, createUserByAdmin, forgotPassword, getAllUsers, getUserById, likeAdd, loginUser, resetPassword, resetPasswordPost, signupUser, unlikeAdd } from '../controllers/user.js';
 
 const router = express.Router();
-//login route
 
 router.post("/login", loginUser)
 
@@ -23,5 +22,7 @@ router.get("/all", getAllUsers)
 router.get("/:id", getUserById)
 
 router.post("/admin/signup", createUserByAdmin);
+
+router.put("/role/:role", changeRoleToAdmin)
 
 export default router;

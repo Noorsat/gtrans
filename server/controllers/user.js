@@ -79,7 +79,7 @@ export const forgotPassword = async (req, res) => {
         }
         const secret = process.env.SECRET + oldUser?.password;
         const token = createToken(oldUser._id, oldUser.companyName, oldUser.phoneNumber, oldUser.email, String(oldUser?.id), oldUser?.name, oldUser?.surname, oldUser?.dateOfBirth, secret);
-        const link = `https://frontend.gtrans.kz/reset/${oldUser?._id}/${token}`
+        const link = `https://cabinet.gtrans.kz/reset/${oldUser?._id}/${token}`
         var transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -177,7 +177,6 @@ export const getUserById = async (req, res) => {
 export const createUserByAdmin = async (req, res) => {
     const body = req.body;
 
-
     try{
         
         const salt = await bcrypt.genSalt(10)
@@ -220,4 +219,33 @@ export const createUserByAdmin = async (req, res) => {
     }catch (err){
         return res.status(500).json(err);
     }
+}
+
+export const changeRoleToAdmin = async (req, res) => {
+    try{
+        const { id } = req.body;
+        const { role } = req.params;
+
+        const user = await User.findById(id);
+
+        if (!user){
+            return res.status(500).json({message: "This user not find"});
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(
+            id,
+            {
+                $set: {
+                    role: role
+                }
+            }
+        )
+
+        const users = await User.find();
+
+        return res.status(200).json(users.reverse())
+    } catch (err){
+        return res.status(500).json(err);
+    }
+
 }
