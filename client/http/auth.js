@@ -50,3 +50,8 @@ export const signupUserByAdmin = (body) => {
     const response = myAxios.post("/user/admin/signup", body);
     return response;
 }
+
+export const changeRoleToAdmin = (body, role) => {
+    const response = myAxios.put(`/user/role/${role}`, body);
+    return response;
+}

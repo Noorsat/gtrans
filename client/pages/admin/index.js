@@ -5,17 +5,16 @@ import {
     MenuFoldOutlined,
     MoneyCollectOutlined,
   } from '@ant-design/icons';
-import { Button, Checkbox, Input, Menu, Modal, notification, Table, Form, DatePicker } from 'antd';
+import { Button, Checkbox, Input, Menu, Modal, notification, Table, Form, DatePicker, Tooltip } from 'antd';
 import { useState, useEffect } from 'react';
-import jwt_decode from "jwt-decode";
-import { getAllUsers, getUserById, signupUserByAdmin } from '../../http/auth';
+import { changeRoleToAdmin, getAllUsers, getUserById, signupUserByAdmin } from '../../http/auth';
 import { acceptProduct, addTrackerCode, changePriceByAdmin, getOrders, getOrdersByAccountId, removeTrackCode } from '../../http/orders';
 import styles from './Admin.module.css';
 import { getId } from '../../components/validation';
 import { useRouter } from 'next/router';
 import { changePrice, getPrices } from '../../http/price';
 import moment from 'moment';
-import { style } from '@mui/system';
+import jwtDecode from 'jwt-decode';
 
   function getItem(label, key, icon, children, type) {
     return {
@@ -66,10 +65,12 @@ import { style } from '@mui/system';
 
     useEffect(() => {
         const user = JSON.parse(localStorage.getItem("user"))
-        if (user?.role != "admin"){
-          router.push("/login")
+        console.log(user?.role)
+        if (user?.role != "admin" && user?.role != "superadmin"){
+          router.push("/request")
         }
         getPrices().then((res) => {
+          setUser(user)
           setPrices(res.data);
           setHoz(res.data[0]?.hoz);
           setTnp(res.data[0]?.tnp);
@@ -362,6 +363,31 @@ import { style } from '@mui/system';
       console.log('Failed:', errorInfo);
     };
 
+    const userDoAdminHandler = (id, role) => {
+      if (user?.role != "superadmin"){
+        notification['error']({
+          message: "У вас нету права менять роль юзера"
+        })
+      }else{
+        const body = {
+          id
+        }
+
+        changeRoleToAdmin(body, role === "admin" ? 'user' : 'admin').then((res) => {
+          if (res.status === 200){
+            notification["success"]({
+              message:"Вы успешно поменяли роль"
+            })
+            setDashboardData(res.data)
+            setAllData(res.data)
+          }
+        }).catch((res) => {
+          notification["error"]({
+            message: res?.response?.data?.message
+          })
+        }) 
+      }
+    }
 
     const menuChangeHandler = (e) => {
         if (e.key === "Пользователи"){
@@ -375,7 +401,14 @@ import { style } from '@mui/system';
                     {
                         title:"Email",
                         dataIndex:"email",
-                        key:"email"
+                        key:"email",
+                        render: (e, item) => {
+                          return (
+                            <Tooltip title={<Button type='primary' onClick={() => userDoAdminHandler(item?._id, item?.role)}>{item?.role === "admin" ? "Сделать юзером" : "Сделать админом"}</Button>} trigger="click">
+                              <span style={{cursor:'pointer'}}>{e}</span>
+                            </Tooltip>
+                          )
+                        }
                     },
                     {
                         title:"Номер телефона",
@@ -387,6 +420,11 @@ import { style } from '@mui/system';
                         dataIndex:"id",
                         key:"id",
                         render: (id) => <div>SM215-{getId(id)}</div>
+                    },
+                    {
+                      title:"Роль",
+                      dataIndex:"role",
+                      key:"role",
                     },
                     {
                         title:"Посмотреть заказы",
@@ -533,8 +571,6 @@ import { style } from '@mui/system';
           setDashboardMode('Цены')
         }
     }
-
-    console.log(registerUser)
 
     return (
         <div className={styles.wrapper}>

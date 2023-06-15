@@ -62,8 +62,12 @@ const Request = ({order, setOrder}) => {
         })
     }, [])
 
-      const createOrderHandler = () => { 
-        if (!(totalVolume && totalWeight)){
+      const createOrderHandler = () => {
+        if (!(orders[0]?.type)){
+          notification["error"]({
+            message:"Выберите наименование груза"
+          })
+        }else if (!(totalVolume && totalWeight)){
           notification["error"]({
             message: "Заполните все поля"
           })
@@ -453,7 +457,7 @@ const Request = ({order, setOrder}) => {
                         <div className={`mb-md-3 mb-2`}>
                           <Select placeholder="Наименование груза" className={`w-100 select`} style={{width:"100%"}}
                             onChange={(e, label) => typeHandler(e, label, index)}
-                            value={order?.type}
+                            value={order?.type || "Наименование груза"}
                             options={
                               [
                                 {
