@@ -4,4 +4,4 @@ const myAxios = axios.create({
     baseURL:"https://backend.gtrans.kz/"
 })
 
-export default myAxios;
+export default myAxios; 
