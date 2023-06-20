@@ -212,6 +212,18 @@ import jwtDecode from 'jwt-decode';
             notification["success"]({
               message:"Товар доставлен на склад"
             })
+            getOrders().then((res) => {
+              let repeatedOrders = [];
+              let newOrders = res.data.map((order, index) => {
+                if (!repeatedOrders.includes(order?.individualCode)){
+                  order.rowSpan = res.data.filter((item, i) => item?.individualCode === order?.individualCode).length;
+                }
+                repeatedOrders.push(order?.individualCode);
+                return order;
+              })
+              setAllOrders(newOrders)
+              setDashboardData(newOrders)
+            })
           }
         })
       }else{
@@ -220,15 +232,28 @@ import jwtDecode from 'jwt-decode';
       }
     }
   
-    const trackerAcceptHandler = (e, item) => {
+    const trackerAcceptHandler = async (e, item) => {
       const body = {
         individualCode: item.individualCode,
+        email: await getUserById(item?.accountId).then((res) => res?.data?.email)
       }
       if (e.target.checked){
         acceptProduct(body).then((res) => {
           if (res?.status < 400){
             notification["success"]({
               message:"Товар доставлен в Алмату"
+            })
+            getOrders().then((res) => {
+              let repeatedOrders = [];
+              let newOrders = res.data.map((order, index) => {
+                if (!repeatedOrders.includes(order?.individualCode)){
+                  order.rowSpan = res.data.filter((item, i) => item?.individualCode === order?.individualCode).length;
+                }
+                repeatedOrders.push(order?.individualCode);
+                return order;
+              })
+              setAllOrders(newOrders)
+              setDashboardData(newOrders)
             })
           }
         })
@@ -248,7 +273,20 @@ import jwtDecode from 'jwt-decode';
           notification["success"]({
             message:"Вы убрали галочку"
           })
+          getOrders().then((res) => {
+            let repeatedOrders = [];
+            let newOrders = res.data.map((order, index) => {
+              if (!repeatedOrders.includes(order?.individualCode)){
+                order.rowSpan = res.data.filter((item, i) => item?.individualCode === order?.individualCode).length;
+              }
+              repeatedOrders.push(order?.individualCode);
+              return order;
+            })
+            setAllOrders(newOrders)
+            setDashboardData(newOrders)
+          })
           setTrackerModal(false)
+          setTrackerSecondModal(false)
         } 
       })
     }
@@ -467,7 +505,7 @@ import jwtDecode from 'jwt-decode';
                     }),
                     render:(e, item) => (
                       <div className='d-flex justify-content-center'>
-                        <Checkbox onChange={(e) => trackerHandler(e, item)} defaultChecked={item?.status >= 1} />
+                        <Checkbox onChange={(e) => trackerHandler(e, item)} checked={item?.status >= 1} />
                       </div>
                     ),
                   }, 
@@ -478,7 +516,7 @@ import jwtDecode from 'jwt-decode';
                     }),
                     render:(e, item) => (
                       <div className='d-flex justify-content-center'>
-                        <Checkbox onChange={(e) => trackerAcceptHandler(e, item)} defaultChecked={item?.status === 2} />
+                        <Checkbox onChange={(e) => trackerAcceptHandler(e, item)} checked={item?.status === 2} />
                       </div>
                     )
                   }, 
@@ -703,7 +741,7 @@ import jwtDecode from 'jwt-decode';
               Вы точно хотите убрать галочку?
             </Modal>
             <Modal open={trackerSecondModal} footer={[
-              <Button onClick={() =>  setTrackerModal(false)}>
+              <Button onClick={() =>  setTrackerSecondModal(false)}>
                 Назад
               </Button>,
               <Button onClick={() => trackerSwitchHandler(1)}>

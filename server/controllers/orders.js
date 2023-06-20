@@ -211,7 +211,27 @@ export const acceptProduct = async (req, res) => {
         }
     )
 
-    res.status(200).send(orders);
+    var transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: 'itsnursat@gmail.com',
+          pass: 'pdlfyedtkldiqrik'
+        }
+      });
+      
+      var mailOptions = {
+        from: 'itsnursat@gmail.com',
+        to: req?.body?.email,
+        subject: 'Ваш заказ прибыл в Алмату | GTrans',
+        text: `Ваш заказ по коду ${req.body.individualCode} уже в Алмате. Вы можете связаться с нами по номеру: +7 (727) 333 70 50` 
+      };
+      transporter.sendMail(mailOptions, function(error, info){
+        if (error) {
+        } else {
+            console.log('send')
+            return res.status(200).json(orders);
+        }
+      });
 } 
 
 export const switchTrackCode = async (req, res) => {
@@ -229,7 +249,8 @@ export const switchTrackCode = async (req, res) => {
         }
     )
 
-    res.status(200).send(orders);
+    return res.status(200).json(orders);
+
 }
 
 export const getOrderByTrackCode = async (req, res) => {
@@ -301,7 +322,6 @@ export const changePriceByAdmin = async (req, res) => {
       transporter.sendMail(mailOptions, function(error, info){
         if (error) {
         } else {
-            
             return res.status(200).json(orders);
         }
       });

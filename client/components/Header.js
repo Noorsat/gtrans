@@ -98,7 +98,7 @@ const Header = ({user, openDrawer, closeDrawer, drawer}) => {
               <Link href="/my-orders">Мои заказы</Link>
               <Link href="/tracking">Трекинг</Link>
               {
-                user?.role === "admin" &&
+                user?.role === "admin" || user?.role === "superadmin" &&
                 <Link href="/admin">Dashboard</Link>
               }
             </div>
