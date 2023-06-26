@@ -164,8 +164,7 @@ const Request = ({order, setOrder}) => {
           prices && orders?.map((order, index) => {
           if ((Number(order?.weight) > 0 && Number(order?.len) > 0 && Number(order?.width) > 0 && Number(order?.height) > 0 && Number(order?.count) >0) || (Number(order?.totalVolume) > 0 && Number(order?.totalWeight) > 0)){
             const totalWeight = order?.switch ? Number(order?.totalWeight) :  Number(order?.weight)*Number(order?.count); 
-            const totalVolume = order?.switch ? (Number(order?.totalVolume)/100) : ((Number(order?.len)/100) * (Number(order?.width)/100) * (Number(order?.height)/100)) * Number(order.count);
-            console.log(totalVolume)
+            const totalVolume = order?.switch ? (Number(order?.totalVolume)) : ((Number(order?.len)/100) * (Number(order?.width)/100) * (Number(order?.height)/100)) * Number(order.count);
             const density = totalWeight / totalVolume;
             const active = order?.switch;
             setTotalVolume(parseFloat(totalVolume.toFixed(2)));
@@ -174,7 +173,6 @@ const Request = ({order, setOrder}) => {
             const priceByDensity = prices?.map(price => {
               return price?.items.filter((item) => item?.from < density && item?.to >= density);
             }).flatMap(arr => arr);
-            console.log(priceByDensity)
           if (totalWeight <= 30 && totalVolume <= 0.2){
             totalPrice1 += 7 * totalWeight;
             totalPrice2 += 7 * totalWeight;
