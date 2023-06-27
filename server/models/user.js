@@ -16,24 +16,23 @@ const userSchema = new Schema({
         type: String,
         required: true
     },
+    accessToken:{
+        type: String,
+    },
     name: {
         type: String,
-        required: true
     },
     surname: {
         type: String,
-        required: true
     },
     dateOfBirth: {
         type: Date,
-        required: true
     },
     companyName:{
         type:String,
     },
     phoneNumber: {
         type:String,
-        required:true
     },
     likeCount: {
         type:Number,

@@ -1,9 +1,7 @@
 import User from './../models/user.js'
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-import Order from '../models/order.js'
 import nodemailer from 'nodemailer';
-import validator from 'validator';
 
 const createToken = (_id, companyName, phoneNumber, email, id, name, surname, dateOfBirth, secret) => {
     return jwt.sign({_id, companyName, phoneNumber, email, id, name, surname, dateOfBirth}, secret ? secret : process.env.SECRET, {expiresIn: '3d'})
@@ -14,7 +12,13 @@ export const loginUser = async (req, res) => {
     try{
         const user = await User.login(email.toLowerCase(), password)
 
+        const nUser = await User.findOne({email: email});
+
         const token = createToken(user._id, user.companyName, user.phoneNumber, user.email, String(user.id), user?.name, user?.surname, user?.dateOfBirth);
+
+        nUser.accessToken = token;
+        
+        await nUser.save();
 
         res.status(200).json({email, token, role: user?.role})
     }catch(error){

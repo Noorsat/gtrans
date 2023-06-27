@@ -1,7 +1,11 @@
 import myAxios from './axios';
 
-export const getPrices = async () => {
-    const response = await myAxios.get('/prices');
+export const getPrices = async (token) => {
+    const response = await myAxios.get('/prices', {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    });
     return response;
 }
 

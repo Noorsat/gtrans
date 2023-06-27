@@ -55,7 +55,7 @@ const Request = ({order, setOrder}) => {
         if (window.innerWidth < 500){
           setMobile(true);
         }
-        getPrices().then((res) => {
+        getPrices(user?.token).then((res) => {
           setPrices(res?.data);
           setHoz(res.data[0]?.hoz);
           setTnp(res.data[0]?.tnp);
