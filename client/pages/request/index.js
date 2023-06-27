@@ -171,8 +171,9 @@ const Request = ({order, setOrder}) => {
             setTotalWeight(parseFloat(totalWeight.toFixed(2)));
             setTotalDensity(parseFloat(density.toFixed(2)));
             const priceByDensity = prices?.map(price => {
-              return price?.items.filter((item) => item?.from < density && item?.to >= density);
-            }).flatMap(arr => arr);
+              return price?.items.filter((item) => item?.from <= density && item?.to > density);
+            }).flatMap(arr => arr)
+            console.log(priceByDensity)
           if (totalWeight <= 30 && totalVolume <= 0.2){
             totalPrice1 += 7 * totalWeight;
             totalPrice2 += 7 * totalWeight;
@@ -180,15 +181,15 @@ const Request = ({order, setOrder}) => {
             totalPrice4 += 7 * totalWeight;
           }else{ 
             if (order?.type === "first"){
-              totalPrice1 += (density < 100 ? Number(totalVolume) : Number(totalWeight)) * priceByDensity[0]?.hoz;
-              totalPrice2 += (density < 100 ? Number(totalVolume) : Number(totalWeight)) * priceByDensity[1]?.hoz
-              totalPrice3 += (density < 100 ? Number(totalVolume) : Number(totalWeight)) * priceByDensity[2]?.hoz
-              totalPrice4 += (density < 100 ? Number(totalVolume) : Number(totalWeight)) * priceByDensity[2]?.hoz
+              totalPrice1 += (density < 100 ? Number(totalVolume) * Number(priceByDensity[0]?.hoz) : Number(totalWeight) * Number(priceByDensity[0]?.hoz))
+              totalPrice2 += (density < 100 ? Number(totalVolume) * Number(priceByDensity[1]?.hoz) : Number(totalWeight) * Number(priceByDensity[1]?.hoz))
+              totalPrice3 += (density < 100 ? Number(totalVolume) * Number(priceByDensity[2]?.hoz) : Number(totalWeight) * Number(priceByDensity[2]?.hoz))
+              totalPrice4 += (density < 100 ? Number(totalVolume) * Number(priceByDensity[3]?.hoz) : Number(totalWeight) * Number(priceByDensity[3]?.hoz))
           }else if(order?.type === "second"){
-            totalPrice1 += (density < 100 ? Number(totalVolume) : Number(totalWeight)) * priceByDensity[0]?.tnp;
-            totalPrice2 += (density < 100 ? Number(totalVolume) : Number(totalWeight)) * priceByDensity[1]?.tnp;
-            totalPrice3 += (density < 100 ? Number(totalVolume) : Number(totalWeight)) * priceByDensity[2]?.hoz;
-            totalPrice4 += (density < 100 ? Number(totalVolume) : Number(totalWeight)) * priceByDensity[3]?.hoz;
+            totalPrice1 += (density < 100 ? Number(totalVolume) * Number(priceByDensity[0]?.tnp) : Number(totalWeight) * Number(priceByDensity[0]?.tnp))
+            totalPrice2 += (density < 100 ? Number(totalVolume) * Number(priceByDensity[1]?.tnp) : Number(totalWeight) * Number(priceByDensity[1]?.tnp))
+            totalPrice3 += (density < 100 ? Number(totalVolume) * Number(priceByDensity[2]?.hoz) : Number(totalWeight) * Number(priceByDensity[2]?.hoz))
+            totalPrice4 += (density < 100 ? Number(totalVolume) * Number(priceByDensity[3]?.hoz) : Number(totalWeight) * Number(priceByDensity[3]?.hoz))
           }
           }
           }else{

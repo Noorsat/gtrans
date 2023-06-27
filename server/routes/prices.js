@@ -4,7 +4,7 @@ import validateToken from '../middlewares/validateToken.js';
 
 const router = express.Router();
 
-router.get('/', validateToken, getPrices);
+router.get('/', getPrices);
 router.put('/change', changePrices);
 router.post('/create', createPrice)
 
