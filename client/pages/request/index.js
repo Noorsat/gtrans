@@ -63,71 +63,74 @@ const Request = ({order, setOrder}) => {
     }, [])
 
       const createOrderHandler = () => {
-        if (!(orders[0]?.type)){
-          notification["error"]({
-            message:"Выберите наименование груза"
-          })
-        }else if (!(totalVolume && totalWeight)){
-          notification["error"]({
-            message: "Заполните все поля"
-          })
-        }else if (!orders[0]?.deliveryType){
-          notification["error"]({
-            message: "Выберите тип доставки"
-          })
-        }else{
-          if (!user){
-            router.push("/register")
-            notification['warning']({
-              message:'Чтобы использовать калькулятор вам надо авторизоваться' 
-            })
-            setOrder(orders.map(order => {
-              order.price1 = price1;
-              order.price2 = price2;
-              order.price3 = price3;
-              order.price4 = price4;
-              order.totalVolume = totalVolume;
-              order.totalDensity = totalDensity;
-              order.totalWeight = totalWeight;
-              return order;
-            }))
-          }else{
-        getOrders().then((res) => {
-          let count = res.data.length;
-          const body = orders.map(order => {
-            return {...order, accountId : user?._id, type: order?.name, individualCode: "GT-2023-"+(count+1), price: selectedPrice, volume: totalVolume, totalWeight: totalWeight}
-          })
-          
-          createOrder(body).then((res) => {
-            if (res?.status === 201){
-              setModal(true)
-              setIndCode("GT-2023-"+(count+1))
-              // notification["success"]({
-              //   message:'Ваш заказ создан',
-              // })
-              // setOrder({})
-              // router.push("/my-orders")
-            }
-          })
-        }).catch((res) => {
-          const body = orders.map(order => {
-            return {...order, accountId : user?._id, type: order?.name, individualCode: "GT-2023-"+(count+1), price: selectedPrice, volume: totalVolume, totalWeight: totalWeight}
-          })
-    
-          createOrder(body).then((res) => {
-            if (res?.status === 201){
-              setModal(true)
-              setIndCode("GT-2023-"+(count+1))
-              // notification["success"]({
-              //   message:'Ваш заказ создан',
-              // })
-              // setOrder({})
-              // router.push("/my-orders")
-            }
-          })
+        notification["error"]({
+          message: "По техническим причинам заказы не принимаются"
         })
-      }
-      }
+      //   if (!(orders[0]?.type)){
+      //     notification["error"]({
+      //       message:"Выберите наименование груза"
+      //     })
+      //   }else if (!(totalVolume && totalWeight)){
+      //     notification["error"]({
+      //       message: "Заполните все поля"
+      //     })
+      //   }else if (!orders[0]?.deliveryType){
+      //     notification["error"]({
+      //       message: "Выберите тип доставки"
+      //     })
+      //   }else{
+      //     if (!user){
+      //       router.push("/register")
+      //       notification['warning']({
+      //         message:'Чтобы использовать калькулятор вам надо авторизоваться' 
+      //       })
+      //       setOrder(orders.map(order => {
+      //         order.price1 = price1;
+      //         order.price2 = price2;
+      //         order.price3 = price3;
+      //         order.price4 = price4;
+      //         order.totalVolume = totalVolume;
+      //         order.totalDensity = totalDensity;
+      //         order.totalWeight = totalWeight;
+      //         return order;
+      //       }))
+      //     }else{
+      //   getOrders().then((res) => {
+      //     let count = res.data.length;
+      //     const body = orders.map(order => {
+      //       return {...order, accountId : user?._id, type: order?.name, individualCode: "GT-2023-"+(count+1), price: selectedPrice, volume: totalVolume, totalWeight: totalWeight}
+      //     })
+          
+      //     createOrder(body).then((res) => {
+      //       if (res?.status === 201){
+      //         setModal(true)
+      //         setIndCode("GT-2023-"+(count+1))
+      //         // notification["success"]({
+      //         //   message:'Ваш заказ создан',
+      //         // })
+      //         // setOrder({})
+      //         // router.push("/my-orders")
+      //       }
+      //     })
+      //   }).catch((res) => {
+      //     const body = orders.map(order => {
+      //       return {...order, accountId : user?._id, type: order?.name, individualCode: "GT-2023-"+(count+1), price: selectedPrice, volume: totalVolume, totalWeight: totalWeight}
+      //     })
+    
+      //     createOrder(body).then((res) => {
+      //       if (res?.status === 201){
+      //         setModal(true)
+      //         setIndCode("GT-2023-"+(count+1))
+      //         // notification["success"]({
+      //         //   message:'Ваш заказ создан',
+      //         // })
+      //         // setOrder({})
+      //         // router.push("/my-orders")
+      //       }
+      //     })
+      //   })
+      // }
+      // }
      }
      
      const onCancel = () => {

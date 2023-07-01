@@ -84,14 +84,14 @@ const Account = () => {
                         <div className={styles.account__item_title}>
                             Адрес склада
                         </div>
-                        <div className={styles.account__item_text}>
+                        {/* <div className={styles.account__item_text}>
                             <div>
                                 <span>Гуанчжоу: </span> &nbsp;&nbsp;北京603公司广州分公司地址：广州市白云区荔德路汇富国际商贸中心A26栋103号603公司18594056603
                             </div>
                             <div>
                                 <span>Иу:</span> &nbsp;&nbsp;地址：浙江省 义乌市 北苑街道 莲塘二区3栋3单元一层  电话 13305898683
                             </div>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
                 <div onClick={exitHandler} className={styles.account__button}>
