@@ -227,27 +227,36 @@ export const createUserByAdmin = async (req, res) => {
 
 export const changeRoleToAdmin = async (req, res) => {
     try{
-        const { id } = req.body;
+        const { id, userId } = req.body;
         const { role } = req.params;
 
         const user = await User.findById(id);
+        
+        const admin = await User.findById(userId);
 
         if (!user){
             return res.status(500).json({message: "This user not find"});
         }
 
-        const updatedUser = await User.findByIdAndUpdate(
-            id,
-            {
-                $set: {
-                    role: role
+        if (admin?.role === "superadmin"){
+            const updatedUser = await User.findByIdAndUpdate(
+                id,
+                {
+                    $set: {
+                        role: role
+                    }
                 }
-            }
-        )
-
-        const users = await User.find();
-
-        return res.status(200).json(users.reverse())
+            )
+    
+            const users = await User.find();
+    
+            return res.status(200).json(users.reverse())
+        }else{
+            return res.status(500).json({
+                error: true,
+                message: "У вас нету права менять роль юзера"
+            })
+        }
     } catch (err){
         return res.status(500).json(err);
     }

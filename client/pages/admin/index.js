@@ -65,12 +65,16 @@ import jwtDecode from 'jwt-decode';
 
     useEffect(() => {
         const user = JSON.parse(localStorage.getItem("user"))
-        console.log(user?.role)
         if (user?.role != "admin" && user?.role != "superadmin"){
           router.push("/request")
         }
+
+        var decoded = jwtDecode(user?.token)
+        const id = decoded?._id
+
+        setUser({...user, _id: id})
+
         getPrices().then((res) => {
-          setUser(user)
           setPrices(res.data);
           setHoz(res.data[0]?.hoz);
           setTnp(res.data[0]?.tnp);
@@ -401,30 +405,31 @@ import jwtDecode from 'jwt-decode';
       console.log('Failed:', errorInfo);
     };
 
-    const userDoAdminHandler = (id, role) => {
-      if (user?.role != "superadmin"){
-        notification['error']({
-          message: "У вас нету права менять роль юзера"
-        })
-      }else{
-        const body = {
-          id
-        }
+    console.log(user);
 
-        changeRoleToAdmin(body, role === "admin" ? 'user' : 'admin').then((res) => {
-          if (res.status === 200){
-            notification["success"]({
-              message:"Вы успешно поменяли роль"
-            })
-            setDashboardData(res.data)
-            setAllData(res.data)
-          }
-        }).catch((res) => {
+    const userDoAdminHandler = (id, role) => {
+      const body = {
+        id,
+        userId: user?._id
+      }
+
+      changeRoleToAdmin(body, role === "admin" ? 'user' : 'admin').then((res) => {
+        if (res.status === 200){
+          notification["success"]({
+            message:"Вы успешно поменяли роль"
+          })
+          setDashboardData(res.data)
+          setAllData(res.data)
+        }else if (res.status === 500){
           notification["error"]({
             message: res?.response?.data?.message
           })
-        }) 
-      }
+        }
+      }).catch((res) => {
+        notification["error"]({
+          message: res?.response?.data?.message
+        })
+      }) 
     }
 
     const menuChangeHandler = (e) => {
@@ -452,12 +457,6 @@ import jwtDecode from 'jwt-decode';
                         title:"Номер телефона",
                         dataIndex:"phoneNumber",
                         key:"phoneNumber"
-                    },
-                    {
-                        title:"Инд код",
-                        dataIndex:"id",
-                        key:"id",
-                        render: (id) => <div>SM215-{getId(id)}</div>
                     },
                     {
                       title:"Роль",
