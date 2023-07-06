@@ -63,74 +63,78 @@ const Request = ({order, setOrder}) => {
     }, [])
 
       const createOrderHandler = () => {
-        notification["error"]({
-          message: "По техническим причинам заказы не принимаются"
-        })
-      //   if (!(orders[0]?.type)){
-      //     notification["error"]({
-      //       message:"Выберите наименование груза"
-      //     })
-      //   }else if (!(totalVolume && totalWeight)){
-      //     notification["error"]({
-      //       message: "Заполните все поля"
-      //     })
-      //   }else if (!orders[0]?.deliveryType){
-      //     notification["error"]({
-      //       message: "Выберите тип доставки"
-      //     })
-      //   }else{
-      //     if (!user){
-      //       router.push("/register")
-      //       notification['warning']({
-      //         message:'Чтобы использовать калькулятор вам надо авторизоваться' 
-      //       })
-      //       setOrder(orders.map(order => {
-      //         order.price1 = price1;
-      //         order.price2 = price2;
-      //         order.price3 = price3;
-      //         order.price4 = price4;
-      //         order.totalVolume = totalVolume;
-      //         order.totalDensity = totalDensity;
-      //         order.totalWeight = totalWeight;
-      //         return order;
-      //       }))
-      //     }else{
-      //   getOrders().then((res) => {
-      //     let count = res.data.length;
-      //     const body = orders.map(order => {
-      //       return {...order, accountId : user?._id, type: order?.name, individualCode: "GT-2023-"+(count+1), price: selectedPrice, volume: totalVolume, totalWeight: totalWeight}
-      //     })
+        // notification["error"]({
+        //   message: "По техническим причинам заказы не принимаются"
+        // })
+        if (!(orders[0]?.type)){
+          notification["error"]({
+            message:"Выберите наименование груза"
+          })
+        }else if (!(totalVolume && totalWeight)){
+          notification["error"]({
+            message: "Заполните все поля"
+          })
+        }else if (!orders[0]?.deliveryType){
+          notification["error"]({
+            message: "Выберите тип доставки"
+          })
+        }else if (totalWeight < 50){
+          notification["warning"]({
+            message: "Мы принимаем доставки только от 50 кг"
+          })
+        }else{
+          if (!user){
+            router.push("/register")
+            notification['warning']({
+              message:'Чтобы использовать калькулятор вам надо авторизоваться' 
+            })
+            setOrder(orders.map(order => {
+              order.price1 = price1;
+              order.price2 = price2;
+              order.price3 = price3;
+              order.price4 = price4;
+              order.totalVolume = totalVolume;
+              order.totalDensity = totalDensity;
+              order.totalWeight = totalWeight;
+              return order;
+            }))
+          }else{
+        getOrders().then((res) => {
+          let count = res.data.length;
+          const body = orders.map(order => {
+            return {...order, accountId : user?._id, type: order?.name, individualCode: "60368-adilet-"+(count+1), price: selectedPrice, volume: totalVolume, totalWeight: totalWeight}
+          })
           
-      //     createOrder(body).then((res) => {
-      //       if (res?.status === 201){
-      //         setModal(true)
-      //         setIndCode("GT-2023-"+(count+1))
-      //         // notification["success"]({
-      //         //   message:'Ваш заказ создан',
-      //         // })
-      //         // setOrder({})
-      //         // router.push("/my-orders")
-      //       }
-      //     })
-      //   }).catch((res) => {
-      //     const body = orders.map(order => {
-      //       return {...order, accountId : user?._id, type: order?.name, individualCode: "GT-2023-"+(count+1), price: selectedPrice, volume: totalVolume, totalWeight: totalWeight}
-      //     })
+          createOrder(body).then((res) => {
+            if (res?.status === 201){
+              setModal(true)
+              setIndCode("60368-adilet-"+(count+1))
+              // notification["success"]({
+              //   message:'Ваш заказ создан',
+              // })
+              // setOrder({})
+              // router.push("/my-orders")
+            }
+          })
+        }).catch((res) => {
+          const body = orders.map(order => {
+            return {...order, accountId : user?._id, type: order?.name, individualCode: "60368-adilet-"+(count+1), price: selectedPrice, volume: totalVolume, totalWeight: totalWeight}
+          })
     
-      //     createOrder(body).then((res) => {
-      //       if (res?.status === 201){
-      //         setModal(true)
-      //         setIndCode("GT-2023-"+(count+1))
-      //         // notification["success"]({
-      //         //   message:'Ваш заказ создан',
-      //         // })
-      //         // setOrder({})
-      //         // router.push("/my-orders")
-      //       }
-      //     })
-      //   })
-      // }
-      // }
+          createOrder(body).then((res) => {
+            if (res?.status === 201){
+              setModal(true)
+              setIndCode("60368-adilet-"+(count+1))
+              // notification["success"]({
+              //   message:'Ваш заказ создан',
+              // })
+              // setOrder({})
+              // router.push("/my-orders")
+            }
+          })
+        })
+      }
+      }
      }
      
      const onCancel = () => {
@@ -408,10 +412,12 @@ const Request = ({order, setOrder}) => {
                   Адрес склада:
                   <div className={styles.account__item_text}>
                       <div>
-                          <span>Гуанчжоу: </span> &nbsp;&nbsp;北京603公司广州分公司地址：广州市白云区荔德路汇富国际商贸中心A26栋103号603公司18594056603
+                          <span>Гуанчжоу: </span> &nbsp;&nbsp;603公司广州地址：广州市白云区汇富国际商贸中心A26栋103号-603库房
+                          <br></br>纪阿乐转你的名字 13811368603
+                          <br></br>货号：60368
                       </div>
                       <div>
-                          <span>Иу:</span> &nbsp;&nbsp;地址：浙江省 义乌市 北苑街道 莲塘二区3栋3单元一层  电话 13305898683
+                          <span>Иу:</span> &nbsp;&nbsp;义乌新库房地址：<br></br> 浙江省金华市义乌市福田街道荷叶塘工业区物华路66号 603库房 收货人 业务员转客户 18966053603/18500791603
                       </div>
                   </div>
                 </div>

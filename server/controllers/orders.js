@@ -15,6 +15,10 @@ export const getOrders = async (req, res) => {
 export const createOrder = async (req, res) => {
     const order = req.body;
 
+    const user = await User.findById(order[0].accountId)
+
+    console.log(user)
+
     await Order.insertMany(order).then(function() {
         var transporter = nodemailer.createTransport({
             service: 'gmail',
@@ -97,6 +101,15 @@ export const createOrder = async (req, res) => {
                                 ))
                             }
                         </table>
+                    </div>
+                    <div style="text-align: center; font-weight:700; font-size: 20px; margin-bottom:20px">
+                        Данные клиента
+                    </div>
+                    <div>
+                        Email: ${user?.email}
+                    </div>
+                    <div>
+                        Контакты: ${user?.phoneNumber}
                     </div>
                 </div>
             `

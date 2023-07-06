@@ -84,14 +84,16 @@ const Account = () => {
                         <div className={styles.account__item_title}>
                             Адрес склада
                         </div>
-                        {/* <div className={styles.account__item_text}>
+                        <div className={styles.account__item_text}>
                             <div>
-                                <span>Гуанчжоу: </span> &nbsp;&nbsp;北京603公司广州分公司地址：广州市白云区荔德路汇富国际商贸中心A26栋103号603公司18594056603
+                                <span>Гуанчжоу: </span> &nbsp;&nbsp;603公司广州地址：广州市白云区汇富国际商贸中心A26栋103号-603库房
+                                <br></br>纪阿乐转你的名字 13811368603
+                                <br></br>货号：60368
                             </div>
                             <div>
-                                <span>Иу:</span> &nbsp;&nbsp;地址：浙江省 义乌市 北苑街道 莲塘二区3栋3单元一层  电话 13305898683
+                                <span>Иу:</span> &nbsp;&nbsp;义乌新库房地址：<br></br> 浙江省金华市义乌市福田街道荷叶塘工业区物华路66号 603库房 收货人 业务员转客户 18966053603/18500791603
                             </div>
-                        </div> */}
+                        </div>
                     </div>
                 </div>
                 <div onClick={exitHandler} className={styles.account__button}>
