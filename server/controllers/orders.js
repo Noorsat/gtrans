@@ -17,20 +17,21 @@ export const createOrder = async (req, res) => {
 
     const user = await User.findById(order[0].accountId)
 
-    console.log(user)
-
     await Order.insertMany(order).then(function() {
         var transporter = nodemailer.createTransport({
-            service: 'gmail',
+            service: 'srv-plesk09.ps.kz',
+            port: 993, 
+            secure:'true',
             auth: {
-              user: 'itsnursat@gmail.com',
-              pass: 'pdlfyedtkldiqrik'
-            }
+              user: 'info@gtrans.kz',
+              pass: 'codmeh-fiwBox-kykge1'
+            },
           });
           
           var mailOptions = {
-            from: 'itsnursat@gmail.com',
-            to: 'info@gtrans.kz',
+            from: 'info@gtrans.kz',
+            to: 'itsnursat@gmail.com',
+            
             subject: 'Новый заказ',
             html: `
                 <div>
@@ -116,7 +117,9 @@ export const createOrder = async (req, res) => {
           };
           transporter.sendMail(mailOptions, function(error, info){
             if (error) {
+                console.log(error)
             } else {
+                console.log('success')
                 return res.status(200).json(orders);
             }
           });
@@ -339,3 +342,48 @@ export const changePriceByAdmin = async (req, res) => {
         }
       });
 } 
+
+export const changeInfoByAdmin = async (req, res) => {
+    const { accountId, orderId} = req.body;
+    
+    const user = await User.findById(accountId)
+
+    console.log(user)
+
+    if (user?.role !== "admin" && user?.role !== "superadmin"){
+        return res.status(400).json({
+            error: true,
+            message: 'У вас нету доступа менять заказ'
+        })
+    }
+
+    const order = await Order.findById(orderId)
+
+    if (!order){
+        return res.status(404).json({
+            error: true,
+            message: 'Заказ не существует'
+        })
+    }
+
+    await Order.updateOne({_id: orderId}, {
+        $set: {
+            type: req.body.type,
+            trackCode: req.body.trackCode,
+            deliveryType: req.body.deliveryType,
+            weight: req.body.weight,
+            len: req.body.len,
+            width: req.body.width,
+            height: req.body.height,
+            count: req.body.count,
+            comment: req.body.comment,
+            individualCode: req.body.individualCode,
+            price: req.body.price
+        }
+    })
+
+    return res.status(200).json({
+        success: true,
+        message: 'Успешно поменяли заказ',
+    })
+}

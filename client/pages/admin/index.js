@@ -5,10 +5,10 @@ import {
     MenuFoldOutlined,
     MoneyCollectOutlined,
   } from '@ant-design/icons';
-import { Button, Checkbox, Input, Menu, Modal, notification, Table, Form, DatePicker, Tooltip } from 'antd';
+import { Button, Checkbox, Input, Menu, Modal, notification, Table, Form, DatePicker, Tooltip, Select } from 'antd';
 import { useState, useEffect } from 'react';
 import { changeRoleToAdmin, getAllUsers, getUserById, signupUserByAdmin } from '../../http/auth';
-import { acceptProduct, addTrackerCode, changePriceByAdmin, getOrders, getOrdersByAccountId, removeTrackCode } from '../../http/orders';
+import { acceptProduct, addTrackerCode, changePriceByAdmin, getOrders, getOrdersByAccountId, removeTrackCode, updateOrder } from '../../http/orders';
 import styles from './Admin.module.css';
 import { getId } from '../../components/validation';
 import { useRouter } from 'next/router';
@@ -55,11 +55,12 @@ import jwtDecode from 'jwt-decode';
     const [hoz, setHoz] = useState();
     const [tnp, setTnp] = useState();
     const [priceId, setPriceId] = useState();
-
     const [allOrders, setAllOrders] = useState();
     const [individualCodeInput, setIndividualCodeInput] = useState("");
     const [trackCodeInput, setTrackCodeInput] = useState('');
     const [registerUser, setRegisterUser] = useState({});
+    const [updateOrderModal, setUpdateOrderModal] = useState(false);
+    const [selectedOrder, setSelectedOrder] = useState();
 
     const router = useRouter();
 
@@ -538,6 +539,11 @@ import jwtDecode from 'jwt-decode';
                     key: 'type',
                   },
                   {
+                    title:"Тип доставки",
+                    dataIndex: 'deliveryType',
+                    key: 'deliveryType',
+                  },
+                  {
                     title:"Вес одной коробки (кг)",
                     dataIndex: 'weight',
                     key: 'weight',
@@ -587,21 +593,24 @@ import jwtDecode from 'jwt-decode';
                         <div style={{textAlign:'center'}}>
                           {item.price} $
                         </div>
-                        <Button type='primary' onClick={() => {
-                          setSelectedPriceId(item.individualCode);
-                          setPriceModal(true)                          
-                        }}>Изменить цену</Button>
                       </>
                     ),
                     sorter: (a,b) => a.price - b.price
                   },
-                    {
-                        title:"Заказщик",
-                        onCell: (_, index) => ({
-                          rowSpan: _.rowSpan ? _.rowSpan : 0
-                        }),
-                        render: (e,item) => <Button type='primary' onClick={() => findUserHandler(item.accountId)}>Узнать заказщика</Button>
-                    },
+                  {
+                      title:"Заказщик",
+                      onCell: (_, index) => ({
+                        rowSpan: _.rowSpan ? _.rowSpan : 0
+                      }),
+                      render: (e,item) => <Button type='primary' onClick={() => findUserHandler(item.accountId)}>Узнать заказщика</Button>
+                  },
+                  {
+                    title:"Изменить заказ",
+                    onCell: (_, index) => ({
+                      rowSpan: _.rowSpan ? _.rowSpan : 0
+                    }),
+                    render: (e,item) => <Button type='primary' onClick={() => handleUpdateOrder(item)}>Изменить заказ</Button>
+                },
                 ]
             )
         }else if (e.key === 'Цены'){
@@ -609,13 +618,148 @@ import jwtDecode from 'jwt-decode';
         }
     }
 
+    const handleUpdateOrder = (order) => {
+      setUpdateOrderModal(true)
+      setSelectedOrder(order);
+    }
+
+    const saveOrderUpdateHandler = () => {
+      updateOrder({...selectedOrder, accountId: user._id, orderId: selectedOrder?._id}).then((res) => {
+        getOrders().then((res) => {
+          let repeatedOrders = [];
+          let newOrders = res.data.map((order, index) => {
+            if (!repeatedOrders.includes(order?.individualCode)){
+              order.rowSpan = res.data.filter((item, i) => item?.individualCode === order?.individualCode).length;
+            }
+            repeatedOrders.push(order?.individualCode);
+            return order;
+          })
+          setAllOrders(newOrders)
+          setDashboardData(newOrders)
+          setUpdateOrderModal(false)
+          notification["success"]({
+            message:"Успешно изменили заказ"
+          })
+        })
+      }).catch((err) => {
+        notification["error"]({
+          message: err.response.data.message
+        })
+      })
+    }
+
     return (
         <div className={styles.wrapper}>
             <div>
-                <Modal open={userModal} footer={[]} onCancel={() => setUserModal(false)} className="userModal">
-                    <Table columns={userModalColumns} dataSource={userModalData} pagination={false} />
-                </Modal>
+              <Modal open={userModal} footer={[]} onCancel={() => setUserModal(false)} className="userModal">
+                  <Table columns={userModalColumns} dataSource={userModalData} pagination={false} />
+              </Modal>
             </div>
+            <Modal open={updateOrderModal} onCancel={() => setUpdateOrderModal(false)} footer={[
+              <Button type='primary' onClick={saveOrderUpdateHandler}>Сохранить</Button>
+            ]}>
+              <div className={styles.update__order}>
+                <div className={styles.update__order_title}>
+                  Изменить заказ
+                </div>
+                <div className={styles.update__order_input}>
+                  <div className={styles.update__order_label}>
+                    Наименование груза    
+                  </div>
+                  <Select 
+                    value={selectedOrder?.type}
+                    onChange={(e) => setSelectedOrder({...selectedOrder, type: e})}
+                    className='w-100'
+                    options={
+                      [
+                        {
+                          label:"Одежда и обувь",
+                          value:"Одежда и обувь"
+                        },
+                        {
+                          label:"Остальное (хоз товары)",
+                          value:"Остальное (хоз товары)"
+                        }
+                      ]
+                    }
+                  >
+                  </Select>
+                </div>
+                <div className={styles.update__order_input}>
+                  <div className={styles.update__order_label}>
+                    Тип доставки   
+                  </div>
+                  <Select 
+                    value={selectedOrder?.deliveryType}
+                    onChange={(e) => setSelectedOrder({...selectedOrder, deliveryType: e})}
+                    className='w-100'
+                    options={
+                      [
+                        {
+                          label:"Экспресс (8-10 дней)",
+                          value:"Экспресс (8-10 дней)"
+                        },
+                        {
+                          label:"Экспресс (15-20 дней)",
+                          value:"Экспресс (15-20 дней)"
+                        },
+                        {
+                          label:"Авто (18-25 дней)",
+                          value:"Авто (18-25 дней)"
+                        },
+                        {
+                          label:"ЖД (30-35 дней)",
+                          value:"ЖД (30-35 дней)"
+                        },
+                      ]
+                    }
+                  >
+                  </Select>
+                </div>
+                <div className={styles.update__order_input}>
+                  <div className={styles.update__order_label}>
+                    Вес одной коробки (кг)    
+                  </div>
+                  <Input value={selectedOrder?.weight} onChange={(e) => setSelectedOrder({...selectedOrder, weight: e.target.value})} />
+                </div>
+                <div className={styles.update__order_input}>
+                  <div className={styles.update__order_label}>
+                    Длина (м3)
+                  </div>
+                  <Input value={selectedOrder?.len} onChange={(e) => setSelectedOrder({...selectedOrder, len: e.target.value})} />
+                </div>
+                <div className={styles.update__order_input}>
+                  <div className={styles.update__order_label}>
+                    Ширина (м3)
+                  </div>
+                  <Input value={selectedOrder?.width} onChange={(e) => setSelectedOrder({...selectedOrder, width: e.target.value})}/>
+                </div>
+                <div className={styles.update__order_input}>
+                  <div className={styles.update__order_label}>
+                    Высота (м3)
+                  </div>
+                  <Input value={selectedOrder?.height} onChange={(e) => setSelectedOrder({...selectedOrder, height: e.target.value})}/>
+                </div>
+                <div className={styles.update__order_input}>
+                  <div className={styles.update__order_label}>
+                    Количество
+                  </div>
+                  <Input value={selectedOrder?.count} onChange={(e) => setSelectedOrder({...selectedOrder, count: e.target.value})}/>
+                </div>
+                <div className={styles.update__order_input}>
+                  <div className={styles.update__order_label}>
+                    Инд код
+                  </div>
+                  <Input value={selectedOrder?.individualCode} onChange={(e) => setSelectedOrder({...selectedOrder, individualCode: e.target.value})}/>
+                </div>
+                <div className={styles.update__order_input}>
+                  <div className={styles.update__order_label}>
+                    Цена
+                  </div>
+                  <Input value={selectedOrder?.price} onChange={(e) => setSelectedOrder({...selectedOrder, price: e.target.value})}/>
+                </div>
+              </div>
+            </Modal>
             <Modal open={createUserModal} footer={[]} onCancel={createUserModalCancel}>
             <Form
               name="basic"

@@ -59,3 +59,8 @@ export const changeTrackCode = async (body) => {
     const response = await myAxios.put('/orders/tracker/change', body);
     return response;
 }
+
+export const updateOrder = async (body) => {
+    const response = await myAxios.put('/orders/', body);
+    return response;
+}

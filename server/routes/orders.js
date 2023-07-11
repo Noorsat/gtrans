@@ -1,11 +1,11 @@
 import express from 'express';
-import { getOrders, createOrder, updateOrder, addRequest, changeStatusRequest, changeTrackCode, getOrderByTrackCode, getOrdersByAccountId, switchTrackCode, getOrderById, acceptProduct, acceptChina, changePriceByAdmin  } from '../controllers/orders.js';
+import { getOrders, createOrder, updateOrder, addRequest, changeStatusRequest, changeTrackCode, getOrderByTrackCode, getOrdersByAccountId, switchTrackCode, getOrderById, acceptProduct, acceptChina, changePriceByAdmin, changeInfoByAdmin  } from '../controllers/orders.js';
 
 const router = express.Router();
 
 router.get("/", getOrders)
 router.post("/", createOrder)
-router.put("/:id", updateOrder)
+router.put("/", changeInfoByAdmin)
 router.put("/add/request/:id", addRequest)
 router.put("/status/request/:id", changeStatusRequest)
 router.put("/tracker/change", changeTrackCode)
