@@ -23,14 +23,14 @@ export const createOrder = async (req, res) => {
             port: 993, 
             secure:'true',
             auth: {
-              user: 'info@gtrans.kz',
-              pass: 'codmeh-fiwBox-kykge1'
+                user: 'itsnursat@gmail.com',
+                pass: 'pdlfyedtkldiqrik'
             },
           });
           
           var mailOptions = {
-            from: 'info@gtrans.kz',
-            to: 'itsnursat@gmail.com',
+            from: 'itsnursat@gmail.com',
+            to: 'info@gtrans.kz',
             
             subject: 'Новый заказ',
             html: `
@@ -46,6 +46,9 @@ export const createOrder = async (req, res) => {
                             <tr> 
                                 <td>
                                     Наименование груза
+                                </td>
+                                <td>
+                                    Тип доставки
                                 </td>
                                 <td>
                                     Вес одной коробки (кг)
@@ -75,6 +78,9 @@ export const createOrder = async (req, res) => {
                                     <tr> 
                                         <td>
                                             ${item?.type}
+                                        </td>
+                                        <td>
+                                            ${item?.deliveryType}                                        
                                         </td>
                                         <td>
                                             ${item?.weight}
@@ -348,8 +354,6 @@ export const changeInfoByAdmin = async (req, res) => {
     
     const user = await User.findById(accountId)
 
-    console.log(user)
-
     if (user?.role !== "admin" && user?.role !== "superadmin"){
         return res.status(400).json({
             error: true,
@@ -382,8 +386,107 @@ export const changeInfoByAdmin = async (req, res) => {
         }
     })
 
+    var transporter = nodemailer.createTransport({
+        service: 'srv-plesk09.ps.kz',
+        port: 993, 
+        secure:'true',
+         auth: {
+                user: 'itsnursat@gmail.com',
+                pass: 'pdlfyedtkldiqrik'
+         }
+        })
+      
+      var mailOptions = {
+        from:'itsnursat@gmail',
+        to: user?.email,
+        
+        subject: 'Наш менеджер отредактировал ваш заказ',
+        html: `
+            <div>
+                <div style="text-align: center; font-weight:700; font-size: 20px; margin-bottom:20px">
+                    Новые данные
+                </div>
+                <div>
+                    <table border="1">
+                        <tr> 
+                            <td>
+                                Наименование груза
+                            </td>
+                            <td>
+                                Тип доставки
+                            </td>
+                            <td>
+                                Вес одной коробки (кг)
+                            </td>
+                            <td>
+                                Длина одной коробки (м)
+                            </td>
+                            <td>
+                                Ширина одной коробки (м)
+                            </td>
+                            <td>
+                                Высота одной коробки (м)
+                            </td>
+                            <td>
+                                Количество коробок
+                            </td>
+                            <td>
+                                Комментарии
+                            </td>
+                            <td>
+                                Цена
+                            </td>
+                        </tr>
+                        <tr> 
+                            <td>
+                                ${req.body?.type}
+                            </td>
+                            <td>
+                                ${req.body?.deliveryType}
+                            </td>
+                            <td>
+                                ${req.body?.weight}
+                            </td>
+                            <td>
+                                ${req.body?.len}
+                            </td>
+                            <td>
+                                ${req.body?.width}
+                            </td>
+                            <td>
+                                ${req.body?.height}
+                            </td>
+                            <td>
+                                ${req.body?.count}
+                            </td>
+                            <td>
+                                ${req.body?.comment}
+                            </td>
+                            <td>
+                                ${req.body?.price}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div>
+                    Что-бы обсудить детали позвоните по номеру: +7 (727) 333 70 50 или +7 (707) 585 1003
+                </div>
+            </div>
+        `
+      };
+      transporter.sendMail(mailOptions, function(error, info){
+        if (error) {
+            console.log(error)
+        } else {
+            console.log('success')
+            return res.status(200).json(orders);
+        }
+      });
+
     return res.status(200).json({
         success: true,
         message: 'Успешно поменяли заказ',
     })
+
+
 }
