@@ -1,11 +1,11 @@
 import myAxios from './axios'
 
-export const getOrders = async () => {
-    const response = await myAxios.get("/orders");
+export const getOrders = async (params = '') => {
+    const response = await myAxios.get("/orders" + params);
     return response
 }
 
-export const createOrder = async (body) => {
+export const createOrder = async (body) => { 
     const response = await myAxios.post("/orders", body);
     return response;
 }
@@ -62,5 +62,10 @@ export const changeTrackCode = async (body) => {
 
 export const updateOrder = async (body) => {
     const response = await myAxios.put('/orders/', body);
+    return response;
+}
+
+export const getDetails = async () => {
+    const response = await myAxios.get("/orders/details")
     return response;
 }

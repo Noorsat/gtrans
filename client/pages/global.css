@@ -4,6 +4,9 @@
 .volumeModal.ant-modal{
     width:80%!important;
 }
+.price__modal .ant-modal-footer{
+    padding: 0!important;
+}
 *, body{
     font-family: 'Ubuntu', sans-serif!important;
     box-sizing: border-box;
@@ -151,4 +154,30 @@ input[type="week"],
 select:focus,
 textarea {
   font-size: 16px;
+}
+.ant-slider-handle{
+    border-color:#FFAD32;
+    box-shadow: none;
+}
+.ant-slider-track{
+    background-color: #FFAD32;
+}
+.ant-slider:hover .ant-slider-track {
+    background-color: #FFAD32;
+    box-shadow: none;
+}
+.ant-slider:hover .ant-slider-handle:not(.ant-tooltip-open), .ant-slider:hover .ant-slider-handle{
+    border-color:#FFAD32;
+    box-shadow: none;
+}
+.ant-slider-handle.ant-tooltip-open{
+    border-color:#FFAD32;
+    box-shadow: none;
+}
+.ant-slider-handle:focus{
+    border-color:#FFAD32;
+    box-shadow: none;
+}
+.ant-spin-dot-item{
+    background-color:#FFAD32!important;  
 }

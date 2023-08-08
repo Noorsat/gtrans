@@ -4,7 +4,30 @@ import nodemailer from 'nodemailer';
 
 export const getOrders = async (req, res) => {
     try {
-        const orders = await Order.find();
+        const { type, deliveryType, minWeight, maxWeight, minVolume, maxVolume } = req.query;
+
+        const typesArray = type && type.split(',');
+        const deliveryArray = deliveryType && deliveryType.split(',');
+
+        const filter = {}
+    
+        if (type){
+            filter.type = { $in: typesArray }
+        }
+        
+        if (deliveryType){
+            filter.deliveryType = { $in : deliveryArray }
+        }
+
+        if (minWeight && maxWeight){
+            filter.totalWeight = { $gte: minWeight, $lte: maxWeight }
+        }
+
+        if (minVolume && maxVolume){
+            filter.volume = { $gte: minVolume, $lte: maxVolume}
+        }
+        
+        const orders = await Order.find(filter);
 
         res.status(200).json(orders.reverse())
     }catch (error){
@@ -487,6 +510,51 @@ export const changeInfoByAdmin = async (req, res) => {
         success: true,
         message: 'Успешно поменяли заказ',
     })
+}
 
+export const getOrderDetails = async (req, res) => {
+    try {
+        const orders = await Order.find();
 
+        const types = orders.map((item) => item.type).filter((type, index, currentVal) =>
+            currentVal.indexOf(type) === index
+        ).filter(item => item !== undefined);
+
+        const deliveryTypes = orders.map((item) => item.deliveryType).filter((deliveryType, index, currentVal) =>
+            currentVal.indexOf(deliveryType) === index
+        ).filter(item => item !== undefined);
+
+        const totalWeight = [orders?.map((item) => Number(item.totalWeight)).filter(item => !isNaN(item)).sort((a,b) => a - b)[0], orders?.map((item) => Number(item.totalWeight)).filter(item => !isNaN(item)).sort((a,b) => a - b)[orders?.map((item) => Number(item.totalWeight)).filter(item => !isNaN(item)).sort((a,b) => a - b).length - 1]]
+
+        const totalVolume = [orders?.map((item) => Number(item.volume)).filter(item => !isNaN(item)).sort((a,b) => a - b)[0], orders?.map((item) => Number(item.volume)).filter(item => !isNaN(item)).sort((a,b) => a - b)[orders?.map((item) => Number(item.volume)).filter(item => !isNaN(item)).sort((a,b) => a - b).length - 1]]
+
+        const body = [
+            {
+                title: 'Название груза',
+                items: types
+            },
+            {
+                title: 'Тип доставки',
+                items: deliveryTypes
+            },
+            {
+                title: 'Вес',
+                items: {
+                    min: totalWeight[0],
+                    max: totalWeight[1]
+                }
+            },
+            {
+                title: 'Объем',
+                items: {
+                    min: totalVolume[0],
+                    max: totalVolume[1]
+                }
+            },
+        ]
+
+        return res.status(200).json(body)
+    }catch (error){
+        return res.status(404).json({message: error.message})
+    }
 }

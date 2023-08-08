@@ -81,6 +81,9 @@ const Header = ({user, openDrawer, closeDrawer, drawer}) => {
         {
           !drawer &&  <div className={`d-flex justify-content-center d-md-none border-bottom ${styles.mobile__items}`}>
             <div className={styles.mobile__links}>
+              <Link href="/marketplace">Биржа</Link>
+            </div>
+            <div className={styles.mobile__links}>
               <Link href="/request">Калькулятор</Link>
             </div>
             <div className={styles.mobile__links}>
@@ -94,6 +97,7 @@ const Header = ({user, openDrawer, closeDrawer, drawer}) => {
         <div className={`position-relative border-bottom border-top d-md-block d-none ${styles.nav}`}>
           <div className={`container d-flex justify-content-between ${styles.links}`}>
             <div className={`d-flex justify-content-center`}>
+              <Link href="/marketplace">Биржа</Link>
               <Link href="/request">Калькулятор</Link>
               <Link href="/my-orders">Мои заказы</Link>
               <Link href="/tracking">Трекинг</Link>
