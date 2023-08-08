@@ -12,13 +12,7 @@ export const loginUser = async (req, res) => {
     try{
         const user = await User.login(email.toLowerCase(), password)
 
-        const nUser = await User.findOne({email: email});
-
         const token = createToken(user._id, user.companyName, user.phoneNumber, user.email, String(user.id), user?.name, user?.surname, user?.dateOfBirth);
-
-        nUser.accessToken = token;
-        
-        await nUser.save();
 
         res.status(200).json({email, token, role: user?.role})
     }catch(error){
