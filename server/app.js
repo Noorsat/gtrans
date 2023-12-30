@@ -40,7 +40,7 @@ app.use("/prices", pricesRoutes)
 //         state: 'state',
 //         server: {
 //             // порт, на котором запустится сервер авторизации
-//             port: 3000
+//             port: 3000j
 //         }
 //         /*
 //             Необязательный араметр состояния для проверки на корректность. 
@@ -58,16 +58,17 @@ app.use("/prices", pricesRoutes)
 // к примеру, HTTP-статус ответа операции
 //console.log(result.response.statusCode);
 
-mongoose.connect("mongodb://127.0.0.1:27017/?retryWrites=true&w=majority", {
-    useNewUrlParser: true, 
-    useUnifiedTopology: true 
-}).then(() => app.listen(5100, () => console.log("Server launched")))
-
-
-// mongoose.connect("mongodb+srv://user:qwerty123@cluster0.bfy5yoo.mongodb.net/?retryWrites=true&w=majority", {
+mongoose.set("strictQuery", false);
+// mongoose.connect("mongodb+srv://itsnursat:itsnoorsat@cluster0.d6wn9dw.mongodb.net/?retryWrites=true&w=majority", {
 //     useNewUrlParser: true, 
 //     useUnifiedTopology: true 
 // }).then(() => app.listen(5100, () => console.log("Server launched")))
+
+
+mongoose.connect("mongodb+srv://user:qwerty123@cluster0.bfy5yoo.mongodb.net/?retryWrites=true&w=majority", {
+    useNewUrlParser: true, 
+    useUnifiedTopology: true 
+}).then(() => app.listen(5100, () => console.log("Server launched")))
 
     
 
