@@ -1,4 +1,4 @@
-import { Button, DatePicker, Form, Input, Select, Table, notification, Modal, Alert, Switch, Radio} from 'antd';
+import { Button, DatePicker, Form, Input, Select, notification, Modal, Switch, Radio} from 'antd';
 import {useState, useEffect} from 'react';
 import {createOrder, getOrders, getOrdersByAccountId} from './../../http/orders';
 import styles from './../../styles/Request.module.css';
@@ -47,6 +47,10 @@ const Request = ({order, setOrder}) => {
     const [prices, setPrices] = useState();
     const [hoz, setHoz] = useState();
     const [tnp, setTnp] = useState();
+    
+    console.log(price1);
+    console.log(price2);
+    console.log(prices);
 
     useEffect(() => {
         const user = JSON.parse(localStorage.getItem("user"))
@@ -173,6 +177,7 @@ const Request = ({order, setOrder}) => {
             const totalWeight = order?.switch ? Number(order?.totalWeight) :  Number(order?.weight)*Number(order?.count); 
             const totalVolume = order?.switch ? (Number(order?.totalVolume)) : ((Number(order?.len)/100) * (Number(order?.width)/100) * (Number(order?.height)/100)) * Number(order.count);
             const density = totalWeight / totalVolume;
+            console.log(density)
             const active = order?.switch;
             setTotalVolume(parseFloat(totalVolume.toFixed(2)));
             setTotalWeight(parseFloat(totalWeight.toFixed(2)));
@@ -180,7 +185,6 @@ const Request = ({order, setOrder}) => {
             const priceByDensity = prices?.map(price => {
               return price?.items.filter((item) => item?.from <= density && item?.to > density);
             }).flatMap(arr => arr)
-            console.log(priceByDensity)
           if (totalWeight <= 30 && totalVolume <= 0.2){
             totalPrice1 += 7 * totalWeight;
             totalPrice2 += 7 * totalWeight;
@@ -188,6 +192,8 @@ const Request = ({order, setOrder}) => {
             totalPrice4 += 7 * totalWeight;
           }else{ 
             if (order?.type === "first"){
+              console.log('qweq');
+              console.log(priceByDensity);
               totalPrice1 += (density < 100 ? Number(totalVolume) * Number(priceByDensity[0]?.hoz) : Number(totalWeight) * Number(priceByDensity[0]?.hoz))
               totalPrice2 += (density < 100 ? Number(totalVolume) * Number(priceByDensity[1]?.hoz) : Number(totalWeight) * Number(priceByDensity[1]?.hoz))
               totalPrice3 += (density < 100 ? Number(totalVolume) * Number(priceByDensity[2]?.hoz) : Number(totalWeight) * Number(priceByDensity[2]?.hoz))
@@ -209,6 +215,7 @@ const Request = ({order, setOrder}) => {
             setTotalWeight(0);
           }
           })
+          console.log(totalPrice1);
           if (totalPrice1 !== 0){
             if (totalPrice1 < 30){
               setPrice1(30);
@@ -468,11 +475,7 @@ const Request = ({order, setOrder}) => {
                             options={
                               [
                                 {
-                                  label:"Одежда и обувь",
-                                  value:"second"
-                                },
-                                {
-                                  label:"Остальное (хоз товары)",
+                                  label: "Хоз товары",
                                   value:"first"
                                 }
                               ]
@@ -578,22 +581,12 @@ const Request = ({order, setOrder}) => {
                       <Radio.Group value={orders[0]?.deliveryType}> 
                         <div className={styles.price}>
                           <Radio value="Экспресс (8-10 дней)" onChange={(e) => priceSelectHandler(e, price1)}>
-                            Экспресс (8-10 дней): <span className={styles.price__bold}>{getPrice(price1)}</span>
+                            Авто (6-8 дней): <span className={styles.price__bold}>{getPrice(price1)}</span>
                           </Radio>
                         </div>
                         <div className={styles.price}>
                           <Radio value="Экспресс (15-20 дней)" onChange={(e) => priceSelectHandler(e, price2)}>
-                            Экспресс (15-20 дней): <span className={styles.price__bold}>{getPrice(price2)}</span>
-                          </Radio>
-                        </div>
-                        <div className={styles.price}>
-                          <Radio value="Авто (18-25 дней)" onChange={(e) => priceSelectHandler(e, price2)}>
-                            Авто (18-25 дней) : <span className={styles.price__bold}>{getPrice(price3)}</span>
-                          </Radio>
-                        </div>
-                        <div className={styles.price} >
-                          <Radio value="ЖД (30-35 дней)" onChange={(e) => priceSelectHandler(e, price2)}>
-                            ЖД (30-35 дней) : <span className={styles.price__bold}>{getPrice(price4)}</span>
+                            Ж/Д (25-35 дней): <span className={styles.price__bold}>{getPrice(price2)}</span>
                           </Radio>
                         </div>
                       </Radio.Group>
