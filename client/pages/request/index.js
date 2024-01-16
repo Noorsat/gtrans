@@ -1,18 +1,13 @@
-import { Button, DatePicker, Form, Input, Select, notification, Modal, Switch, Radio} from 'antd';
+import { Form, Input, Select, notification, Modal, Switch, Radio, Spin} from 'antd';
 import {useState, useEffect} from 'react';
 import {createOrder, getOrders, getOrdersByAccountId} from './../../http/orders';
 import styles from './../../styles/Request.module.css';
-import moment from 'moment';
 import jwt_decode from 'jwt-decode'
 import { useRouter } from 'next/router';
-import { getId } from '../../components/validation';
-import { height } from '@mui/system';
-import Link from 'next/link';
 import { getPrices } from '../../http/price';
 
 
 const Request = ({order, setOrder}) => {
-    const { Option } = Select;
     const router = useRouter();
 
     const [totalVolume, setTotalVolume] = useState(order && order[0]?.totalVolume || 0);
@@ -37,39 +32,36 @@ const Request = ({order, setOrder}) => {
     );
     const [price1, setPrice1] = useState(order && order[0]?.price1 || 0);
     const [price2, setPrice2] = useState(order && order[0]?.price2 || 0);
-    const [price3, setPrice3] = useState(order && order[0]?.price3 || 0);
-    const [price4, setPrice4] = useState(order && order[0]?.price4 || 0);
     const [selectedPrice, setSelectedPrice] = useState();
     const [modal, setModal] = useState(false);
     const [indCode, setIndCode] = useState();
-    const [volumeModal, setVolumeModal] = useState(false);
     const [mobile, setMobile] = useState(false);
     const [prices, setPrices] = useState();
-    const [hoz, setHoz] = useState();
-    const [tnp, setTnp] = useState();
-    
-    console.log(price1);
-    console.log(price2);
-    console.log(prices);
+    const [isLoading, setIsLoading] = useState(false);
+
+    console.log(orders);
 
     useEffect(() => {
-        const user = JSON.parse(localStorage.getItem("user"))
-        var decoded = user && jwt_decode(user?.token);
-        decoded && setUser(decoded);
+        setIsLoading(true);
+        const user = JSON.parse(localStorage.getItem("user")) || null;
+        if (user){
+          var decoded = user && jwt_decode(user?.token);
+          decoded && setUser(decoded);
+
+          getPrices(user?.token).then((res) => {
+            setPrices(res?.data);
+            setIsLoading(false); 
+          })
+        }else{
+          router.push("/login")
+        }
         if (window.innerWidth < 500){
           setMobile(true);
         }
-        getPrices(user?.token).then((res) => {
-          setPrices(res?.data);
-          setHoz(res.data[0]?.hoz);
-          setTnp(res.data[0]?.tnp);
-        })
+        
     }, [])
 
       const createOrderHandler = () => {
-        // notification["error"]({
-        //   message: "По техническим причинам заказы не принимаются"
-        // })
         if (!(orders[0]?.type)){
           notification["error"]({
             message:"Выберите наименование груза"
@@ -95,8 +87,6 @@ const Request = ({order, setOrder}) => {
             setOrder(orders.map(order => {
               order.price1 = price1;
               order.price2 = price2;
-              order.price3 = price3;
-              order.price4 = price4;
               order.totalVolume = totalVolume;
               order.totalDensity = totalDensity;
               order.totalWeight = totalWeight;
@@ -162,23 +152,16 @@ const Request = ({order, setOrder}) => {
       router.push("/my-orders")
      }
 
-     const getIndividualCode = (id) => {
-      return "GT-2023-" + getId(id);
-     }
     
       useEffect(() => {
           let totalPrice1 = 0;
           let totalPrice2 = 0;
-          let totalPrice3 = 0;
-          let totalPrice4 = 0;
 
-          prices && orders?.map((order, index) => {
+          prices && orders?.map((order) => {
           if ((Number(order?.weight) > 0 && Number(order?.len) > 0 && Number(order?.width) > 0 && Number(order?.height) > 0 && Number(order?.count) >0) || (Number(order?.totalVolume) > 0 && Number(order?.totalWeight) > 0)){
             const totalWeight = order?.switch ? Number(order?.totalWeight) :  Number(order?.weight)*Number(order?.count); 
             const totalVolume = order?.switch ? (Number(order?.totalVolume)) : ((Number(order?.len)/100) * (Number(order?.width)/100) * (Number(order?.height)/100)) * Number(order.count);
             const density = totalWeight / totalVolume;
-            console.log(density)
-            const active = order?.switch;
             setTotalVolume(parseFloat(totalVolume.toFixed(2)));
             setTotalWeight(parseFloat(totalWeight.toFixed(2)));
             setTotalDensity(parseFloat(density.toFixed(2)));
@@ -188,28 +171,19 @@ const Request = ({order, setOrder}) => {
           if (totalWeight <= 30 && totalVolume <= 0.2){
             totalPrice1 += 7 * totalWeight;
             totalPrice2 += 7 * totalWeight;
-            totalPrice3 += 7 * totalWeight;
-            totalPrice4 += 7 * totalWeight;
           }else{ 
             if (order?.type === "first"){
-              console.log('qweq');
               console.log(priceByDensity);
               totalPrice1 += (density < 100 ? Number(totalVolume) * Number(priceByDensity[0]?.hoz) : Number(totalWeight) * Number(priceByDensity[0]?.hoz))
               totalPrice2 += (density < 100 ? Number(totalVolume) * Number(priceByDensity[1]?.hoz) : Number(totalWeight) * Number(priceByDensity[1]?.hoz))
-              totalPrice3 += (density < 100 ? Number(totalVolume) * Number(priceByDensity[2]?.hoz) : Number(totalWeight) * Number(priceByDensity[2]?.hoz))
-              totalPrice4 += (density < 100 ? Number(totalVolume) * Number(priceByDensity[3]?.hoz) : Number(totalWeight) * Number(priceByDensity[3]?.hoz))
           }else if(order?.type === "second"){
             totalPrice1 += (density < 100 ? Number(totalVolume) * Number(priceByDensity[0]?.tnp) : Number(totalWeight) * Number(priceByDensity[0]?.tnp))
             totalPrice2 += (density < 100 ? Number(totalVolume) * Number(priceByDensity[1]?.tnp) : Number(totalWeight) * Number(priceByDensity[1]?.tnp))
-            totalPrice3 += (density < 100 ? Number(totalVolume) * Number(priceByDensity[2]?.hoz) : Number(totalWeight) * Number(priceByDensity[2]?.hoz))
-            totalPrice4 += (density < 100 ? Number(totalVolume) * Number(priceByDensity[3]?.hoz) : Number(totalWeight) * Number(priceByDensity[3]?.hoz))
           }
           }
           }else{
             setPrice1(0);
             setPrice2(0);
-            setPrice3(0);
-            setPrice4(0);
             setTotalDensity(0);
             setTotalVolume(0);
             setTotalWeight(0);
@@ -230,34 +204,7 @@ const Request = ({order, setOrder}) => {
               setPrice2(Math.round(totalPrice2))
             }
           }
-          if (totalPrice3 !== 0){
-            if (totalPrice3 < 30){
-              setPrice3(30);
-            }else{
-              setPrice3(Math.round(totalPrice3))
-            }
-          }
-          if (totalPrice4 !== 0){
-            if (totalPrice4 < 30){
-              setPrice4(30);
-            }else{
-              setPrice4(Math.round(totalPrice4))
-            }
-          }
      }, [orders])
-
-     const weightHandler = (value) => {
-      setOrder({...order, weight:value});
-      if (value <= 20){
-        totalPrice += (Number(value)*7)
-      }else{
-        if (order.len == "" || order.width  == "" || order.height == ""){
-          notification["info"]({
-            message:'Вам надо написать длину, ширину, высоту',
-          })
-        }
-      }
-    };
 
      const typeHandler = (e, label, index) => {
       setOrders(orders?.map((order, i) => {
@@ -406,6 +353,13 @@ const Request = ({order, setOrder}) => {
 
     return (
         <div className='container'>
+            {
+                isLoading && (
+                    <div className="loading">
+                        <Spin size='large' />
+                    </div>
+                )
+            }
             <Modal open={modal} footer={null}
               onCancel={onCancel}
               width={!mobile ?  "80%" : '95%'}
@@ -580,12 +534,12 @@ const Request = ({order, setOrder}) => {
                       </div>
                       <Radio.Group value={orders[0]?.deliveryType}> 
                         <div className={styles.price}>
-                          <Radio value="Экспресс (8-10 дней)" onChange={(e) => priceSelectHandler(e, price1)}>
+                          <Radio value="Авто (6-8 дней)" onChange={(e) => priceSelectHandler(e, price1)}>
                             Авто (6-8 дней): <span className={styles.price__bold}>{getPrice(price1)}</span>
                           </Radio>
                         </div>
                         <div className={styles.price}>
-                          <Radio value="Экспресс (15-20 дней)" onChange={(e) => priceSelectHandler(e, price2)}>
+                          <Radio value="Ж/Д (25-35 дней)" onChange={(e) => priceSelectHandler(e, price2)}>
                             Ж/Д (25-35 дней): <span className={styles.price__bold}>{getPrice(price2)}</span>
                           </Radio>
                         </div>

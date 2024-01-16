@@ -5,7 +5,7 @@ import Router, {useRouter} from 'next/router';
 import { changeTrackCode, getOrderById } from '../../http/orders';
 import { getUserById } from '../../http/auth';
 import moment from 'moment';
-import {Modal, Button, Input, notification, message} from 'antd';
+import {Modal, Input, notification, message, Spin} from 'antd';
 import Link from 'next/link';
 
 const Order = () => {
@@ -13,20 +13,23 @@ const Order = () => {
     const [owner, setOwner] = useState();
     const [modal, setModal] = useState(false);
     const [trackcodeValue, setTrackcodeValue] = useState();
+    const [isLoading, setIsLoading] = useState();
 
      const router = useRouter();
     const id = router.query.id;
 
     useEffect(() => {
         if (id){
-        getOrderById(id).then((res) => {
-            if (res.status === 200)
-                setOrder(res.data)
-                getUserById(res.data.accountId).then((res) => {
-                    setOwner(res.data);
-                })
-            })
-        }
+            setIsLoading(true);
+            getOrderById(id).then((res) => {
+                if (res.status === 200){
+                    setOrder(res.data)
+                    getUserById(res.data.accountId).then((res) => {
+                        setOwner(res.data);
+                    })
+                    setIsLoading(false);
+                }})
+            }
     }, [id])
 
     const goBackHandler = () => {
@@ -70,6 +73,13 @@ const Order = () => {
 
     return (
         <div className={styles.order}>
+            {
+                isLoading && (
+                    <div className="loading">
+                        <Spin size='large' />
+                    </div>
+                )
+            }
             <Modal open={modal} footer={[
               <button onClick={() =>  setModal(false)} className='track__button'>
                 Назад

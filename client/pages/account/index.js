@@ -15,14 +15,11 @@ const Account = () => {
         const user = JSON.parse(localStorage.getItem("user"))
         if (user){
             var decoded = jwt_decode(user?.token);
-            console.log(decoded)
             setUser(decoded);
         }else{
             router.push("/login")
         }
     }, [])
-
-    console.log(user);
 
     const exitHandler = () => {
         localStorage.removeItem("user")

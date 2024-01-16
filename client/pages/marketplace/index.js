@@ -112,7 +112,7 @@ const Marketplace = () => {
         <div className={styles.marketplace}>
             {
                 isLoading && (
-                    <div className={styles.loading}>
+                    <div className="loading">
                         <Spin size='large' />
                     </div>
                 )

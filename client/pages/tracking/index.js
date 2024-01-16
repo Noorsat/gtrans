@@ -6,19 +6,21 @@ import { GrWaypoint } from 'react-icons/gr';
 import {RiFlightTakeoffFill, RiFlightLandFill, RiCreativeCommonsLine} from 'react-icons/ri';
 import { AiFillCheckCircle } from 'react-icons/ai';
 import styles from './../../styles/Tracking.module.css'
-import { Button, Input, notification } from 'antd';
+import { Button, Input, Spin, notification } from 'antd';
 import { getOrderByTrackCode } from '../../http/orders';
 import moment from 'moment';
 
 const Tracking = () => {
     const [trackerCode, setTrackerCode] = useState();
     const [status, setStatus] = useState();
+    const [isLoading, setIsLoading] = useState();
 
     const router = useRouter()
     const { trackCode } = router.query
 
     useEffect(() => {
         if (trackCode){
+            setIsLoading(true);
             setTrackerCode(trackCode)
             getOrderByTrackCode(trackCode).then((res) => {
                 if (res.status === 200){
@@ -36,6 +38,8 @@ const Tracking = () => {
                     })
                     setOrder(null)
                 }
+            }).finally((res) => {
+                setIsLoading(false);
             })
         }
     }, []);
@@ -44,6 +48,7 @@ const Tracking = () => {
     const [diff, setDiff] = useState(0);
 
     const searchOrder = () => {
+        setIsLoading(true);
         getOrderByTrackCode(trackerCode).then((res) => {
             if (res.status === 200){
                 let nowDate = moment();
@@ -60,6 +65,8 @@ const Tracking = () => {
                 })
                 setOrder(null)
             }
+        }).finally((res) => {
+            setIsLoading(false);
         })
     }
 
@@ -67,6 +74,13 @@ const Tracking = () => {
 
     return (
         <div className='container'>
+            {
+                isLoading && (
+                    <div className="loading">
+                        <Spin size='large' />
+                    </div>
+                )
+            }
             <div className='d-md-flex d-block'>
                 <div className={styles.tracking__left}>
                     <div className={styles.tracking__title}>
