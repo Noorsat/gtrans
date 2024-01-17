@@ -5,7 +5,7 @@ import {
     MenuFoldOutlined,
     MoneyCollectOutlined,
   } from '@ant-design/icons';
-import { Button, Checkbox, Input, Menu, Modal, notification, Table, Form, DatePicker, Tooltip, Select } from 'antd';
+import { Button, Checkbox, Input, Menu, Modal, notification, Table, Form, DatePicker, Tooltip, Select, Spin } from 'antd';
 import { useState, useEffect } from 'react';
 import { changeRoleToAdmin, getAllUsers, getUserById, signupUserByAdmin } from '../../http/auth';
 import { acceptProduct, addTrackerCode, changePriceByAdmin, getOrders, getOrdersByAccountId, removeTrackCode, updateOrder } from '../../http/orders';
@@ -52,35 +52,32 @@ import jwtDecode from 'jwt-decode';
     const [selectedPriceValue, setSelectedPriceValue] = useState();
     const [priceModal, setPriceModal] = useState(false);
     const [prices, setPrices] = useState();
-    const [hoz, setHoz] = useState();
-    const [tnp, setTnp] = useState();
-    const [priceId, setPriceId] = useState();
     const [allOrders, setAllOrders] = useState();
     const [individualCodeInput, setIndividualCodeInput] = useState("");
     const [trackCodeInput, setTrackCodeInput] = useState('');
     const [registerUser, setRegisterUser] = useState({});
     const [updateOrderModal, setUpdateOrderModal] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState();
+    const [isLoading, setIsLoading] = useState(false);
 
     const router = useRouter();
 
     useEffect(() => {
-        const user = JSON.parse(localStorage.getItem("user"))
-        if (user?.role != "admin" && user?.role != "superadmin"){
-          router.push("/request")
-        }
+      setIsLoading(true);
+      const user = JSON.parse(localStorage.getItem("user"))
+      if (user?.role != "admin" && user?.role != "superadmin"){
+        router.push("/request")
+      }
 
-        var decoded = jwtDecode(user?.token)
-        const id = decoded?._id
+      var decoded = jwtDecode(user?.token)
+      const id = decoded?._id
 
-        setUser({...user, _id: id})
+      setUser({...user, _id: id})
 
-        getPrices().then((res) => {
-          setPrices(res.data);
-          setHoz(res.data[0]?.hoz);
-          setTnp(res.data[0]?.tnp);
-          setPriceId(res.data[0]?._id);
-        })
+      getPrices().then((res) => {
+        setPrices(res.data);
+        setIsLoading(false);
+      })
     }, [])
 
     useEffect(() => {
@@ -434,11 +431,13 @@ import jwtDecode from 'jwt-decode';
     }
 
     const menuChangeHandler = (e) => {
+        setIsLoading(true);
         if (e.key === "Пользователи"){
             setDashboardMode("Пользователи")
             getAllUsers().then((res) => {
                 setDashboardData(res.data)
                 setAllData(res.data)
+                setIsLoading(false)
             })
             setDashboardColumns(
                 [
@@ -483,6 +482,7 @@ import jwtDecode from 'jwt-decode';
               })
               setAllOrders(newOrders)
               setDashboardData(newOrders)
+              setIsLoading(false)
             })
             setDashboardColumns(
                 [
@@ -615,6 +615,7 @@ import jwtDecode from 'jwt-decode';
             )
         }else if (e.key === 'Цены'){
           setDashboardMode('Цены')
+          setIsLoading(false)
         }
     }
 
@@ -650,6 +651,13 @@ import jwtDecode from 'jwt-decode';
 
     return (
         <div className={styles.wrapper}>
+           {
+                isLoading && (
+                    <div className="loading">
+                        <Spin size='large' />
+                    </div>
+                )
+            }
             <div>
               <Modal open={userModal} footer={[]} onCancel={() => setUserModal(false)} className="userModal">
                   <Table columns={userModalColumns} dataSource={userModalData} pagination={false} />

@@ -1,4 +1,4 @@
-import { Table, Button, Modal, Input, notification } from 'antd';
+import { Table, Button, Modal, Input, notification, Spin } from 'antd';
 import {useState, useEffect} from 'react';
 import { acceptRequest, addTrackerCode, changeStatusRequest, getOrders, getOrdersByAccountId } from '../../http/orders';
 import moment from 'moment'
@@ -16,35 +16,27 @@ const MyOrders = ( ) => {
     const [selectedOrder, setSelectedOrder] = useState();
     const [user, setUser] = useState()
     const [trackerCodeModal, setTrackerCodeModal] = useState();
-    const  [trackerInput, setTrackerInput] = useState();
+    const [trackerInput, setTrackerInput] = useState();
+    const [isLoading, setIsLoading] = useState(false);
 
     const router = useRouter()
 
     const [requests, setRequests] = useState();
 
     useEffect(() => {
-        const user = JSON.parse(localStorage.getItem("user"))
-        if (user){
-            var decoded = jwt_decode(user?.token);
-            const id = decoded?._id
-            getOrdersByAccountId(id).then((res) => {
-              // let repeatedOrders = [];
-              // let newOrders = res.data.map((order, index) => {
-              //   if (!repeatedOrders.includes(order?.individualCode)){
-              //     order.rowSpan = res.data.filter((item, i) => item?.individualCode === order?.individualCode).length;
-              //   }
-              //   repeatedOrders.push(order?.individualCode);
-              //   return order;
-              // })
-              setOrders(res.data)
-            })
-            // getRequests().then((res) => {
-            //     setRequests(res.data);
-            // })
-            setUser(decoded);
-        }else{
-            router.push("/login")
-        }
+      setIsLoading(true);
+      const user = JSON.parse(localStorage.getItem("user"))
+      if (user){
+          var decoded = jwt_decode(user?.token);
+          const id = decoded?._id
+          getOrdersByAccountId(id).then((res) => {
+            setIsLoading(false);
+            setOrders(res.data)
+          })
+          setUser(decoded);
+      }else{
+          router.push("/login")
+      }
     }, [])
 
     const likeHandler = (order) => {
@@ -92,7 +84,6 @@ const MyOrders = ( ) => {
     };
   
     const handleCancel = () => {
-      //setIsModalOpen(false);
       setTrackerCodeModal(false)
     };
 
@@ -125,12 +116,6 @@ const MyOrders = ( ) => {
           setIsModalOpen(false)
         })
       }
-    }
-9
-    const trackerModalOpenHandler = (item) => {
-      setOrderId(item._id);
-      setOrderIndividualCode(item?.individualCode);
-      setTrackerCodeModal(true);
     }
 
     const openOrderDetail = (id) => {
@@ -320,6 +305,13 @@ const MyOrders = ( ) => {
       ]
     return (
         <div className={styles.my__orders}>
+           {
+                isLoading && (
+                    <div className="loading">
+                        <Spin size='large' />
+                    </div>
+                )
+            }
           <div className='container'>
             <div className={styles.my__orders_title}>
               Мои заказы
