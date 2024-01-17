@@ -1,0 +1,148 @@
+/* ModalAdd.module.css */
+
+.container {
+	position: absolute;
+	width: 700px;
+	top: 100%;
+	left: 0;
+	transform: translate(-10%, -15%);
+  padding: 20px;
+  border: 1px solid #ccc;
+	border-radius: 8px;
+	background: #fff;
+	z-index: 100;
+}
+
+.header {
+  font-size: 1.5rem;
+  font-weight: bold;
+  /* margin-bottom: 10px; */
+	text-align: center;
+}
+
+.description{
+	text-align: center;
+	margin: 10px 0;
+	font-size: 1rem;
+}
+
+.sizeSelect {
+  display: flex;
+	font-size: 10px;
+	gap: 10px;
+}
+
+.sizeSelect > * {
+	min-width: 50px;
+}
+
+.sizeSelect__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+
+
+.sizeSelect__width, .sizeSelect__height, .sizeSelect__length, .sizeSelect__weight{
+	width: 70px;
+}
+
+.sizeSelect__measure {
+  /* width: 13rem; */
+}
+
+.sizeSelect__volume b{
+	display: flex;
+	align-items: center;
+	height: 100%;
+	font-size: 1rem;
+}
+
+.sizeSelect__item p {
+  margin: 0;
+}
+
+.sizeSelect__item img {
+
+}
+
+.calc {
+  display: flex;
+  gap: 10px;
+  margin-top: 30px;
+}
+
+.calc p {
+	margin: 0;
+}
+
+.calc > div {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	height: 100%;
+}
+
+.calc__totalVolume, .calc__totalWeight{
+	height: 100%;
+	display: flex;
+	align-items: center;
+}
+
+
+.calc__amount div {
+  display: flex;
+  /* align-items: center; */
+}
+
+.calc__amount button {
+  /* background-color: #ffad32; */
+	background: none;
+  /* color: #fff; */
+  border: 1px solid rgb(193, 192, 192);
+  padding: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.calc__amount button:nth-child(1){
+	border-top-left-radius: 4px;
+	border-bottom-left-radius: 4px;
+}
+.calc__amount input{
+	width: 40px;
+	padding: 5px;
+	text-align: center;
+}
+.calc__amount button:nth-child(3){
+	border-top-right-radius: 4px;
+	border-bottom-right-radius: 4px;
+}
+
+.calc__amount button:hover {
+  background-color: #ffad32;
+	color: #fff;
+	border-color: #ffad32;
+}
+
+.add {
+	width: 100%;
+	margin-top: 40px;
+  /* background-color: #ffad32; */
+	background: none;
+  /* color: #fff; */
+  border: 1px solid #000;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 40px;
+}
+
+.add:hover {
+  background-color: #ffad32;
+	color: #fff;
+	border: none;
+}
