@@ -8,6 +8,7 @@ import requestsRoutes from './routes/requests.js'
 import userRoutes from './routes/user.js'
 import safePhoneRoutes from './routes/safePhoneUser.js';
 import pricesRoutes from './routes/prices.js';
+import marketplaceRoutes from './routes/marketplace.js';
 //import { Client } from 'amocrm-js'
 
 dotenv.config();
@@ -25,6 +26,7 @@ app.use('/orders', ordersRoutes)
 app.use('/requests', requestsRoutes)
 app.use("/user", userRoutes)
 app.use("/prices", pricesRoutes)
+app.use("/marketplace", marketplaceRoutes)
 
 // const client = new Client({
 //     // логин пользователя в портале, где адрес портала domain.amocrm.ru
