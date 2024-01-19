@@ -6,8 +6,11 @@ import AddNewOrderModal from "../../components/ModalAdd/AddNewOrderModal"
 import styles from "./Marketplace.module.css"
 import MarketplaceFilters from "../../components/MarketplaceFilters/MarketplaceFilters"
 import axios from "axios"
-
+import jwt_decode from 'jwt-decode'
+import { createMarketplaceRequest } from '../../http/marketplace'
+ 
 const Marketplace = () => {
+  const [user, setUser] = useState()
   const [orders, setOrders] = useState()
   const [details, setDetails] = useState()
   const [isLoading, setIsLoading] = useState(false)
@@ -128,6 +131,25 @@ const Marketplace = () => {
     setIsModalVisible(false)
   }
 
+  const handleCreateRequest = (newData) =>{
+    const user = JSON.parse(localStorage.getItem('user') || null)
+    if(user){
+      var decoded = user && jwt_decode(user?.token)
+      decoded && setUser(decoded)
+      createMarketplaceRequest(newData,user?.token).then((res)=>{
+          if(res?.status === 201){
+            setIsModalVisible(false)
+          }
+      }).catch((res)=>{
+        if (res.response.status === 404){
+          notification["error"]({
+              message:res.response.data.message
+          })
+      }
+      })
+    }
+  }
+
   return (
     <div className={styles.marketplace}>
       {isLoading && (
@@ -156,6 +178,7 @@ const Marketplace = () => {
       <div className={styles.marketplace__wrapper}>
         {orders?.map((order) => (
           <Order
+            id={order?._id}
             type={order?.type}
             deliveryType={order?.deliveryType}
             totalWeight={order?.totalWeight}
@@ -165,6 +188,7 @@ const Marketplace = () => {
             volume={order?.volume}
             count={order?.count}
             price={order?.price}
+            onCreateRequest={handleCreateRequest}
           />
         ))}
       </div>

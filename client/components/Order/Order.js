@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { Input, Modal } from 'antd';
 import styles from './Order.module.css'
 
-const Order = ({type, deliveryType, totalWeight, len, width, height, volume, count, price}) => {
+const Order = ({id, type, deliveryType, totalWeight, len, width, height, volume, count, price,onCreateRequest}) => {
     const [modal, setModal] = useState(false);
     const [priceValue, setPriceValue] = useState('');
-    
+        
     const modalOpenHandler = () => {
         setModal(true)
     }
@@ -16,6 +16,16 @@ const Order = ({type, deliveryType, totalWeight, len, width, height, volume, cou
         if (digitsRegex.test(value)) {
             setPriceValue(value);
         }
+    }
+
+    const handleCreateRequest = () =>{
+        const newData = {
+            orderId: id,
+            typeOfDelivery: deliveryType,
+            daysOfDelivery: 7,
+            priceOfDelivery: priceValue
+        }
+        onCreateRequest(newData)
     }
 
 
@@ -36,7 +46,7 @@ const Order = ({type, deliveryType, totalWeight, len, width, height, volume, cou
                         onChange={(e) => changePriceHandler(e.target.value)}
                     />
                 </div>
-                <div className={styles.button}>
+                <div className={styles.button} onClick={handleCreateRequest}>
                     Предложить 
                 </div>
             </Modal>

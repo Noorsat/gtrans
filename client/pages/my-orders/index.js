@@ -8,6 +8,7 @@ import jwt_decode from 'jwt-decode';
 import {AiFillLike, AiFillDislike} from 'react-icons/ai';
 import styles from './../../styles/MyOrders.module.css'
 import { companyPutLike, companyPutUnlike } from '../../http/auth';
+import { getMarketplaceRequestsByUserId } from '../../http/marketplace';
 
 const MyOrders = ( ) => {
     const [orders, setOrders] = useState()
@@ -18,7 +19,9 @@ const MyOrders = ( ) => {
     const [trackerCodeModal, setTrackerCodeModal] = useState();
     const [trackerInput, setTrackerInput] = useState();
     const [isLoading, setIsLoading] = useState(false);
-
+    const [currentTab, setCurrentTab] = useState('order')
+    const [myRequests, setMyRequests] = useState()
+    
     const router = useRouter()
 
     const [requests, setRequests] = useState();
@@ -33,7 +36,12 @@ const MyOrders = ( ) => {
             setIsLoading(false);
             setOrders(res.data)
           })
-          setUser(decoded);
+          decoded && setUser(decoded);
+          getMarketplaceRequestsByUserId(user?.token).then((res)=>{
+            setMyRequests(res.data.data)
+          }).catch((res)=>{
+            console.log(res);
+          })
       }else{
           router.push("/login")
       }
@@ -303,6 +311,28 @@ const MyOrders = ( ) => {
         },
 
       ]
+const myRequestsColumn = [
+  {
+    title:"Откуда",
+    dataIndex: 'from',
+    key: 'from',
+},
+{
+  title:"Куда",
+  dataIndex: 'to',
+  key: 'to',
+},
+{
+  title:"Название",
+  dataIndex: 'name',
+  key: 'name',
+},
+{
+  title:"Цена",
+  dataIndex: 'price',
+  key: 'price',
+},
+]
     return (
         <div className={styles.my__orders}>
            {
@@ -313,23 +343,26 @@ const MyOrders = ( ) => {
                 )
             }
           <div className='container'>
-            <div className={styles.my__orders_title}>
-              Мои заказы
-            </div>
-            <div className={styles.my__orders_items}>
-              {
-                orders?.filter(order => order?.accountId === user?._id).map(item => (
-                  <div className={styles.my__orders_item} onClick={() => openOrderDetail(item?._id)}>
-                  <div className={styles.my__orders_item_title}>
-                    {item.type}
-                  </div>
-                  <div className={styles.my__orders_item_trackCode}>
-                    Трек-код: {item.individualCode}
-                  </div>
-                </div> 
-                ))
-              }
-            </div>
+              <div className={styles.my__orders_title}>
+                <span onClick={()=>setCurrentTab('order')} className={currentTab==='order' && styles.my__orders_tab}>Мои заказы</span>
+                <span onClick={()=>setCurrentTab('request')} className={currentTab==='request' && styles.my__orders_tab} style={{marginLeft:'15px'}}>Мои предложение</span>
+              </div>
+              {currentTab === 'order' ? 
+                <div className={styles.my__orders_items}>
+                  {
+                    orders?.filter(order => order?.accountId === user?._id).map(item => (
+                      <div className={styles.my__orders_item} onClick={() => openOrderDetail(item?._id)}>
+                      <div className={styles.my__orders_item_title}>
+                        {item.type}
+                      </div>
+                      <div className={styles.my__orders_item_trackCode}>
+                        Трек-код: {item.individualCode}
+                      </div>
+                    </div> 
+                    ))
+                  }
+                </div>
+                 :<Table columns={myRequestsColumn} dataSource={myRequests}/>}
           </div>
             {/* <Table dataSource={orders?.filter(order => order?.accountId === user?._id)} columns={columns}  title={() => `Мои заказы`} scroll={{x:800}} pagination={false}/> */}
             <Modal title="Посмотреть заявки" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}
