@@ -23,6 +23,24 @@ export const getRequestsByOrder = async (req, res) => {
     }
 }
 
+export const getRequestsByUserId = async (req, res) => {
+    try{
+        const token = req.headers.authorization.split(" ")[1]; 
+
+        if (!token){
+            res.status(401).json({ message: "No token"});
+        }
+
+        const decoded = jwtDecode(token);
+
+        const requests = await Request.find({ userId: decoded._id});
+
+        res.status(200).json({ data: requests, message: "Succesfully get requests by userId"})
+    }catch (err){
+        res.status(400).json({message: err.message})
+    }
+}
+
 export const createRequest = async (req, res) => {
     try{
         const body = req.body;
