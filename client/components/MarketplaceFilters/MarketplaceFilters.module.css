@@ -1,39 +1,51 @@
-.filters{
-    margin-top: 32px;
+.filters {
+  --accent-color: #ffad32;
+  --accent-color-hover: #ffbe5e;
+  --accent-color2: #333333;
+
+  margin-top: 32px;
+  color: var(--accent-color2);
 }
 
-.title{
-    font-weight: 700;
-    font-size:18px;
+.title {
+  font-weight: 700;
+  font-size: 18px;
 }
 
-.item{
-    display: flex;
-    gap: 6px; 
-    margin-bottom: 4px;
-    cursor: pointer;
+.item {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 4px;
+  cursor: pointer;
 }
 
-.filter{
-    margin-bottom: 16px;
+.filter {
+  margin-bottom: 16px;
 }
 
-.slider{
-    margin-right: 24px;
+.slider {
+  margin-right: 24px;
 }
 
-.button{
-    color: #000;
-    text-align: center;
-    font-size: 14px;
-    font-weight: 500;
-    border-radius: 20px;
-    background: #FFAD32;
-    font-weight: 700;
-    padding:8px 0;
-    cursor: pointer;
-    margin-right: 24px;
-		min-width: 150px;
-		border: none;
-		margin-bottom: 16px;
+.button {
+  position: relative;
+  left: 45%;
+  transform: translateX(-50%);
+  width: 80%;
+  /* color: #000; */
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 20px;
+  background: var(--accent-color);
+  font-weight: 700;
+  padding: 8px 0;
+  cursor: pointer;
+  /* margin-right: 24px; */
+  min-width: 150px;
+  border: none;
+  margin-bottom: 16px;
+}
+.button:hover {
+  background: var(--accent-color-hover);
 }

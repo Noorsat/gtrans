@@ -1,31 +1,27 @@
 import { useEffect, useState } from "react"
-import { getDetails, getOrders } from "./../../http/orders"
-import { Spin, Input, Modal, Select, Space } from "antd"
-import Order from "../../components/Order/Order"
-import AddNewOrderModal from "../../components/ModalAdd/AddNewOrderModal"
-import styles from "./Marketplace.module.css"
-import MarketplaceFilters from "../../components/MarketplaceFilters/MarketplaceFilters"
 import axios from "axios"
-import jwt_decode from 'jwt-decode'
+import { Spin } from "antd"
+import styles from "./Marketplace.module.css"
+import { getMarketplaceOrders } from "./../../http/marketplace"
+import { getDetails } from "./../../http/orders"
+import MarketplaceOrder from "../../components/MarketplaceOrder/MarketplaceOrder"
+import MarketplaceFilters from "../../components/MarketplaceFilters/MarketplaceFilters"
+import AddNewMarketOrderModal from "../../components/Modals/AddNewMarketOrderModal/AddNewMarketOrderModal"
+import OfferServiceModal from "../../components/Modals/OfferServiceModal/OfferServiceModal"
+import Order from "../../components/Order/Order"
+import jwt_decode from "jwt-decode"
 import { createMarketplaceRequest } from '../../http/marketplace'
- 
+
 const Marketplace = () => {
   const [user, setUser] = useState()
   const [orders, setOrders] = useState()
   const [details, setDetails] = useState()
   const [isLoading, setIsLoading] = useState(false)
-  const [isModalVisible, setIsModalVisible] = useState(false)
+  const [isAddOrderModalVisible, setIsAddOrderModalVisible] = useState(false)
+  const [isOfferModalVisible, setIsOfferModalVisible] = useState(false)
+  const [currentMarketplaceOrderId, setCurrentMarketplaceOrderId] =
+    useState(null)
   const [params, setParams] = useState([
-    // {
-    //   title: "Название груза",
-    //   name: "type",
-    //   items: [],
-    // },
-    // {
-    //   title: "Тип доставки",
-    //   name: "deliveryType",
-    //   items: [],
-    // },
     {
       title: "Вес",
       name: "weight",
@@ -39,15 +35,24 @@ const Marketplace = () => {
       max: 0,
     },
   ])
+  // useEffect(() => {
+  //   console.log(currentMarketplaceOrderId)
+  // }, [currentMarketplaceOrderId])
+
   useEffect(() => {
     setIsLoading(true)
     axios
       .all([
-        getOrders().then((res) => {
-          setOrders(res.data)
-        }),
+        // getOrders().then((res) => {
+        //   setOrders(res.data)
+        // }),
         getDetails().then((res) => {
-          setDetails(res.data)
+          setDetails(() => {
+            const data = res.data.filter(
+              (e) => e.title !== "Название груза" && e.title !== "Тип доставки"
+            )
+            return data
+          })
           setParams(
             params.map((param) => {
               if (param?.title === "Вес" || param?.title === "Объем") {
@@ -69,6 +74,27 @@ const Marketplace = () => {
         })
       )
   }, [])
+
+  const user =
+    (typeof window !== "undefined" &&
+      JSON.parse(localStorage.getItem("user"))) ||
+    null
+
+  useEffect(() => {
+    if (user) {
+      setIsLoading(true)
+
+      getMarketplaceOrders(user.token)
+        .then((res) => {
+          setOrders(res.data.data)
+          setIsLoading(false)
+        })
+        .catch((error) => {
+          console.error("Ошибка при получении данных о заказах:", error)
+          setIsLoading(false)
+        })
+    }
+  }, [user?.token])
 
   const paramsSelectHandler = (title, item) => {
     setParams(
@@ -121,14 +147,26 @@ const Marketplace = () => {
         }
       })
 
-    getOrders(route).then((res) => {
-      setOrders(res.data)
-      setIsLoading(false)
-    })
+    // getOrders(route).then((res) => {
+    //   setOrders(res.data)
+    //   setIsLoading(false)
+    // })
   }
-  const handleAddData = (newData) => {
-    setOrders((prevOrders) => [...prevOrders, newData])
-    setIsModalVisible(false)
+
+  const getCurrentId = () => {
+    return currentMarketplaceOrderId
+  }
+
+  const updateMarketplaceOrders = (token) => {
+    getMarketplaceOrders(token)
+      .then((res) => {
+        setOrders(res.data.data)
+        setIsLoading(false)
+      })
+      .catch((error) => {
+        console.error("Ошибка при получении данных о заказах:", error)
+        setIsLoading(false)
+      })
   }
 
   const handleCreateRequest = (newData) =>{
@@ -157,14 +195,21 @@ const Marketplace = () => {
           <Spin size="large" />
         </div>
       )}
-      <Modal
-        open={isModalVisible}
-        footer={[]}
-        className="price__modal"
-        onCancel={() => setIsModalVisible(false)}
-      >
-        <AddNewOrderModal onAddData={handleAddData} />
-      </Modal>
+      {isAddOrderModalVisible && (
+        <AddNewMarketOrderModal
+          updateMarketplaceOrders={(token) => {
+            setIsLoading(true)
+            updateMarketplaceOrders(token)
+          }}
+          onCancel={() => setIsAddOrderModalVisible(false)}
+        />
+      )}
+      {isOfferModalVisible && (
+        <OfferServiceModal
+          getCurrentId={() => getCurrentId()}
+          onCancel={() => setIsOfferModalVisible(false)}
+        />
+      )}
       <div className={styles.marketplace__filters}>
         <MarketplaceFilters
           details={details}
@@ -172,21 +217,25 @@ const Marketplace = () => {
           paramsSelectHandler={paramsSelectHandler}
           paramsSliderHandler={paramsSliderHandler}
           filtersSaveHandler={filtersSaveHandler}
-          setIsModalVisible={setIsModalVisible}
+          setIsModalVisible={setIsAddOrderModalVisible}
         />
       </div>
       <div className={styles.marketplace__wrapper}>
         {orders?.map((order) => (
-          <Order
+          <MarketplaceOrder
+            offerModalVisible={() => setIsOfferModalVisible(true)}
+            giveMarketlaceOrderId={(id) => setCurrentMarketplaceOrderId(id)}
             id={order?._id}
-            type={order?.type}
-            deliveryType={order?.deliveryType}
-            totalWeight={order?.totalWeight}
-            len={order?.len}
+            length={order?.length}
             width={order?.width}
             height={order?.height}
+            weight={order?.weight}
+            totalWeight={order?.totalWeight}
             volume={order?.volume}
+            totalVolume={order?.totalVolume}
             count={order?.count}
+            from={order?.from}
+            to={order?.to}
             price={order?.price}
             onCreateRequest={handleCreateRequest}
           />

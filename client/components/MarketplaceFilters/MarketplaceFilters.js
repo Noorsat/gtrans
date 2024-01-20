@@ -23,7 +23,7 @@ const MarketplaceFilters = ({
   return (
     <div className={styles.filters}>
       <button className={styles.button} onClick={() => setIsModalVisible(true)}>
-        add
+        Добавить заказ
       </button>
       {details?.map((detail) => (
         <div className={styles.filter}>
