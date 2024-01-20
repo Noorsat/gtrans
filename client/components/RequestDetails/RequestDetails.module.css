@@ -1,0 +1,27 @@
+.request{
+    border-radius: 10px;
+    background-color: #E1E9F4;
+    padding: 24px;
+}
+
+.request__items{
+    display: flex;
+    gap: 50px;
+}
+
+.request__item{
+    width: 100px;
+    margin-bottom: 24px;
+}
+
+.request__item_title{
+    color: #000;
+    font-size: 12px;
+    font-weight: 300;
+}
+
+.request__item_value{
+    color: #000;
+    font-size: 16px;
+    font-weight: 500;
+}

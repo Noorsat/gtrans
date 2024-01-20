@@ -47,3 +47,8 @@ export const createMarketplaceRequest = async (body,token) => {
     });
     return response;
 }
+
+export const getMarketplaceByOrderId = async (id) => {
+    const response = await myAxios.get("/marketplace/" + id)
+    return response;
+}

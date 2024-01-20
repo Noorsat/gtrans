@@ -3,12 +3,13 @@ import {useState, useEffect} from 'react';
 import { acceptRequest, addTrackerCode, changeStatusRequest, getOrders, getOrdersByAccountId } from '../../http/orders';
 import moment from 'moment'
 import { getRequests } from '../../http/request';
+import RequestDetails  from '../../components/RequestDetails/RequestDetails'
 import { useRouter } from 'next/router';
 import jwt_decode from 'jwt-decode';
 import {AiFillLike, AiFillDislike} from 'react-icons/ai';
 import styles from './../../styles/MyOrders.module.css'
 import { companyPutLike, companyPutUnlike } from '../../http/auth';
-import { getMarketplaceRequestsByUserId } from '../../http/marketplace';
+import { getMarketplaceByOrderId, getMarketplaceRequestsByUserId } from '../../http/marketplace';
 
 const MyOrders = ( ) => {
     const [orders, setOrders] = useState()
@@ -25,6 +26,8 @@ const MyOrders = ( ) => {
     const router = useRouter()
 
     const [requests, setRequests] = useState();
+    const [requestDetailsModal, setRequestDetailsModal] = useState(false)
+    const [requestDetailsData, setRequestDetailsData] = useState()
 
     useEffect(() => {
       setIsLoading(true);
@@ -128,6 +131,13 @@ const MyOrders = ( ) => {
 
     const openOrderDetail = (id) => {
       router.push("/order/"+id)      
+    }
+
+    const trackerRequestDetailsModal = (id)=>{
+      getMarketplaceByOrderId(id).then((res)=>{
+        setRequestDetailsData(res.data.data)
+        setRequestDetailsModal(true)
+      })
     }
 
     const columns = [
@@ -313,24 +323,28 @@ const MyOrders = ( ) => {
       ]
 const myRequestsColumn = [
   {
-    title:"Откуда",
-    dataIndex: 'from',
-    key: 'from',
+    title:"Тип доставки",
+    dataIndex: 'typeOfDelivery',
+    key: 'typeOfDelivery',
 },
 {
-  title:"Куда",
-  dataIndex: 'to',
-  key: 'to',
-},
-{
-  title:"Название",
-  dataIndex: 'name',
-  key: 'name',
+  title:"Дни доставки",
+  dataIndex: 'daysOfDelivery',
+  key: 'daysOfDelivery',
 },
 {
   title:"Цена",
-  dataIndex: 'price',
-  key: 'price',
+  dataIndex: 'priceOfDelivery',
+  key: 'priceOfDelivery',
+},
+{
+  title:"Заказ",
+  key: 'order',
+  render: (e) => {
+    return <div className={styles.button} onClick={() => trackerRequestDetailsModal(e.orderId)}>
+              Посмотреть детали
+            </div>
+  }
 },
 ]
     return (
@@ -362,8 +376,11 @@ const myRequestsColumn = [
                     ))
                   }
                 </div>
-                 :<Table columns={myRequestsColumn} dataSource={myRequests}/>}
+                 :<Table columns={myRequestsColumn} dataSource={myRequests} />}
           </div>
+          <Modal title="Детали о заявке" open={requestDetailsModal} footer={null} onCancel={() => setRequestDetailsModal(false)}>
+            <RequestDetails details={requestDetailsData} />
+          </Modal>
             {/* <Table dataSource={orders?.filter(order => order?.accountId === user?._id)} columns={columns}  title={() => `Мои заказы`} scroll={{x:800}} pagination={false}/> */}
             <Modal title="Посмотреть заявки" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}
               width={850}

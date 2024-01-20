@@ -251,7 +251,6 @@ const Order = () => {
                         <Table  
                             columns={columns}
                             dataSource={requests}
-                            loading={isLoading}
                             bordered={true}
                             pagination={{
                                 pageSize: 5,
