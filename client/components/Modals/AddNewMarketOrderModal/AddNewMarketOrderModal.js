@@ -5,7 +5,7 @@ import { FaSearch, FaQuestionCircle } from "react-icons/fa"
 import { createMarketplaceOrder } from "../../../http/marketplace"
 import jwt_decode from "jwt-decode"
 
-const AddNewMarketOrderModal = ({onCancel}) => {
+const AddNewMarketOrderModal = ({ onCancel, updateMarketplaceOrders }) => {
   const [user, setUser] = useState()
   const [storeHousesFromArray, setStoreHousesFromArray] = useState([
     "Beijing",
@@ -19,7 +19,7 @@ const AddNewMarketOrderModal = ({onCancel}) => {
     "Хоз товары",
     "Furniture",
     "Devices",
-		"Plant"
+    "Plant",
   ])
 
   const [properties, setProperties] = useState({
@@ -131,7 +131,8 @@ const AddNewMarketOrderModal = ({onCancel}) => {
 
         createMarketplaceOrder(data, user?.token)
           .then((res) => {
-            console.log("success")
+            console.log("success added new order")
+            updateMarketplaceOrders(user?.token)
           })
           .catch((res) => {
             console.error(res)

@@ -152,7 +152,19 @@ const Marketplace = () => {
   }
 
   const getCurrentId = () => {
-		return currentMarketplaceOrderId
+    return currentMarketplaceOrderId
+  }
+
+  const updateMarketplaceOrders = (token) => {
+    getMarketplaceOrders(token)
+      .then((res) => {
+        setOrders(res.data.data)
+        setIsLoading(false)
+      })
+      .catch((error) => {
+        console.error("Ошибка при получении данных о заказах:", error)
+        setIsLoading(false)
+      })
   }
 
   return (
@@ -164,6 +176,10 @@ const Marketplace = () => {
       )}
       {isAddOrderModalVisible && (
         <AddNewMarketOrderModal
+          updateMarketplaceOrders={(token) => {
+            setIsLoading(true)
+            updateMarketplaceOrders(token)
+          }}
           onCancel={() => setIsAddOrderModalVisible(false)}
         />
       )}
