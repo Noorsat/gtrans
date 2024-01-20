@@ -10,8 +10,10 @@ import AddNewMarketOrderModal from "../../components/Modals/AddNewMarketOrderMod
 import OfferServiceModal from "../../components/Modals/OfferServiceModal/OfferServiceModal"
 import Order from "../../components/Order/Order"
 import jwt_decode from "jwt-decode"
+import { createMarketplaceRequest } from '../../http/marketplace'
 
 const Marketplace = () => {
+  const [user, setUser] = useState()
   const [orders, setOrders] = useState()
   const [details, setDetails] = useState()
   const [isLoading, setIsLoading] = useState(false)
@@ -167,6 +169,25 @@ const Marketplace = () => {
       })
   }
 
+  const handleCreateRequest = (newData) =>{
+    const user = JSON.parse(localStorage.getItem('user') || null)
+    if(user){
+      var decoded = user && jwt_decode(user?.token)
+      decoded && setUser(decoded)
+      createMarketplaceRequest(newData,user?.token).then((res)=>{
+          if(res?.status === 201){
+            setIsModalVisible(false)
+          }
+      }).catch((res)=>{
+        if (res.response.status === 404){
+          notification["error"]({
+              message:res.response.data.message
+          })
+      }
+      })
+    }
+  }
+
   return (
     <div className={styles.marketplace}>
       {isLoading && (
@@ -215,6 +236,8 @@ const Marketplace = () => {
             count={order?.count}
             from={order?.from}
             to={order?.to}
+            price={order?.price}
+            onCreateRequest={handleCreateRequest}
           />
         ))}
       </div>

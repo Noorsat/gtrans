@@ -3,11 +3,13 @@ import {useState, useEffect} from 'react';
 import { acceptRequest, addTrackerCode, changeStatusRequest, getOrders, getOrdersByAccountId } from '../../http/orders';
 import moment from 'moment'
 import { getRequests } from '../../http/request';
+import RequestDetails  from '../../components/RequestDetails/RequestDetails'
 import { useRouter } from 'next/router';
 import jwt_decode from 'jwt-decode';
 import {AiFillLike, AiFillDislike} from 'react-icons/ai';
 import styles from './../../styles/MyOrders.module.css'
 import { companyPutLike, companyPutUnlike } from '../../http/auth';
+import { getMarketplaceByOrderId, getMarketplaceRequestsByUserId } from '../../http/marketplace';
 
 const MyOrders = ( ) => {
     const [orders, setOrders] = useState()
@@ -18,10 +20,14 @@ const MyOrders = ( ) => {
     const [trackerCodeModal, setTrackerCodeModal] = useState();
     const [trackerInput, setTrackerInput] = useState();
     const [isLoading, setIsLoading] = useState(false);
-
+    const [currentTab, setCurrentTab] = useState('order')
+    const [myRequests, setMyRequests] = useState()
+    
     const router = useRouter()
 
     const [requests, setRequests] = useState();
+    const [requestDetailsModal, setRequestDetailsModal] = useState(false)
+    const [requestDetailsData, setRequestDetailsData] = useState()
 
     useEffect(() => {
       setIsLoading(true);
@@ -33,7 +39,12 @@ const MyOrders = ( ) => {
             setIsLoading(false);
             setOrders(res.data)
           })
-          setUser(decoded);
+          decoded && setUser(decoded);
+          getMarketplaceRequestsByUserId(user?.token).then((res)=>{
+            setMyRequests(res.data.data)
+          }).catch((res)=>{
+            console.log(res);
+          })
       }else{
           router.push("/login")
       }
@@ -120,6 +131,13 @@ const MyOrders = ( ) => {
 
     const openOrderDetail = (id) => {
       router.push("/order/"+id)      
+    }
+
+    const trackerRequestDetailsModal = (id)=>{
+      getMarketplaceByOrderId(id).then((res)=>{
+        setRequestDetailsData(res.data.data)
+        setRequestDetailsModal(true)
+      })
     }
 
     const columns = [
@@ -303,6 +321,32 @@ const MyOrders = ( ) => {
         },
 
       ]
+const myRequestsColumn = [
+  {
+    title:"Тип доставки",
+    dataIndex: 'typeOfDelivery',
+    key: 'typeOfDelivery',
+},
+{
+  title:"Дни доставки",
+  dataIndex: 'daysOfDelivery',
+  key: 'daysOfDelivery',
+},
+{
+  title:"Цена",
+  dataIndex: 'priceOfDelivery',
+  key: 'priceOfDelivery',
+},
+{
+  title:"Заказ",
+  key: 'order',
+  render: (e) => {
+    return <div className={styles.button} onClick={() => trackerRequestDetailsModal(e.orderId)}>
+              Посмотреть детали
+            </div>
+  }
+},
+]
     return (
         <div className={styles.my__orders}>
            {
@@ -313,24 +357,30 @@ const MyOrders = ( ) => {
                 )
             }
           <div className='container'>
-            <div className={styles.my__orders_title}>
-              Мои заказы
-            </div>
-            <div className={styles.my__orders_items}>
-              {
-                orders?.filter(order => order?.accountId === user?._id).map(item => (
-                  <div className={styles.my__orders_item} onClick={() => openOrderDetail(item?._id)}>
-                  <div className={styles.my__orders_item_title}>
-                    {item.type}
-                  </div>
-                  <div className={styles.my__orders_item_trackCode}>
-                    Трек-код: {item.individualCode}
-                  </div>
-                </div> 
-                ))
-              }
-            </div>
+              <div className={styles.my__orders_title}>
+                <span onClick={()=>setCurrentTab('order')} className={currentTab==='order' && styles.my__orders_tab}>Мои заказы</span>
+                <span onClick={()=>setCurrentTab('request')} className={currentTab==='request' && styles.my__orders_tab} style={{marginLeft:'15px'}}>Мои предложение</span>
+              </div>
+              {currentTab === 'order' ? 
+                <div className={styles.my__orders_items}>
+                  {
+                    orders?.filter(order => order?.accountId === user?._id).map(item => (
+                      <div className={styles.my__orders_item} onClick={() => openOrderDetail(item?._id)}>
+                      <div className={styles.my__orders_item_title}>
+                        {item.type}
+                      </div>
+                      <div className={styles.my__orders_item_trackCode}>
+                        Трек-код: {item.individualCode}
+                      </div>
+                    </div> 
+                    ))
+                  }
+                </div>
+                 :<Table columns={myRequestsColumn} dataSource={myRequests} />}
           </div>
+          <Modal title="Детали о заявке" open={requestDetailsModal} footer={null} onCancel={() => setRequestDetailsModal(false)}>
+            <RequestDetails details={requestDetailsData} />
+          </Modal>
             {/* <Table dataSource={orders?.filter(order => order?.accountId === user?._id)} columns={columns}  title={() => `Мои заказы`} scroll={{x:800}} pagination={false}/> */}
             <Modal title="Посмотреть заявки" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}
               width={850}
