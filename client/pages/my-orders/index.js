@@ -9,7 +9,7 @@ import jwt_decode from 'jwt-decode';
 import {AiFillLike, AiFillDislike} from 'react-icons/ai';
 import styles from './../../styles/MyOrders.module.css'
 import { companyPutLike, companyPutUnlike } from '../../http/auth';
-import { getMarketplaceByOrderId, getMarketplaceRequestsByUserId } from '../../http/marketplace';
+import { getMarketplaceByOrderId, getMarketplaceMyOrders, getMarketplaceRequestsByUserId } from '../../http/marketplace';
 
 const MyOrders = ( ) => {
     const [orders, setOrders] = useState()
@@ -34,14 +34,13 @@ const MyOrders = ( ) => {
       const user = JSON.parse(localStorage.getItem("user"))
       if (user){
           var decoded = jwt_decode(user?.token);
-          const id = decoded?._id
-          getOrdersByAccountId(id).then((res) => {
-            setIsLoading(false);
-            setOrders(res.data)
+          getMarketplaceMyOrders(user?.token).then((res) => {
+            setOrders(res.data.data)
           })
           decoded && setUser(decoded);
           getMarketplaceRequestsByUserId(user?.token).then((res)=>{
             setMyRequests(res.data.data)
+            setIsLoading(false);
           }).catch((res)=>{
             console.log(res);
           })
@@ -364,13 +363,13 @@ const myRequestsColumn = [
               {currentTab === 'order' ? 
                 <div className={styles.my__orders_items}>
                   {
-                    orders?.filter(order => order?.accountId === user?._id).map(item => (
+                    orders?.map(item => (
                       <div className={styles.my__orders_item} onClick={() => openOrderDetail(item?._id)}>
                       <div className={styles.my__orders_item_title}>
                         {item.type}
                       </div>
                       <div className={styles.my__orders_item_trackCode}>
-                        Трек-код: {item.individualCode}
+                        {item.from} - {item.to}
                       </div>
                     </div> 
                     ))

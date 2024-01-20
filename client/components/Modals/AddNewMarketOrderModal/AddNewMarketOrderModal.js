@@ -125,6 +125,8 @@ const AddNewMarketOrderModal = ({ onCancel, updateMarketplaceOrders }) => {
       }
       const user = JSON.parse(localStorage.getItem("user")) || null
 
+      console.log(user);
+
       if (user) {
         var decoded = user && jwt_decode(user?.token)
         decoded && setUser(decoded)

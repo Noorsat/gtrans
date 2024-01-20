@@ -10,6 +10,10 @@ const marketplaceSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    type: {
+        type: String,
+        required: true
+    },
     length: {
         type: Number,
         required: true

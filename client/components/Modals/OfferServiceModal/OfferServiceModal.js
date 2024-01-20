@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import styles from "./OfferServiceModal.module.css"
-import { createMarketplaceOffer } from "../../../http/marketplace"
+import { createMarketplaceOffer, createMarketplaceRequest } from "../../../http/marketplace"
 
 const offerService = ({ onCancel, getCurrentId }) => {
   const [selectedTypeIndex, setSelectedTypeIndex] = useState(null)
@@ -54,7 +54,7 @@ const offerService = ({ onCancel, getCurrentId }) => {
           JSON.parse(localStorage.getItem("user"))) ||
         null
       if (user) {
-        createMarketplaceOffer(data, user?.token)
+        createMarketplaceRequest(data, user?.token)
           .then((res) => {
             console.log("success create marketplace offer")
           })

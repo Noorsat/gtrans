@@ -2,7 +2,6 @@ import { Spin } from 'antd';
 import styles from './RequestDetails.module.css'
 
 const RequestDetails = ({details}) => {
-  console.log('Details',details);
   return (
     <>
     {!details ? 

@@ -4,12 +4,13 @@ import styles from './../../styles/Order.module.css';
 import Router, {useRouter} from 'next/router';
 import { changeTrackCode, getOrderById } from '../../http/orders';
 import { getUserById } from '../../http/auth';
-import { getMarketplaceRequestsByOrderId } from '../../http/marketplace'
+import { getMarketplaceByOrderId, getMarketplaceRequestsByOrderId } from '../../http/marketplace'
 import moment from 'moment';
 import {Modal, Input, notification, message, Spin, Table} from 'antd';
 import Link from 'next/link';
 import axios from 'axios';
 import { AiFillPhone } from "react-icons/ai";
+import RequestDetails from '../../components/RequestDetails/RequestDetails';
 
 const Order = () => {
     const [order, setOrder] = useState();
@@ -29,14 +30,14 @@ const Order = () => {
     
                 try {
                     const [orderResponse, requestsResponse] = await Promise.all([
-                        getOrderById(id),
+                        getMarketplaceByOrderId(id),
                         getMarketplaceRequestsByOrderId(id)
                     ]);
     
                     if (orderResponse.status === 200) {
-                        setOrder(orderResponse.data);
-                        const ownerResponse = await getUserById(orderResponse.data.accountId);
-                        setOwner(ownerResponse.data);
+                        setOrder(orderResponse.data.data);
+                        // const ownerResponse = await getUserById(orderResponse.data.accountId);
+                        // setOwner(ownerResponse.data);
                     }
     
                     if (requestsResponse.status === 200) {
@@ -66,6 +67,7 @@ const Order = () => {
         fetchData();
     }, [id]);
 
+    console.log(order);
     const goBackHandler = () => {
         router.push("/my-orders")
     }
@@ -156,94 +158,7 @@ const Order = () => {
                     ← Вернуться к заказам
                 </div>
                 <div className='d-md-flex d-block gap-2'>
-                    <div>
-                        <div className={styles.order__title}>
-                            {order?.type}
-                        </div>
-                        <div className={styles.order__detail}>
-                            <div className={styles.order__detail_items}>
-                                <div className={styles.order__detail_item}>
-                                    <div className={styles.order__detail_item_title}>
-                                        Название груза
-                                    </div>
-                                    <div className={styles.order__detail_item_value}>
-                                        {order?.type}
-                                    </div>
-                                </div>
-                                <div className={styles.order__detail_item}>
-                                    <div className={styles.order__detail_item_title}>
-                                        Цена заказа
-                                    </div>
-                                    <div className={styles.order__detail_item_value}>
-                                        {order?.deliveryType} - {order?.price } $                           
-                                    </div>
-                                </div>
-                                <div className={styles.order__detail_item}>
-                                    <div className={styles.order__detail_item_title}>
-                                        Объем доставки
-                                    </div>
-                                    <div className={styles.order__detail_item_value}>
-                                        {
-                                            order?.volume
-                                        } м3
-                                    </div>
-                                </div>
-                                {
-                                    order?.trackCode ? 
-                                    <div className={styles.order__detail_item}>
-                                        <div className={styles.order__detail_item_title}>
-                                            Трек код
-                                        </div>
-                                        <div className={styles.order__detail_item_value}>
-                                            {order?.trackCode}
-                                        </div>
-                                    </div>
-                                    :
-                                    <div className={styles.trackCode__button} onClick={modalOpenHandler}>
-                                        Добавить трек код
-                                    </div>
-                                }
-                            </div>
-                            <div className={styles.order__detail_items}>
-                                <div className={styles.order__detail_item}>
-                                    <div className={styles.order__detail_item_title}>
-                                        Получатель
-                                    </div>
-                                    <div className={styles.order__detail_item_value}>
-                                        {owner?.email}
-                                    </div>
-                                </div>
-                                <div className={styles.order__detail_item}>
-                                    <div className={styles.order__detail_item_title}>
-                                        Дата введения
-                                    </div>
-                                    <div className={styles.order__detail_item_value}>
-                                        {moment(order?.createdAt).format("DD.MM.YY")}
-                                    </div>
-                                </div>
-                                <div className={styles.order__detail_item}>
-                                    <div className={styles.order__detail_item_title}>
-                                        На складе
-                                    </div>
-                                    <div className={styles.order__detail_item_value}>
-                                        {
-                                            order?.status === 0 ? <>Еще не поступил</> : moment(order?.updatedAt).format("DD.MM.YY")
-                                        }        
-                                    </div>
-                                </div>
-                                <div className={styles.order__detail_item}>
-                                    <div className={styles.order__detail_item_title}>
-                                        Ожидаемая дата доставки
-                                    </div>
-                                    <div className={styles.order__detail_item_value}>
-                                        {
-                                            order?.status === 0 ? <>Еще не поступил</> : moment(order?.updatedAt).add(18, "days").format("DD.MM.YY")
-                                        }  
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <RequestDetails  details={order}/>
                     <div className={styles.order__requests}>
                         <div className={styles.order__title}>
                             Предложение
