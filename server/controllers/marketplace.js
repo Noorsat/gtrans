@@ -11,6 +11,18 @@ export const getOrders = async (req, res) => {
     }
 }
 
+export const getOrderById = async (req, res) => {
+    try {
+        const id = req.params.id;
+
+        const order = await Marketplace.findById(id);
+    
+        res.status(200).json({ message: "Succesfully get order by id", data: order })
+    } catch (err){
+        res.status(404).json({ message: err.message})
+    }
+}
+
 export const getMyOrders = async (req, res) => {
     try {
         const token = req.headers.authorization.split(" ")[1]; 
