@@ -38,15 +38,15 @@
 }
 .my__orders_item_title{
     font-weight: 500;
-    font-size: 16px;
-    line-height: 18px;
+    font-size: 18px;
+    line-height: 20px;
     color: #000000;
     margin-bottom: 17px;
 }
-.my__orders_item-trackCode{
+.my__orders_item_value{
     font-weight: 300;
-    font-size: 12px;
-    line-height: 14px;
+    font-size: 14px;
+    line-height: 16px;
     color: #000000;
 }
 .button{

@@ -13,7 +13,6 @@ import jwt_decode from "jwt-decode"
 import { createMarketplaceRequest } from '../../http/marketplace'
 
 const Marketplace = () => {
-  const [user, setUser] = useState()
   const [orders, setOrders] = useState()
   const [details, setDetails] = useState()
   const [isLoading, setIsLoading] = useState(false)

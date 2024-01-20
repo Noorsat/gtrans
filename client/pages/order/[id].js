@@ -2,9 +2,9 @@ import { style } from '@mui/system';
 import React, { useEffect, useState } from 'react';
 import styles from './../../styles/Order.module.css';
 import Router, {useRouter} from 'next/router';
-import { changeTrackCode, getOrderById } from '../../http/orders';
+// import { changeTrackCode, getOrderById } from '../../http/orders';
 import { getUserById } from '../../http/auth';
-import { getMarketplaceRequestsByOrderId } from '../../http/marketplace'
+import { getMarketplaceRequestsByOrderId, getMarketplaceByOrderId } from '../../http/marketplace'
 import moment from 'moment';
 import {Modal, Input, notification, message, Spin, Table} from 'antd';
 import Link from 'next/link';
@@ -29,13 +29,13 @@ const Order = () => {
     
                 try {
                     const [orderResponse, requestsResponse] = await Promise.all([
-                        getOrderById(id),
+                        getMarketplaceByOrderId(id),
                         getMarketplaceRequestsByOrderId(id)
                     ]);
     
                     if (orderResponse.status === 200) {
-                        setOrder(orderResponse.data);
-                        const ownerResponse = await getUserById(orderResponse.data.accountId);
+                        setOrder(orderResponse.data.data);
+                        const ownerResponse = await getUserById(orderResponse.data.data.userId);
                         setOwner(ownerResponse.data);
                     }
     
@@ -156,93 +156,83 @@ const Order = () => {
                     ← Вернуться к заказам
                 </div>
                 <div className='d-md-flex d-block gap-2'>
-                    <div>
-                        <div className={styles.order__title}>
-                            {order?.type}
-                        </div>
-                        <div className={styles.order__detail}>
-                            <div className={styles.order__detail_items}>
-                                <div className={styles.order__detail_item}>
-                                    <div className={styles.order__detail_item_title}>
-                                        Название груза
-                                    </div>
-                                    <div className={styles.order__detail_item_value}>
-                                        {order?.type}
-                                    </div>
+                    <div className={styles.order__requests}>
+                    <div className={styles.order__title}>
+                        Заказ
+                    </div>
+                    <div className={styles.request}>
+                        <div className={styles.request__items}>
+                            <div className={styles.request__item}>
+                                <div className={styles.request__item_title}>
+                                    Откуда
                                 </div>
-                                <div className={styles.order__detail_item}>
-                                    <div className={styles.order__detail_item_title}>
-                                        Цена заказа
-                                    </div>
-                                    <div className={styles.order__detail_item_value}>
-                                        {order?.deliveryType} - {order?.price } $                           
-                                    </div>
+                                <div className={styles.request__item_value}>
+                                     {order?.from}
                                 </div>
-                                <div className={styles.order__detail_item}>
-                                    <div className={styles.order__detail_item_title}>
-                                        Объем доставки
-                                    </div>
-                                    <div className={styles.order__detail_item_value}>
-                                        {
-                                            order?.volume
-                                        } м3
-                                    </div>
-                                </div>
-                                {
-                                    order?.trackCode ? 
-                                    <div className={styles.order__detail_item}>
-                                        <div className={styles.order__detail_item_title}>
-                                            Трек код
-                                        </div>
-                                        <div className={styles.order__detail_item_value}>
-                                            {order?.trackCode}
-                                        </div>
-                                    </div>
-                                    :
-                                    <div className={styles.trackCode__button} onClick={modalOpenHandler}>
-                                        Добавить трек код
-                                    </div>
-                                }
                             </div>
-                            <div className={styles.order__detail_items}>
-                                <div className={styles.order__detail_item}>
-                                    <div className={styles.order__detail_item_title}>
-                                        Получатель
-                                    </div>
-                                    <div className={styles.order__detail_item_value}>
-                                        {owner?.email}
-                                    </div>
+                            <div className={styles.request__item}>
+                                <div className={styles.request__item_title}>
+                                     Куда
                                 </div>
-                                <div className={styles.order__detail_item}>
-                                    <div className={styles.order__detail_item_title}>
-                                        Дата введения
-                                    </div>
-                                    <div className={styles.order__detail_item_value}>
-                                        {moment(order?.createdAt).format("DD.MM.YY")}
-                                    </div>
+                                <div className={styles.request__item_value}>
+                                    {order?.to}
                                 </div>
-                                <div className={styles.order__detail_item}>
-                                    <div className={styles.order__detail_item_title}>
-                                        На складе
-                                    </div>
-                                    <div className={styles.order__detail_item_value}>
-                                        {
-                                            order?.status === 0 ? <>Еще не поступил</> : moment(order?.updatedAt).format("DD.MM.YY")
-                                        }        
-                                    </div>
+                            </div>
+                            <div className={styles.request__item}>
+                                <div className={styles.request__item_title}>
+                                    Количество
                                 </div>
-                                <div className={styles.order__detail_item}>
-                                    <div className={styles.order__detail_item_title}>
-                                        Ожидаемая дата доставки
-                                    </div>
-                                    <div className={styles.order__detail_item_value}>
-                                        {
-                                            order?.status === 0 ? <>Еще не поступил</> : moment(order?.updatedAt).add(18, "days").format("DD.MM.YY")
-                                        }  
-                                    </div>
+                                <div className={styles.request__item_value}>
+                                    {order?.count}
                                 </div>
                             </div>
                         </div>
+                        <div className={styles.request__items}>
+                        <div className={styles.request__item}>
+                            <div className={styles.request__item_title}>
+                            Длина (см)
+                            </div>
+                            <div className={styles.request__item_value}>
+                            {order?.length}
+                            </div>
+                        </div>
+                        <div className={styles.request__item}>
+                            <div className={styles.request__item_title}>
+                            Ширина (см)
+                            </div>
+                            <div className={styles.request__item_value}>
+                            {order?.width}
+                            </div>
+                        </div>
+                        <div className={styles.request__item}>
+                            <div className={styles.request__item_title}>
+                            Высота (см)
+                            </div>
+                            <div className={styles.request__item_value}>
+                            {order?.height}
+                            </div>
+                        </div>
+                        </div>
+                        <div className={styles.request__items}>
+                        <div className={styles.request__item}>
+                            <div className={styles.request__item_title}>
+                            Общий Объем
+                            </div>
+                            <div className={styles.request__item_value}>
+                            {order?.totalVolume} (м3)
+                            </div>
+                        </div>
+                        <div className={styles.request__item}>
+                            <div className={styles.request__item_title}>
+                            Общий Вес (кг)
+                            </div>
+                            <div className={styles.request__item_value}>
+                            {order?.totalWeight}
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+
                     </div>
                     <div className={styles.order__requests}>
                         <div className={styles.order__title}>
