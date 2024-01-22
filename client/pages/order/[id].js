@@ -11,6 +11,7 @@ import Link from 'next/link';
 import axios from 'axios';
 import { AiFillPhone } from "react-icons/ai";
 import RequestDetails from '../../components/RequestDetails/RequestDetails';
+import { ExclamationCircleFilled } from '@ant-design/icons';
 
 const Order = () => {
     const [order, setOrder] = useState();
@@ -19,8 +20,9 @@ const Order = () => {
     const [modal, setModal] = useState(false);
     const [trackcodeValue, setTrackcodeValue] = useState();
     const [isLoading, setIsLoading] = useState();
+    const { confirm } = Modal;
 
-     const router = useRouter();
+    const router = useRouter();
     const id = router.query.id;
 
     useEffect(() => {
@@ -48,7 +50,8 @@ const Order = () => {
                             return {
                                 ...el,
                                 phoneNumber: userResponse.data.phoneNumber,
-                                name: userResponse.data.name
+                                name: userResponse.data.name,
+                                email: userResponse.data.email
                             };
                         });
     
@@ -114,6 +117,11 @@ const Order = () => {
             key: 'name'
         },
         {
+            title: 'Почта',
+            dataIndex: 'email',
+            key: 'email'
+        },
+        {
             title: 'Телефон',
             dataIndex: 'phoneNumber',
             key: 'phoneNumber',
@@ -128,6 +136,23 @@ const Order = () => {
             render: (text,record)=> (<a href={`tel:${record.phoneNumber}`} style={{color: '#ffad32'}}><AiFillPhone/></a>)
         }
     ]
+
+    const showDeleteConfirm = (id) => {
+        confirm({
+          title: 'Вы уверены, что хотите удалить это заказ?',
+          icon: <ExclamationCircleFilled />,
+          content: 'После удаления вы не сможете восстановить заказ. Вы уверены?',
+          okText: 'Да',
+          okType: 'danger',
+          cancelText: 'Нет',
+          onOk() {
+            // add to here http request
+            console.log('removed', id);
+          },
+          onCancel() {},
+        });
+      };
+  
 
     return (
         <div className={styles.order}>
@@ -175,8 +200,9 @@ const Order = () => {
                     </div>
                 </div>
 
-                <div className={styles.tracking__link}>
-                    {
+                <div className={styles.tracking__link} onClick={ () => showDeleteConfirm(order?._id)}>
+                    Удалить заказ
+                    {/* {
                         !order?.trackCode ? 
                         <div onClick={showErrorTrackCode} >
                             Отследить заказ
@@ -188,7 +214,7 @@ const Order = () => {
                            }}>
                             Отследить заказ
                         </Link>                    
-                    }
+                    } */}
                 </div>
             </div>
         </div>

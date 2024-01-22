@@ -10,6 +10,7 @@ import {AiFillLike, AiFillDislike} from 'react-icons/ai';
 import styles from './../../styles/MyOrders.module.css'
 import { companyPutLike, companyPutUnlike } from '../../http/auth';
 import { getMarketplaceByOrderId, getMarketplaceMyOrders, getMarketplaceRequestsByUserId } from '../../http/marketplace';
+import { ExclamationCircleFilled } from '@ant-design/icons';
 
 const MyOrders = ( ) => {
     const [orders, setOrders] = useState()
@@ -28,6 +29,7 @@ const MyOrders = ( ) => {
     const [requests, setRequests] = useState();
     const [requestDetailsModal, setRequestDetailsModal] = useState(false)
     const [requestDetailsData, setRequestDetailsData] = useState()
+    const { confirm } = Modal;
 
     useEffect(() => {
       setIsLoading(true);
@@ -138,6 +140,21 @@ const MyOrders = ( ) => {
         setRequestDetailsModal(true)
       })
     }
+    const showDeleteConfirm = (id) => {
+      confirm({
+        title: 'Вы уверены, что хотите удалить это предложение?',
+        icon: <ExclamationCircleFilled />,
+        content: 'После удаления вы не сможете восстановить предложение. Вы уверены?',
+        okText: 'Да',
+        okType: 'danger',
+        cancelText: 'Нет',
+        onOk() {
+          // add to here http request
+          console.log('removed', id);
+        },
+        onCancel() {},
+      });
+    };
 
     const columns = [
         {
@@ -339,10 +356,18 @@ const myRequestsColumn = [
 {
   title:"Заказ",
   key: 'order',
+  className: styles.table_header_order,
   render: (e) => {
-    return <div className={styles.button} onClick={() => trackerRequestDetailsModal(e.orderId)}>
-              Посмотреть детали
+    return (
+           <div className='d-flex gap-2'>
+              <div className={styles.request_button} onClick={() => trackerRequestDetailsModal(e.orderId)}>
+                Посмотреть детали
+              </div>
+              <div className={`${styles.request_button} ${styles.button_red}`} onClick={() => showDeleteConfirm(e.orderId)}>
+                Удалить
+              </div>
             </div>
+            )
   }
 },
 ]
