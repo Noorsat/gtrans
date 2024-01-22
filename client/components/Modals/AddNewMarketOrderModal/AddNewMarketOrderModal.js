@@ -4,6 +4,7 @@ import styles from "./AddNewMarketOrderModal.module.css"
 import { FaSearch, FaQuestionCircle } from "react-icons/fa"
 import { createMarketplaceOrder } from "../../../http/marketplace"
 import jwt_decode from "jwt-decode"
+import { notification } from "antd"
 
 const AddNewMarketOrderModal = ({ onCancel, updateMarketplaceOrders }) => {
   const [user, setUser] = useState()
@@ -11,7 +12,7 @@ const AddNewMarketOrderModal = ({ onCancel, updateMarketplaceOrders }) => {
     "Beijing",
     "Shanghai",
   ])
-  const [storeHouseToArray, setSroteHouseToArray] = useState([
+  const [storeHouseToArray, setStoreHouseToArray] = useState([
     "Almaty",
     "Astana",
   ])
@@ -97,7 +98,10 @@ const AddNewMarketOrderModal = ({ onCancel, updateMarketplaceOrders }) => {
   }
 
   const onAdd = () => {
-    if (
+    if (totalWeight < 50) {
+      openNotificationWithIcon("Общий вес меньше 50кг")
+			return
+    } else if (
       type &&
       properties.length &&
       properties.width &&
@@ -125,7 +129,7 @@ const AddNewMarketOrderModal = ({ onCancel, updateMarketplaceOrders }) => {
       }
       const user = JSON.parse(localStorage.getItem("user")) || null
 
-      console.log(user);
+      console.log(user)
 
       if (user) {
         var decoded = user && jwt_decode(user?.token)
@@ -134,14 +138,37 @@ const AddNewMarketOrderModal = ({ onCancel, updateMarketplaceOrders }) => {
         createMarketplaceOrder(data, user?.token)
           .then((res) => {
             console.log("success added new order")
+            onCancel()
             updateMarketplaceOrders(user?.token)
+            openNotificationWithIcon("Новый заказ успечно создан")
           })
           .catch((res) => {
             console.error(res)
           })
-        onCancel()
       }
+    } else openNotificationWithIcon("Заполните все поля")
+  }
+
+  const openNotificationWithIcon = (info) => {
+    let type = ""
+    switch (info) {
+      case "Заполните все поля":
+        type = "error"
+        break
+      case "Общий вес меньше 50кг":
+        type = "warning"
+        break
+      case "Новый заказ успечно создан":
+        type = "success"
+        break
     }
+    notification.config({
+      duration: 2,
+    })
+
+    notification[type]({
+      message: info,
+    })
   }
 
   const filteredProductTypes = productTypes.filter((type) =>
