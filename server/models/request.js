@@ -10,6 +10,10 @@ const requestSchema = mongoose.Schema({
         type: ObjectId,
         required: true
     },
+    currencyId: {
+        type: ObjectId,
+        required: true
+    },
     typeOfDelivery: {
         type: String,
         required: true

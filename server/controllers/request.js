@@ -1,3 +1,4 @@
+import Currency from '../models/currency.js';
 import Request from './../models/request.js'
 import { jwtDecode } from "jwt-decode";
 
@@ -5,7 +6,20 @@ export const getRequests = async (req, res) => {
     try {
         const requests = await Request.find();
 
-        res.status(200).json(requests)
+        const requestsWithCurrency = [];
+
+        for (const request of requests){
+            const currency = await Currency.findById(request.currencyId);
+
+            if (currency){
+                const mergedCurrency = { ...request, currency: currency.toObject()}
+                requestsWithCurrency.push(mergedCurrency);
+            }else{
+                requestsWithCurrency.push(request);
+            }
+        }
+        
+        res.status(200).json(requestsWithCurrency)
     }catch (error){
         res.status(404).json({message: error.message})
     }
@@ -17,7 +31,20 @@ export const getRequestsByOrder = async (req, res) => {
 
         const requests = await Request.find({ orderId });
 
-        res.status(200).json({ data: requests, message: "get requests by order id"})
+        const requestsWithCurrency = [];
+
+        for (const request of requests){
+            const currency = await Currency.findById(request.currencyId);
+
+            if (currency){
+                const mergedCurrency = { ...request._doc, currency: currency.toObject()}
+                requestsWithCurrency.push(mergedCurrency);
+            }else{
+                requestsWithCurrency.push(request);
+            }
+        }
+
+        res.status(200).json({ data: requestsWithCurrency, message: "get requests by order id"})
     }catch (err) {
         res.status(400).json({ message: err.message})
     }
@@ -35,7 +62,21 @@ export const getRequestsByUserId = async (req, res) => {
 
         const requests = await Request.find({ userId: decoded._id});
 
-        res.status(200).json({ data: requests, message: "Succesfully get requests by userId"})
+        const requestsWithCurrency = [];
+
+        for (const request of requests){
+            const currency = await Currency.findById(request.currencyId);
+
+            if (currency){
+                const mergedCurrency = { ...request._doc, currency: currency.toObject()}
+                requestsWithCurrency.push(mergedCurrency);
+            }else{
+                requestsWithCurrency.push(request);
+            }
+        }
+
+
+        res.status(200).json({ data: requestsWithCurrency, message: "Succesfully get requests by userId"})
     }catch (err){
         res.status(400).json({message: err.message})
     }
