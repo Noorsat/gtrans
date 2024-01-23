@@ -68,3 +68,37 @@ export const createOrder = async (req, res) => {
         res.status(400).json({message: err.message})
     }
 }
+
+export const deleteOrder = async (req, res) => {
+    try {
+        const id = req.params.id;
+
+        const token = req.headers.authorization.split(" ")[1]; 
+
+        if (!token){
+            res.status(401).json({ message: "No token"});
+        }
+
+        const decoded = jwtDecode(token);
+
+        const userId = decoded._id;
+
+        const order = await Marketplace.findById(id);
+
+        if (!order){
+            res.status(404).json({ message: "Order with this id not exists"});
+        }
+
+        if (order.userId == userId){
+            const response = await Marketplace.findByIdAndDelete(id);
+
+            if (response){
+                res.status(204).json({ message: "Succesfully delete order"});
+            }
+        }else{
+            res.status(400).json({ message: "It's not your order"});
+        }
+    } catch (err){
+        res.status(400).json({message: err.meesage})
+    }
+}
