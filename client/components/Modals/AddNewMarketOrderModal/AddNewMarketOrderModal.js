@@ -98,55 +98,56 @@ const AddNewMarketOrderModal = ({ onCancel, updateMarketplaceOrders }) => {
   }
 
   const onAdd = () => {
-    if (totalWeight < 50) {
-      openNotificationWithIcon("Общий вес меньше 50кг")
-			return
-    } else if (
-      type &&
-      properties.length &&
-      properties.width &&
-      properties.height &&
-      properties.weight &&
-      count &&
-      volume &&
-      totalVolume &&
-      totalWeight > 50 &&
-      storeHouse.from &&
-      storeHouse.to
+    if (
+      !type ||
+      !properties.length ||
+      !properties.width ||
+      !properties.height ||
+      !properties.weight ||
+      !count ||
+      !volume ||
+      !totalVolume ||
+      !totalWeight > 50 ||
+      !storeHouse.from ||
+      !storeHouse.to
     ) {
-      const data = {
-        type,
-        length: properties.length,
-        width: properties.width,
-        height: properties.height,
-        weight: properties.weight,
-        count,
-        volume,
-        totalVolume,
-        totalWeight,
-        from: storeHouse.from,
-        to: storeHouse.to,
-      }
-      const user = JSON.parse(localStorage.getItem("user")) || null
+      openNotificationWithIcon("Заполните все поля")
+      return
+    } else if (totalWeight < 50) {
+      openNotificationWithIcon("Общий вес меньше 50кг")
+      return
+    }
+    const data = {
+      type,
+      length: properties.length,
+      width: properties.width,
+      height: properties.height,
+      weight: properties.weight,
+      count,
+      volume,
+      totalVolume,
+      totalWeight,
+      from: storeHouse.from,
+      to: storeHouse.to,
+    }
+    const user = JSON.parse(localStorage.getItem("user")) || null
 
-      console.log(user)
+    console.log(user)
 
-      if (user) {
-        var decoded = user && jwt_decode(user?.token)
-        decoded && setUser(decoded)
+    if (user) {
+      var decoded = user && jwt_decode(user?.token)
+      decoded && setUser(decoded)
 
-        createMarketplaceOrder(data, user?.token)
-          .then((res) => {
-            console.log("success added new order")
-            onCancel()
-            updateMarketplaceOrders(user?.token)
-            openNotificationWithIcon("Новый заказ успечно создан")
-          })
-          .catch((res) => {
-            console.error(res)
-          })
-      }
-    } else openNotificationWithIcon("Заполните все поля")
+      createMarketplaceOrder(data, user?.token)
+        .then((res) => {
+          onCancel()
+          updateMarketplaceOrders(user?.token)
+          openNotificationWithIcon("Новый заказ успечно создан")
+        })
+        .catch((res) => {
+          console.error(res)
+        })
+    }
   }
 
   const openNotificationWithIcon = (info) => {

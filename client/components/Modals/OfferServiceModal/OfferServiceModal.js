@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import styles from "./OfferServiceModal.module.css"
 import {
-  createMarketplaceOffer,
+  getCurrency,
   createMarketplaceRequest,
 } from "../../../http/marketplace"
 import { notification } from "antd"
@@ -13,15 +13,25 @@ const offerService = ({ onCancel, getCurrentId }) => {
     "Ж/Д (10-15 дней)",
     "Авто (10-15 дней)",
   ])
-  const [moneyBadges, setMoneyBadges] = useState(["₸", "$", "€", "£", "₽"])
+  const [currency, setCurrency] = useState([])
   const [orderId, setOrderId] = useState(null)
+  const [isSuggestionsVisible, setIsSuggestionsVisible] = useState(false)
   const [typeOfDelivery, setTypeOfDelivery] = useState()
   const [daysOfDelivery, setDaysOfDelivery] = useState()
   const [priceOfDelivery, setPriceOfDelivery] = useState()
-  const [selectedBadge, setSelectedBadge] = useState("₸")
-  const [isSuggestionsVisible, setIsSuggestionsVisible] = useState(false)
+  const [selectedCurrency, setSelectedCurrency] = useState("₸")
 
   const refMyForm = useRef(null)
+
+  useEffect(() => {
+    getCurrency()
+      .then((res) => {
+        setCurrency(res.data.data)
+      })
+      .catch((error) => {
+        openNotification("error", error)
+      })
+  }, [])
 
   useEffect(() => {
     setOrderId(() => getCurrentId())
@@ -51,12 +61,22 @@ const offerService = ({ onCancel, getCurrentId }) => {
   }
 
   const sendOffer = () => {
-    if (orderId && typeOfDelivery && daysOfDelivery && priceOfDelivery) {
+    const currencyId = currency.filter(
+      (el) => el.symbol === selectedCurrency
+    )[0]._id
+    if (
+      orderId &&
+      typeOfDelivery &&
+      daysOfDelivery &&
+      priceOfDelivery &&
+      currencyId
+    ) {
       const data = {
         orderId,
         typeOfDelivery,
         daysOfDelivery,
         priceOfDelivery,
+        currencyId,
       }
 
       const user =
@@ -64,19 +84,20 @@ const offerService = ({ onCancel, getCurrentId }) => {
           JSON.parse(localStorage.getItem("user"))) ||
         null
       if (user) {
+				openNotification("success", "Предложение успечно отправлено")
         createMarketplaceRequest(data, user?.token)
           .then((res) => {
             onCancel()
-            openNotificationWithIcon("succes", "Предложение успечно отправлено")
+            openNotification("success", "Предложение успечно отправлено")
           })
           .catch((error) => {
-            openNotificationWithIcon("error", error)
+            openNotification("error", error)
           })
       }
-    } else openNotificationWithIcon("error", "Заполните все поля")
+    } else openNotification("error", "Заполните все поля")
   }
 
-  const openNotificationWithIcon = (type = "error", info = "") => {
+  const openNotification = (type = "error", info = "") => {
     notification.config({
       duration: 2,
     })
@@ -133,7 +154,6 @@ const offerService = ({ onCancel, getCurrentId }) => {
                   if (!isNaN(numericValue)) setDaysOfDelivery(numericValue)
                   else setDaysOfDelivery((prev) => 0)
                 }
-								
               }}
             />
           </div>
@@ -155,7 +175,7 @@ const offerService = ({ onCancel, getCurrentId }) => {
               <div className={styles.form__money}>
                 <input
                   readOnly
-                  value={selectedBadge}
+                  value={selectedCurrency}
                   className={styles.money__input}
                   onClick={() => toogleIsSuggestionsVisible()}
                 />
@@ -165,15 +185,15 @@ const offerService = ({ onCancel, getCurrentId }) => {
                     isSuggestionsVisible ? styles.visible : ""
                   }`}
                 >
-                  {moneyBadges.map((moneyBadge) => (
+                  {currency.map((moneyBadge) => (
                     <li
-                      key={moneyBadge}
+                      key={moneyBadge.id}
                       className={styles.money__suggestion}
                       onClick={() => {
-                        setSelectedBadge(moneyBadge)
+                        setSelectedCurrency(moneyBadge.symbol)
                       }}
                     >
-                      {moneyBadge}
+                      {moneyBadge.symbol}
                     </li>
                   ))}
                 </ul>
