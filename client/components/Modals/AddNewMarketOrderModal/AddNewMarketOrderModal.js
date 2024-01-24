@@ -4,6 +4,7 @@ import styles from "./AddNewMarketOrderModal.module.css"
 import { FaSearch, FaQuestionCircle } from "react-icons/fa"
 import { createMarketplaceOrder } from "../../../http/marketplace"
 import jwt_decode from "jwt-decode"
+import { notification } from "antd"
 
 const AddNewMarketOrderModal = ({ onCancel, updateMarketplaceOrders }) => {
   const [user, setUser] = useState()
@@ -11,7 +12,7 @@ const AddNewMarketOrderModal = ({ onCancel, updateMarketplaceOrders }) => {
     "Beijing",
     "Shanghai",
   ])
-  const [storeHouseToArray, setSroteHouseToArray] = useState([
+  const [storeHouseToArray, setStoreHouseToArray] = useState([
     "Almaty",
     "Astana",
   ])
@@ -98,50 +99,77 @@ const AddNewMarketOrderModal = ({ onCancel, updateMarketplaceOrders }) => {
 
   const onAdd = () => {
     if (
-      type &&
-      properties.length &&
-      properties.width &&
-      properties.height &&
-      properties.weight &&
-      count &&
-      volume &&
-      totalVolume &&
-      totalWeight > 50 &&
-      storeHouse.from &&
-      storeHouse.to
+      !type ||
+      !properties.length ||
+      !properties.width ||
+      !properties.height ||
+      !properties.weight ||
+      !count ||
+      !volume ||
+      !totalVolume ||
+      !totalWeight > 50 ||
+      !storeHouse.from ||
+      !storeHouse.to
     ) {
-      const data = {
-        type,
-        length: properties.length,
-        width: properties.width,
-        height: properties.height,
-        weight: properties.weight,
-        count,
-        volume,
-        totalVolume,
-        totalWeight,
-        from: storeHouse.from,
-        to: storeHouse.to,
-      }
-      const user = JSON.parse(localStorage.getItem("user")) || null
-
-      console.log(user);
-
-      if (user) {
-        var decoded = user && jwt_decode(user?.token)
-        decoded && setUser(decoded)
-
-        createMarketplaceOrder(data, user?.token)
-          .then((res) => {
-            console.log("success added new order")
-            updateMarketplaceOrders(user?.token)
-          })
-          .catch((res) => {
-            console.error(res)
-          })
-        onCancel()
-      }
+      openNotificationWithIcon("Заполните все поля")
+      return
+    } else if (totalWeight < 50) {
+      openNotificationWithIcon("Общий вес меньше 50кг")
+      return
     }
+    const data = {
+      type,
+      length: properties.length,
+      width: properties.width,
+      height: properties.height,
+      weight: properties.weight,
+      count,
+      volume,
+      totalVolume,
+      totalWeight,
+      from: storeHouse.from,
+      to: storeHouse.to,
+    }
+    const user = JSON.parse(localStorage.getItem("user")) || null
+
+    console.log(user)
+
+    if (user) {
+      var decoded = user && jwt_decode(user?.token)
+      decoded && setUser(decoded)
+
+      createMarketplaceOrder(data, user?.token)
+        .then((res) => {
+          onCancel()
+          updateMarketplaceOrders(user?.token)
+          openNotificationWithIcon("Новый заказ успечно создан")
+        })
+        .catch((res) => {
+          console.error(res)
+        })
+    }
+  }
+
+  const openNotificationWithIcon = (info) => {
+    let type = ""
+    switch (info) {
+      case "Заполните все поля":
+        type = "error"
+        break
+      case "Общий вес меньше 50кг":
+        type = "warning"
+        break
+      case "Новый заказ успечно создан":
+        type = "success"
+        break
+    }
+    notification.config({
+      duration: 2,
+    })
+
+    notification[type]({
+      message: info,
+    })
   }
 
   const filteredProductTypes = productTypes.filter((type) =>

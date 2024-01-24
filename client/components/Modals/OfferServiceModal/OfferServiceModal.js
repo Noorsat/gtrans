@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState } from "react"
 import styles from "./OfferServiceModal.module.css"
-import { createMarketplaceOffer, createMarketplaceRequest } from "../../../http/marketplace"
+import {
+  getCurrency,
+  createMarketplaceRequest,
+} from "../../../http/marketplace"
+import { notification } from "antd"
+import { FaAngleDown } from "react-icons/fa"
 
 const offerService = ({ onCancel, getCurrentId }) => {
   const [selectedTypeIndex, setSelectedTypeIndex] = useState(null)
@@ -8,12 +13,25 @@ const offerService = ({ onCancel, getCurrentId }) => {
     "Ж/Д (10-15 дней)",
     "Авто (10-15 дней)",
   ])
+  const [currency, setCurrency] = useState([])
   const [orderId, setOrderId] = useState(null)
+  const [isSuggestionsVisible, setIsSuggestionsVisible] = useState(false)
   const [typeOfDelivery, setTypeOfDelivery] = useState()
   const [daysOfDelivery, setDaysOfDelivery] = useState()
   const [priceOfDelivery, setPriceOfDelivery] = useState()
+  const [selectedCurrency, setSelectedCurrency] = useState("₸")
 
   const refMyForm = useRef(null)
+
+  useEffect(() => {
+    getCurrency()
+      .then((res) => {
+        setCurrency(res.data.data)
+      })
+      .catch((error) => {
+        openNotification("error", error)
+      })
+  }, [])
 
   useEffect(() => {
     setOrderId(() => getCurrentId())
@@ -28,6 +46,8 @@ const offerService = ({ onCancel, getCurrentId }) => {
       if (refMyForm.current && !refMyForm.current.contains(event.target)) {
         refMyForm.current.reset()
         onCancel()
+      } else if (!event.target.classList.contains(styles.money__suggestion)) {
+        setIsSuggestionsVisible(false)
       }
     }
     document.addEventListener("mousedown", handleClickOutside)
@@ -40,13 +60,23 @@ const offerService = ({ onCancel, getCurrentId }) => {
     setSelectedTypeIndex(index)
   }
 
-  const offerService = () => {
-    if (orderId && typeOfDelivery && daysOfDelivery && priceOfDelivery) {
+  const sendOffer = () => {
+    const currencyId = currency.filter(
+      (el) => el.symbol === selectedCurrency
+    )[0]._id
+    if (
+      orderId &&
+      typeOfDelivery &&
+      daysOfDelivery &&
+      priceOfDelivery &&
+      currencyId
+    ) {
       const data = {
         orderId,
         typeOfDelivery,
         daysOfDelivery,
         priceOfDelivery,
+        currencyId,
       }
 
       const user =
@@ -54,16 +84,31 @@ const offerService = ({ onCancel, getCurrentId }) => {
           JSON.parse(localStorage.getItem("user"))) ||
         null
       if (user) {
+				openNotification("success", "Предложение успечно отправлено")
         createMarketplaceRequest(data, user?.token)
           .then((res) => {
-            console.log("success create marketplace offer")
+            onCancel()
+            openNotification("success", "Предложение успечно отправлено")
           })
           .catch((error) => {
-            console.log(error)
+            openNotification("error", error)
           })
-        onCancel()
       }
-    }
+    } else openNotification("error", "Заполните все поля")
+  }
+
+  const openNotification = (type = "error", info = "") => {
+    notification.config({
+      duration: 2,
+    })
+
+    notification[type]({
+      message: info,
+    })
+  }
+
+  const toogleIsSuggestionsVisible = () => {
+    setIsSuggestionsVisible(!isSuggestionsVisible)
   }
 
   return (
@@ -100,38 +145,66 @@ const offerService = ({ onCancel, getCurrentId }) => {
           <div className={styles.form__property}>
             <p>За сколько дней готовы выполнить заказ? </p>
             <input
-              value={daysOfDelivery !== undefined ? daysOfDelivery : ""}
+              value={daysOfDelivery !== 0 ? daysOfDelivery : ""}
               placeholder="Количество дней"
               onChange={(el) => {
                 const inputValue = el.target.value
                 if (/^\d*$/.test(inputValue)) {
                   const numericValue = parseInt(inputValue, 10)
                   if (!isNaN(numericValue)) setDaysOfDelivery(numericValue)
-                  else setDaysOfDelivery(undefined)
+                  else setDaysOfDelivery((prev) => 0)
                 }
               }}
             />
           </div>
-          <div className={styles.form__property}>
+          <div className={`${styles.form__property}`}>
             <p>Предложите вашу цену</p>
-            <input
-              value={priceOfDelivery !== undefined ? priceOfDelivery : ""}
-              placeholder="Цена"
-              onChange={(el) => {
-                const inputValue = el.target.value
-                if (/^\d*$/.test(inputValue)) {
-                  const numericValue = parseInt(inputValue, 10)
-                  if (!isNaN(numericValue)) setPriceOfDelivery(numericValue)
-                  else setPriceOfDelivery(undefined)
-                }
-              }}
-            />
+            <div className={styles.form__cost}>
+              <input
+                value={priceOfDelivery !== 0 ? priceOfDelivery : ""}
+                placeholder="Цена"
+                onChange={(el) => {
+                  const inputValue = el.target.value
+                  if (/^\d*$/.test(inputValue)) {
+                    const numericValue = parseInt(inputValue, 10)
+                    if (!isNaN(numericValue)) setPriceOfDelivery(numericValue)
+                    else setPriceOfDelivery((prev) => 0)
+                  }
+                }}
+              />
+              <div className={styles.form__money}>
+                <input
+                  readOnly
+                  value={selectedCurrency}
+                  className={styles.money__input}
+                  onClick={() => toogleIsSuggestionsVisible()}
+                />
+                <FaAngleDown className={styles.money__icon} />
+                <ul
+                  className={`${styles.money__suggestions} ${
+                    isSuggestionsVisible ? styles.visible : ""
+                  }`}
+                >
+                  {currency.map((moneyBadge) => (
+                    <li
+                      key={moneyBadge.id}
+                      className={styles.money__suggestion}
+                      onClick={() => {
+                        setSelectedCurrency(moneyBadge.symbol)
+                      }}
+                    >
+                      {moneyBadge.symbol}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
         <button
           className={styles.form__button}
           type="button"
-          onClick={() => offerService()}
+          onClick={() => sendOffer()}
         >
           Предложить
         </button>
