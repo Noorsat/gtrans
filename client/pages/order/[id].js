@@ -4,7 +4,7 @@ import styles from './../../styles/Order.module.css';
 import Router, {useRouter} from 'next/router';
 import { changeTrackCode, getOrderById } from '../../http/orders';
 import { getUserById } from '../../http/auth';
-import { getMarketplaceByOrderId, getMarketplaceRequestsByOrderId } from '../../http/marketplace'
+import { getMarketplaceByOrderId, getMarketplaceRequestsByOrderId, deleteMarketplaceOrder } from '../../http/marketplace'
 import moment from 'moment';
 import {Modal, Input, notification, message, Spin, Table} from 'antd';
 import Link from 'next/link';
@@ -128,7 +128,10 @@ const Order = () => {
         },{
             title: 'Цена',
             dataIndex: 'priceOfDelivery',
-            key: 'priceOfDelivery'
+            key: 'priceOfDelivery',
+            render: (price,item) => {
+                return ( <>{price} {item?.currency?.symbol}</>)
+               },
         },{
             title: 'Звонок',
             dataIndex: 'call',
@@ -146,8 +149,13 @@ const Order = () => {
           okType: 'danger',
           cancelText: 'Нет',
           onOk() {
-            // add to here http request
-            console.log('removed', id);
+            setIsLoading(true)
+            const user = JSON.parse(localStorage.getItem("user"))
+            deleteMarketplaceOrder(id,user?.token).then((res)=>{
+                router.push("/my-orders")
+            }).catch((res)=>{
+                console.log('err',res);
+            })
           },
           onCancel() {},
         });

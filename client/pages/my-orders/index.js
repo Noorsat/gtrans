@@ -2,7 +2,7 @@ import { Table, Button, Modal, Input, notification, Spin } from 'antd';
 import {useState, useEffect} from 'react';
 import { acceptRequest, addTrackerCode, changeStatusRequest, getOrders, getOrdersByAccountId } from '../../http/orders';
 import moment from 'moment'
-import { getRequests } from '../../http/request';
+import { getRequests, deleteRequest } from '../../http/request';
 import RequestDetails  from '../../components/RequestDetails/RequestDetails'
 import { useRouter } from 'next/router';
 import jwt_decode from 'jwt-decode';
@@ -44,7 +44,7 @@ const MyOrders = ( ) => {
             setMyRequests(res.data.data)
             setIsLoading(false);
           }).catch((res)=>{
-            console.log(res);
+            console.error(res);
           })
       }else{
           router.push("/login")
@@ -149,8 +149,20 @@ const MyOrders = ( ) => {
         okType: 'danger',
         cancelText: 'Нет',
         onOk() {
-          // add to here http request
-          console.log('removed', id);
+          setIsLoading(true)
+          const user = JSON.parse(localStorage.getItem("user"))
+          deleteRequest(id,user?.token).then((res)=>{
+            if(res.status === 204){
+              getMarketplaceRequestsByUserId(user?.token).then((res)=>{
+                setMyRequests(res.data.data)
+                setIsLoading(false);
+              }).catch((res)=>{
+                console.error('err',res);
+              })
+            }
+          }).catch((res)=>{
+            console.error('err',res);
+          })
         },
         onCancel() {},
       });
@@ -352,6 +364,9 @@ const myRequestsColumn = [
   title:"Цена",
   dataIndex: 'priceOfDelivery',
   key: 'priceOfDelivery',
+  render: (price,item) => {
+   return ( <>{price} {item?.currency?.symbol}</>)
+  },
 },
 {
   title:"Заказ",
@@ -363,7 +378,7 @@ const myRequestsColumn = [
               <div className={styles.request_button} onClick={() => trackerRequestDetailsModal(e.orderId)}>
                 Посмотреть детали
               </div>
-              <div className={`${styles.request_button} ${styles.button_red}`} onClick={() => showDeleteConfirm(e.orderId)}>
+              <div className={`${styles.request_button} ${styles.button_red}`} onClick={() => showDeleteConfirm(e._id)}>
                 Удалить
               </div>
             </div>

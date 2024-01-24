@@ -52,3 +52,12 @@ export const getMarketplaceByOrderId = async (id) => {
     const response = await myAxios.get("/marketplace/" + id)
     return response;
 }
+
+export const deleteMarketplaceOrder = async (id,token) => {
+    const response = await myAxios.delete(`/marketplace/${id}`,{
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    });
+    return response;
+}
