@@ -9,4 +9,12 @@ export const getRequests = async () => {
     const response  = await myAxios.get("/requests");
     return response; 
 }
- 
+
+export const deleteRequest = async (id,token) => {
+    const response = await myAxios.delete(`/requests/${id}`,{
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    });
+    return response;
+}

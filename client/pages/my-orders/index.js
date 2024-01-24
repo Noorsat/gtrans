@@ -2,7 +2,7 @@ import { Table, Button, Modal, Input, notification, Spin } from 'antd';
 import {useState, useEffect} from 'react';
 import { acceptRequest, addTrackerCode, changeStatusRequest, getOrders, getOrdersByAccountId } from '../../http/orders';
 import moment from 'moment'
-import { getRequests } from '../../http/request';
+import { getRequests, deleteRequest } from '../../http/request';
 import RequestDetails  from '../../components/RequestDetails/RequestDetails'
 import { useRouter } from 'next/router';
 import jwt_decode from 'jwt-decode';
@@ -10,6 +10,7 @@ import {AiFillLike, AiFillDislike} from 'react-icons/ai';
 import styles from './../../styles/MyOrders.module.css'
 import { companyPutLike, companyPutUnlike } from '../../http/auth';
 import { getMarketplaceByOrderId, getMarketplaceMyOrders, getMarketplaceRequestsByUserId } from '../../http/marketplace';
+import { ExclamationCircleFilled } from '@ant-design/icons';
 
 const MyOrders = ( ) => {
     const [orders, setOrders] = useState()
@@ -28,6 +29,7 @@ const MyOrders = ( ) => {
     const [requests, setRequests] = useState();
     const [requestDetailsModal, setRequestDetailsModal] = useState(false)
     const [requestDetailsData, setRequestDetailsData] = useState()
+    const { confirm } = Modal;
 
     useEffect(() => {
       setIsLoading(true);
@@ -42,7 +44,7 @@ const MyOrders = ( ) => {
             setMyRequests(res.data.data)
             setIsLoading(false);
           }).catch((res)=>{
-            console.log(res);
+            console.error(res);
           })
       }else{
           router.push("/login")
@@ -138,6 +140,33 @@ const MyOrders = ( ) => {
         setRequestDetailsModal(true)
       })
     }
+    const showDeleteConfirm = (id) => {
+      confirm({
+        title: 'Вы уверены, что хотите удалить это предложение?',
+        icon: <ExclamationCircleFilled />,
+        content: 'После удаления вы не сможете восстановить предложение. Вы уверены?',
+        okText: 'Да',
+        okType: 'danger',
+        cancelText: 'Нет',
+        onOk() {
+          setIsLoading(true)
+          const user = JSON.parse(localStorage.getItem("user"))
+          deleteRequest(id,user?.token).then((res)=>{
+            if(res.status === 204){
+              getMarketplaceRequestsByUserId(user?.token).then((res)=>{
+                setMyRequests(res.data.data)
+                setIsLoading(false);
+              }).catch((res)=>{
+                console.error('err',res);
+              })
+            }
+          }).catch((res)=>{
+            console.error('err',res);
+          })
+        },
+        onCancel() {},
+      });
+    };
 
     const columns = [
         {
@@ -335,14 +364,25 @@ const myRequestsColumn = [
   title:"Цена",
   dataIndex: 'priceOfDelivery',
   key: 'priceOfDelivery',
+  render: (price,item) => {
+   return ( <>{price} {item?.currency?.symbol}</>)
+  },
 },
 {
   title:"Заказ",
   key: 'order',
+  className: styles.table_header_order,
   render: (e) => {
-    return <div className={styles.button} onClick={() => trackerRequestDetailsModal(e.orderId)}>
-              Посмотреть детали
+    return (
+           <div className='d-flex gap-2'>
+              <div className={styles.request_button} onClick={() => trackerRequestDetailsModal(e.orderId)}>
+                Посмотреть детали
+              </div>
+              <div className={`${styles.request_button} ${styles.button_red}`} onClick={() => showDeleteConfirm(e._id)}>
+                Удалить
+              </div>
             </div>
+            )
   }
 },
 ]

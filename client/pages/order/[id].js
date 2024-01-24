@@ -4,13 +4,14 @@ import styles from './../../styles/Order.module.css';
 import Router, {useRouter} from 'next/router';
 import { changeTrackCode, getOrderById } from '../../http/orders';
 import { getUserById } from '../../http/auth';
-import { getMarketplaceByOrderId, getMarketplaceRequestsByOrderId } from '../../http/marketplace'
+import { getMarketplaceByOrderId, getMarketplaceRequestsByOrderId, deleteMarketplaceOrder } from '../../http/marketplace'
 import moment from 'moment';
 import {Modal, Input, notification, message, Spin, Table} from 'antd';
 import Link from 'next/link';
 import axios from 'axios';
 import { AiFillPhone } from "react-icons/ai";
 import RequestDetails from '../../components/RequestDetails/RequestDetails';
+import { ExclamationCircleFilled } from '@ant-design/icons';
 
 const Order = () => {
     const [order, setOrder] = useState();
@@ -19,8 +20,9 @@ const Order = () => {
     const [modal, setModal] = useState(false);
     const [trackcodeValue, setTrackcodeValue] = useState();
     const [isLoading, setIsLoading] = useState();
+    const { confirm } = Modal;
 
-     const router = useRouter();
+    const router = useRouter();
     const id = router.query.id;
 
     useEffect(() => {
@@ -48,7 +50,8 @@ const Order = () => {
                             return {
                                 ...el,
                                 phoneNumber: userResponse.data.phoneNumber,
-                                name: userResponse.data.name
+                                name: userResponse.data.name,
+                                email: userResponse.data.email
                             };
                         });
     
@@ -114,13 +117,21 @@ const Order = () => {
             key: 'name'
         },
         {
+            title: 'Почта',
+            dataIndex: 'email',
+            key: 'email'
+        },
+        {
             title: 'Телефон',
             dataIndex: 'phoneNumber',
             key: 'phoneNumber',
         },{
             title: 'Цена',
             dataIndex: 'priceOfDelivery',
-            key: 'priceOfDelivery'
+            key: 'priceOfDelivery',
+            render: (price,item) => {
+                return ( <>{price} {item?.currency?.symbol}</>)
+               },
         },{
             title: 'Звонок',
             dataIndex: 'call',
@@ -128,6 +139,28 @@ const Order = () => {
             render: (text,record)=> (<a href={`tel:${record.phoneNumber}`} style={{color: '#ffad32'}}><AiFillPhone/></a>)
         }
     ]
+
+    const showDeleteConfirm = (id) => {
+        confirm({
+          title: 'Вы уверены, что хотите удалить это заказ?',
+          icon: <ExclamationCircleFilled />,
+          content: 'После удаления вы не сможете восстановить заказ. Вы уверены?',
+          okText: 'Да',
+          okType: 'danger',
+          cancelText: 'Нет',
+          onOk() {
+            setIsLoading(true)
+            const user = JSON.parse(localStorage.getItem("user"))
+            deleteMarketplaceOrder(id,user?.token).then((res)=>{
+                router.push("/my-orders")
+            }).catch((res)=>{
+                console.log('err',res);
+            })
+          },
+          onCancel() {},
+        });
+      };
+  
 
     return (
         <div className={styles.order}>
@@ -175,8 +208,9 @@ const Order = () => {
                     </div>
                 </div>
 
-                <div className={styles.tracking__link}>
-                    {
+                <div className={styles.tracking__link} onClick={ () => showDeleteConfirm(order?._id)}>
+                    Удалить заказ
+                    {/* {
                         !order?.trackCode ? 
                         <div onClick={showErrorTrackCode} >
                             Отследить заказ
@@ -188,7 +222,7 @@ const Order = () => {
                            }}>
                             Отследить заказ
                         </Link>                    
-                    }
+                    } */}
                 </div>
             </div>
         </div>
