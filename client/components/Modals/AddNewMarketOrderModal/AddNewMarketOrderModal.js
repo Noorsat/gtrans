@@ -38,8 +38,7 @@ const AddNewMarketOrderModal = ({ onCancel, updateMarketplaceOrders }) => {
     from: "",
     to: "",
   })
-  const [searchProductType, setSearchProductType] = useState("")
-  const [isSuggestionsVisible, setSuggestionsVisible] = useState(false)
+  const [isWarning, setIsWarning] = useState(false)
 
   const refMyForm = useRef(null)
 
@@ -48,11 +47,6 @@ const AddNewMarketOrderModal = ({ onCancel, updateMarketplaceOrders }) => {
       if (refMyForm.current && !refMyForm.current.contains(event.target)) {
         refMyForm.current.reset()
         onCancel()
-      } else if (
-        !event.target.classList.contains(styles.search__input) &&
-        !event.target.classList.contains(styles.searchContainer__suggestion)
-      ) {
-        setSuggestionsVisible(false)
       }
     }
     document.addEventListener("mousedown", handleClickOutside)
@@ -111,10 +105,11 @@ const AddNewMarketOrderModal = ({ onCancel, updateMarketplaceOrders }) => {
       !storeHouse.from ||
       !storeHouse.to
     ) {
-      openNotificationWithIcon("Заполните все поля")
+      openNotificationWithIcon("error", "Заполните все поля")
       return
-    } else if (totalWeight < 50) {
-      openNotificationWithIcon("Общий вес меньше 50кг")
+    }
+    if (totalWeight < 50) {
+      openNotificationWithIcon("warning", "Общий вес меньше 50кг")
       return
     }
     const data = {
@@ -130,9 +125,8 @@ const AddNewMarketOrderModal = ({ onCancel, updateMarketplaceOrders }) => {
       from: storeHouse.from,
       to: storeHouse.to,
     }
-    const user = JSON.parse(localStorage.getItem("user")) || null
 
-    console.log(user)
+    const user = JSON.parse(localStorage.getItem("user")) || null
 
     if (user) {
       var decoded = user && jwt_decode(user?.token)
@@ -142,7 +136,7 @@ const AddNewMarketOrderModal = ({ onCancel, updateMarketplaceOrders }) => {
         .then((res) => {
           onCancel()
           updateMarketplaceOrders(user?.token)
-          openNotificationWithIcon("Новый заказ успечно создан")
+          openNotificationWithIcon("success", "Новый заказ успечно создан")
         })
         .catch((res) => {
           console.error(res)
@@ -150,19 +144,7 @@ const AddNewMarketOrderModal = ({ onCancel, updateMarketplaceOrders }) => {
     }
   }
 
-  const openNotificationWithIcon = (info) => {
-    let type = ""
-    switch (info) {
-      case "Заполните все поля":
-        type = "error"
-        break
-      case "Общий вес меньше 50кг":
-        type = "warning"
-        break
-      case "Новый заказ успечно создан":
-        type = "success"
-        break
-    }
+  const openNotificationWithIcon = (type = "error", info = "") => {
     notification.config({
       duration: 2,
     })
@@ -171,10 +153,6 @@ const AddNewMarketOrderModal = ({ onCancel, updateMarketplaceOrders }) => {
       message: info,
     })
   }
-
-  const filteredProductTypes = productTypes.filter((type) =>
-    type.toLowerCase().includes(searchProductType.toLowerCase())
-  )
 
   return (
     <div className={styles.modal}>
@@ -187,39 +165,45 @@ const AddNewMarketOrderModal = ({ onCancel, updateMarketplaceOrders }) => {
         </div>
         <main className={styles.main}>
           <div className={styles.searchContainer}>
-            <div className={styles.searchContainer__search}>
-              <input
-                className={styles.search__input}
-                placeholder="Поиск типа груза ..."
-                value={searchProductType}
-                onClick={() => setSuggestionsVisible(true)}
-                onChange={(e) => {
-                  setSearchProductType(e.target.value)
-                  setSuggestionsVisible(true)
-                  setType(e.target.value)
-                }}
-              />
-              <FaSearch className={styles.search__icon} />
-            </div>
-            <ul
-              className={`${styles.searchContainer__suggestions} ${
-                isSuggestionsVisible ? styles.visible : ""
-              }`}
-            >
-              {filteredProductTypes.map((type) => (
-                <li
-                  key={type}
-                  className={styles.searchContainer__suggestion}
-                  onClick={() => {
-                    setSearchProductType(type)
-                    setSuggestionsVisible(false)
-                    setType(type)
-                  }}
-                >
-                  {type}
-                </li>
-              ))}
-            </ul>
+            <Select
+              placeholder="Выберите тип продукта"
+              options={productTypes.map((option) => ({
+                value: option,
+                label: option,
+              }))}
+              onChange={(el) => setType(el.value)}
+              styles={{
+                control: (baseStyles, state) => ({
+                  ...baseStyles,
+                  background: "#f0f0f0",
+                  borderWidth: "2px",
+                  borderColor:
+                    isWarning && !type
+                      ? "rgb(255, 110, 110)"
+                      : state.isFocused
+                      ? "#ffad32"
+                      : "#f0f0f0",
+                  cursor: "pointer",
+                  "&:hover": {
+                    borderColor: "",
+                  },
+                }),
+                option: (baseStyles, state) => ({
+                  ...baseStyles,
+                  cursor: "pointer",
+                }),
+              }}
+              theme={(theme) => ({
+                ...theme,
+                borderRadius: "8px",
+                borderColor: "#f0f0f0",
+                colors: {
+                  ...theme.colors,
+                  primary25: "#f0f0f0",
+                  primary: "#ffad32",
+                },
+              })}
+            />
           </div>
           <div className={styles.miniTitle}>
             <h1 className={styles.miniTitle__text}>Параметры одного места</h1>
@@ -240,6 +224,9 @@ const AddNewMarketOrderModal = ({ onCancel, updateMarketplaceOrders }) => {
                 <p>Длина</p>
                 <input
                   value={properties.length !== 0 ? properties.length : ""}
+                  className={
+                    isWarning && !properties.length ? styles.error : ""
+                  }
                   placeholder="см"
                   onChange={(el) => {
                     const inputValue = el.target.value
@@ -256,6 +243,9 @@ const AddNewMarketOrderModal = ({ onCancel, updateMarketplaceOrders }) => {
                 <p>Ширина</p>
                 <input
                   value={properties.width !== 0 ? properties.width : ""}
+                  className={
+                    isWarning && !properties.length ? styles.error : ""
+                  }
                   placeholder="см"
                   onChange={(el) => {
                     const inputValue = el.target.value
@@ -274,6 +264,9 @@ const AddNewMarketOrderModal = ({ onCancel, updateMarketplaceOrders }) => {
                 <p>Высота</p>
                 <input
                   value={properties.height !== 0 ? properties.height : ""}
+                  className={
+                    isWarning && !properties.height ? styles.error : ""
+                  }
                   placeholder="см"
                   onChange={(el) => {
                     const inputValue = el.target.value
@@ -292,6 +285,9 @@ const AddNewMarketOrderModal = ({ onCancel, updateMarketplaceOrders }) => {
                 <p>Вес</p>
                 <input
                   value={properties.weight !== 0 ? properties.weight : ""}
+                  className={
+                    isWarning && !properties.weight ? styles.error : ""
+                  }
                   placeholder="кг"
                   onChange={(el) => {
                     const inputValue = el.target.value
@@ -324,6 +320,7 @@ const AddNewMarketOrderModal = ({ onCancel, updateMarketplaceOrders }) => {
                 </button>
                 <input
                   value={count !== 0 ? count : ""}
+                  className={isWarning && !count ? styles.error : ""}
                   placeholder="0"
                   onChange={(el) => {
                     const inputValue = parseInt(el.target.value, 10)
@@ -346,7 +343,12 @@ const AddNewMarketOrderModal = ({ onCancel, updateMarketplaceOrders }) => {
               Общий объем: <b>{totalVolume} м³</b>
             </div>
             <div className={styles.product__totalWeightContainer}>
-              Общий вес: <b>{totalWeight} кг</b>
+              Общий вес:{" "}
+              <b
+                className={isWarning && totalWeight < 50 ? styles.warning : ""}
+              >
+                {totalWeight} кг
+              </b>
             </div>
           </div>
           <div className={styles.storeHouse}>
@@ -361,6 +363,37 @@ const AddNewMarketOrderModal = ({ onCancel, updateMarketplaceOrders }) => {
                 onChange={(el) =>
                   setStoreHouse((prev) => ({ ...prev, from: el.value }))
                 }
+                styles={{
+                  control: (baseStyles, state) => ({
+                    ...baseStyles,
+                    background: "#f0f0f0",
+                    borderWidth: "2px",
+                    borderColor:
+                      isWarning && !storeHouse.from
+                        ? "rgb(255, 110, 110)"
+                        : state.isFocused
+                        ? "#ffad32"
+                        : "#f0f0f0",
+                    cursor: "pointer",
+                    "&:hover": {
+                      borderColor: "",
+                    },
+                  }),
+                  option: (baseStyles, state) => ({
+                    ...baseStyles,
+                    cursor: "pointer",
+                  }),
+                }}
+                theme={(theme) => ({
+                  ...theme,
+                  borderRadius: "8px",
+                  borderColor: "#f0f0f0",
+                  colors: {
+                    ...theme.colors,
+                    primary25: "#f0f0f0",
+                    primary: "#ffad32",
+                  },
+                })}
               />
             </div>
             <div className={styles.storeHouse__to}>
@@ -374,10 +407,48 @@ const AddNewMarketOrderModal = ({ onCancel, updateMarketplaceOrders }) => {
                 onChange={(el) =>
                   setStoreHouse((prev) => ({ ...prev, to: el.value }))
                 }
+                styles={{
+                  control: (baseStyles, state) => ({
+                    ...baseStyles,
+                    background: "#f0f0f0",
+                    borderWidth: "2px",
+                    borderColor:
+                      isWarning && !storeHouse.to
+                        ? "rgb(255, 110, 110)"
+                        : state.isFocused
+                        ? "#ffad32"
+                        : "#f0f0f0",
+                    cursor: "pointer",
+                    "&:hover": {
+                      borderColor: "",
+                    },
+                  }),
+                  option: (baseStyles, state) => ({
+                    ...baseStyles,
+                    cursor: "pointer",
+                  }),
+                }}
+                theme={(theme) => ({
+                  ...theme,
+                  borderRadius: "8px",
+                  borderColor: "#f0f0f0",
+                  colors: {
+                    ...theme.colors,
+                    primary25: "#f0f0f0",
+                    primary: "#ffad32",
+                  },
+                })}
               />
             </div>
           </div>
-          <button type="button" className={styles.addButton} onClick={onAdd}>
+          <button
+            type="button"
+            className={styles.addButton}
+            onClick={() => {
+              setIsWarning(true)
+              onAdd()
+            }}
+          >
             Добавить новый заказ
           </button>
         </main>
