@@ -55,3 +55,12 @@ export const getCurrency = async () => {
   const response = await myAxios.get("currency")
   return response
 }
+
+export const deleteMarketplaceOrder = async (id,token) => {
+    const response = await myAxios.delete(`/marketplace/${id}`,{
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    });
+    return response;
+}
