@@ -1,6 +1,6 @@
 import { Table, Button, Modal, Input, notification, Spin } from 'antd';
 import {useState, useEffect} from 'react';
-import { acceptRequest, addTrackerCode, changeStatusRequest, getOrders, getOrdersByAccountId } from '../../http/orders';
+import { acceptRequest, addTrackerCode, changeStatusRequest, getMyOrders, getOrders, getOrdersByAccountId } from '../../http/orders';
 import moment from 'moment'
 import { getRequests, deleteRequest } from '../../http/request';
 import RequestDetails  from '../../components/RequestDetails/RequestDetails'
@@ -24,7 +24,8 @@ const MyOrders = ( ) => {
     const [currentTab, setCurrentTab] = useState('order')
     const [myRequests, setMyRequests] = useState()
     
-    const router = useRouter()
+    const router = useRouter();
+    const mode = router.query.mode;
 
     const [requests, setRequests] = useState();
     const [requestDetailsModal, setRequestDetailsModal] = useState(false)
@@ -36,9 +37,16 @@ const MyOrders = ( ) => {
       const user = JSON.parse(localStorage.getItem("user"))
       if (user){
           var decoded = jwt_decode(user?.token);
-          getMarketplaceMyOrders(user?.token).then((res) => {
-            setOrders(res.data.data)
-          })
+          if (mode == "marketplace"){
+            getMarketplaceMyOrders(user?.token).then((res) => {
+              setOrders(res.data.data)
+            })
+          }else{
+            getMyOrders(user?.token).then((res) => {
+              setOrders(res.data.data)
+            })
+          }
+          
           decoded && setUser(decoded);
           getMarketplaceRequestsByUserId(user?.token).then((res)=>{
             setMyRequests(res.data.data)
@@ -49,19 +57,19 @@ const MyOrders = ( ) => {
       }else{
           router.push("/login")
       }
-    }, [])
+    }, [mode])
 
-    const likeHandler = (order) => {
-      companyPutLike(user?._id).then((res) => {
-        requestAcceptHandler(order?.acceptedRequest.filter(item => item.status === 3)[0], 4, order._id)
-      })
-    }
+    // const likeHandler = (order) => {
+    //   companyPutLike(user?._id).then((res) => {
+    //     requestAcceptHandler(order?.acceptedRequest.filter(item => item.status === 3)[0], 4, order._id)
+    //   })
+    // }
 
-    const unlikeHandler = (order) => {
-      companyPutUnlike(user?._id).then((res) => {
-        requestAcceptHandler(order?.acceptedRequest.filter(item => item.status === 3)[0], 4, order._id)
-      })
-    }
+    // const unlikeHandler = (order) => {
+    //   companyPutUnlike(user?._id).then((res) => {
+    //     requestAcceptHandler(order?.acceptedRequest.filter(item => item.status === 3)[0], 4, order._id)
+    //   })
+    // }
 
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -131,7 +139,7 @@ const MyOrders = ( ) => {
     }
 
     const openOrderDetail = (id) => {
-      router.push("/order/"+id)      
+      router.push("/order/"+id + "?mode="+mode);      
     }
 
     const trackerRequestDetailsModal = (id)=>{
@@ -148,7 +156,7 @@ const MyOrders = ( ) => {
         okText: 'Да',
         okType: 'danger',
         cancelText: 'Нет',
-        onOk() {
+      onOk() {
           setIsLoading(true)
           const user = JSON.parse(localStorage.getItem("user"))
           deleteRequest(id,user?.token).then((res)=>{
@@ -398,7 +406,11 @@ const myRequestsColumn = [
           <div className='container'>
               <div className={styles.my__orders_title}>
                 <span onClick={()=>setCurrentTab('order')} className={currentTab==='order' && styles.my__orders_tab}>Мои заказы</span>
-                <span onClick={()=>setCurrentTab('request')} className={currentTab==='request' && styles.my__orders_tab} style={{marginLeft:'15px'}}>Мои предложение</span>
+                {
+                  mode == "marketplace" && (
+                    <span onClick={()=>setCurrentTab('request')} className={currentTab==='request' && styles.my__orders_tab} style={{marginLeft:'15px'}}>Мои предложение</span>
+                  )
+                }
               </div>
               {currentTab === 'order' ? 
                 <div className={styles.my__orders_items}>
@@ -408,9 +420,20 @@ const myRequestsColumn = [
                       <div className={styles.my__orders_item_title}>
                         {item.type}
                       </div>
-                      <div className={styles.my__orders_item_trackCode}>
-                        {item.from} - {item.to}
-                      </div>
+                      {
+                        mode == "marketplace" && (
+                          <div className={styles.my__orders_item_trackCode}>
+                            {item.from} - {item.to}
+                          </div>  
+                        )
+                      }
+                      {
+                        mode == "calculator" && (
+                          <div className={styles.my__orders_item_trackCode}>
+                            {item.individualCode}
+                          </div> 
+                        )
+                      }
                     </div> 
                     ))
                   }

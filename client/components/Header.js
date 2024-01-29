@@ -1,14 +1,57 @@
-import React, {useState, useEffect,Component } from 'react';
+import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'antd/dist/antd.css';
-import {BsFacebook} from 'react-icons/bs';
-import {AiFillInstagram} from 'react-icons/ai';
 import Link from 'next/link';
 import styles from './../styles/Layout.module.css';
-import TemporaryDrawer from './Drawer';
-
+import { ConfigProvider, Menu } from 'antd';
+import { useRouter } from 'next/router';
 
 const Header = ({user, openDrawer, closeDrawer, drawer}) => {
+  const router = useRouter();
+
+  const menu = [
+    {
+      label:"Биржа",
+      key:"birzha",
+      children: [
+        {
+          label:"Маркетплейс",
+          key: "marketplace",
+        },
+        {
+          label:"Мои заказы",
+          key: "my-orders?mode=marketplace",
+        },
+      ]
+    },
+    {
+      label:"Калькулятор",
+      key:"calculator",
+      children: [
+        {
+          label:"Калькулятор",
+          key: "request",
+        },
+        {
+          label:"Мои заказы",
+          key: "my-orders?mode=calculator",
+        },
+        {
+          label:"Трекинг",
+          key: "tracking"
+        },
+      ]
+    },
+    // (user?.role === "admin" || user?.role === "superadmin") ? {
+    //   label:"Dashboard",
+    //   key:"dashboard"
+    // } : {}
+  ]
+
+  const onClick = (e) => {
+    router.push("/"+e.key)
+  };
+
     return (
       <div className='layout'>
         <div className={styles.container} style={{paddingBottom: drawer ? 23 : 10, paddingTop: 10}}>
@@ -79,7 +122,7 @@ const Header = ({user, openDrawer, closeDrawer, drawer}) => {
         </div>
         </div>
         {
-          !drawer &&  <div className={`d-flex justify-content-center d-md-none border-bottom ${styles.mobile__items}`}>
+          !drawer && <div className={`d-flex justify-content-center d-md-none border-bottom ${styles.mobile__items}`}>
             <div className={styles.mobile__links}>
               <Link href="/marketplace">Биржа</Link>
             </div>
@@ -96,17 +139,18 @@ const Header = ({user, openDrawer, closeDrawer, drawer}) => {
         }
         <div className={`position-relative border-bottom border-top d-md-block d-none ${styles.nav}`}>
           <div className={`container d-flex justify-content-between ${styles.links}`}>
-            <div className={`d-flex justify-content-center`}>
-              <Link href="/marketplace">Биржа</Link>
+            <div className={`d-flex justify-content-center align-items-center`}>
+                <Menu items={menu} mode='horizontal' onClick={onClick} />
+              {/* <Link href="/marketplace">Биржа</Link>
               <Link href="/request">Калькулятор</Link>
               <Link href="/my-orders">Мои заказы</Link>
               <Link href="/tracking">Трекинг</Link>
               {
                 (user?.role === "admin" || user?.role === "superadmin") &&
                 <Link href="/admin">Dashboard</Link>
-              }
+              } */}
             </div>
-            <div className='d-flex'>
+            <div className='d-flex align-items-center'>
                 {
                   !user && <div className={styles.register__link}><Link href="/register">Зарегистрироваться</Link></div>
                 }

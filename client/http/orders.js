@@ -5,6 +5,15 @@ export const getOrders = async (params = '') => {
     return response
 }
 
+export const getMyOrders = async (token) => {
+    const response = await myAxios.get('/orders/my', {
+        headers: {
+            Authorization: `Bearer ${token}`,
+          },
+    })
+    return response
+}
+
 export const createOrder = async (body) => { 
     const response = await myAxios.post("/orders", body);
     return response;

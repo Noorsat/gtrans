@@ -27,10 +27,10 @@ const RequestDetails = ({details}) => {
           </div>
           <div className={styles.request__item}>
             <div className={styles.request__item_title}>
-              Количество
+              Тип груза
             </div>
             <div className={styles.request__item_value}>
-              {details.count}
+              {details.type}
               </div>
           </div>
         </div>
@@ -75,6 +75,14 @@ const RequestDetails = ({details}) => {
             </div>
             <div className={styles.request__item_value}>
               {details.totalWeight}
+              </div>
+          </div>
+          <div className={styles.request__item}>
+            <div className={styles.request__item_title}>
+              Количество
+            </div>
+            <div className={styles.request__item_value}>
+              {details.count}
               </div>
           </div>
         </div>

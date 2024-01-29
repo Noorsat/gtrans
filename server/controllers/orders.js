@@ -1,6 +1,7 @@
 import User from '../models/user.js';
 import Order from './../models/order.js';
 import nodemailer from 'nodemailer';
+import { jwtDecode } from "jwt-decode";
 
 export const getOrders = async (req, res) => {
     try {
@@ -32,6 +33,26 @@ export const getOrders = async (req, res) => {
         res.status(200).json(orders.reverse())
     }catch (error){
         res.status(404).json({message: error.message})
+    }
+}
+
+export const getMyOrders = async (req, res) => {
+    try {   
+        const token = req.headers.authorization.split(" ")[1]; 
+
+        if (!token){
+            res.status(401).json({ message: "No token"});
+        }
+
+        const decoded = jwtDecode(token);
+
+        const id = decoded._id;
+
+        const orders = await Order.find({ accountId: id});
+
+        return res.status(200).json({ message: "Succesfully get my orders", data: orders});
+    }catch (err){   
+        res.status(400).json({ message: err.message })
     }
 }
 

@@ -4,10 +4,11 @@ import styles from "./AddNewMarketOrderModal.module.css"
 import { FaSearch, FaQuestionCircle } from "react-icons/fa"
 import { createMarketplaceOrder } from "../../../http/marketplace"
 import jwt_decode from "jwt-decode"
-import { notification } from "antd"
+import { Spin, notification } from "antd"
 
 const AddNewMarketOrderModal = ({ onCancel, updateMarketplaceOrders }) => {
   const [user, setUser] = useState()
+  const [loading, setLoading] = useState();
   const [storeHousesFromArray, setStoreHousesFromArray] = useState([
     "Beijing",
     "Shanghai",
@@ -129,6 +130,7 @@ const AddNewMarketOrderModal = ({ onCancel, updateMarketplaceOrders }) => {
     const user = JSON.parse(localStorage.getItem("user")) || null
 
     if (user) {
+      setLoading(true);
       var decoded = user && jwt_decode(user?.token)
       decoded && setUser(decoded)
 
@@ -146,7 +148,8 @@ const AddNewMarketOrderModal = ({ onCancel, updateMarketplaceOrders }) => {
 
   const openNotificationWithIcon = (type = "error", info = "") => {
     notification.config({
-      duration: 2,
+      duration: 1,
+      closeIcon: false
     })
 
     notification[type]({
@@ -156,6 +159,13 @@ const AddNewMarketOrderModal = ({ onCancel, updateMarketplaceOrders }) => {
 
   return (
     <div className={styles.modal}>
+        {
+          loading && (
+            <div className="loading">
+                <Spin size='large' />
+            </div>
+          )
+        }
       <form ref={refMyForm} className={styles.form}>
         <div className={styles.header}>
           <h1 className={styles.header__title}>Добавить заказ</h1>

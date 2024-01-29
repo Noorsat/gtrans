@@ -1,17 +1,14 @@
-import { style } from '@mui/system';
 import React, { useEffect, useState } from 'react';
 import styles from './../../styles/Order.module.css';
-import Router, {useRouter} from 'next/router';
+import {useRouter} from 'next/router';
 import { changeTrackCode, getOrderById } from '../../http/orders';
 import { getUserById } from '../../http/auth';
 import { getMarketplaceByOrderId, getMarketplaceRequestsByOrderId, deleteMarketplaceOrder } from '../../http/marketplace'
-import moment from 'moment';
-import {Modal, Input, notification, message, Spin, Table} from 'antd';
-import Link from 'next/link';
-import axios from 'axios';
+import {Modal, Input, notification, Spin, Table} from 'antd';
 import { AiFillPhone } from "react-icons/ai";
 import RequestDetails from '../../components/RequestDetails/RequestDetails';
 import { ExclamationCircleFilled } from '@ant-design/icons';
+import OrderDetails from '../../components/OrderDetails/OrderDetails';
 
 const Order = () => {
     const [order, setOrder] = useState();
@@ -24,6 +21,9 @@ const Order = () => {
 
     const router = useRouter();
     const id = router.query.id;
+    const mode = router.query.mode;
+
+    console.log(order);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -31,37 +31,42 @@ const Order = () => {
                 setIsLoading(true);
     
                 try {
-                    const [orderResponse, requestsResponse] = await Promise.all([
-                        getMarketplaceByOrderId(id),
-                        getMarketplaceRequestsByOrderId(id)
-                    ]);
-    
-                    if (orderResponse.status === 200) {
-                        setOrder(orderResponse.data.data);
-                        // const ownerResponse = await getUserById(orderResponse.data.accountId);
-                        // setOwner(ownerResponse.data);
+                    if (mode == "marketplace"){
+                        const [orderResponse, requestsResponse] = await Promise.all([
+                            getMarketplaceByOrderId(id),
+                            getMarketplaceRequestsByOrderId(id)
+                        ]);
+        
+                        if (orderResponse.status === 200) {
+                            setOrder(orderResponse.data.data);
+                            // const ownerResponse = await getUserById(orderResponse.data.accountId);
+                            // setOwner(ownerResponse.data);
+                        }
+        
+                        if (requestsResponse.status === 200) {
+                            const requestsData = requestsResponse.data.data;
+        
+                            const requestsPromises = requestsData.map(async (el) => {
+                                const userResponse = await getUserById(el.userId);
+                                return {
+                                    ...el,
+                                    phoneNumber: userResponse.data.phoneNumber,
+                                    name: userResponse.data.name,
+                                    email: userResponse.data.email
+                                };
+                            });
+        
+                            const updatedRequests = await Promise.all(requestsPromises);
+                            setRequests([...requests, ...updatedRequests]);
+                        }
+                    }else if (mode == "calculator"){
+                        getOrderById(id).then((res) => {
+                            setOrder(res.data);
+                        })
                     }
-    
-                    if (requestsResponse.status === 200) {
-                        const requestsData = requestsResponse.data.data;
-    
-                        const requestsPromises = requestsData.map(async (el) => {
-                            const userResponse = await getUserById(el.userId);
-                            return {
-                                ...el,
-                                phoneNumber: userResponse.data.phoneNumber,
-                                name: userResponse.data.name,
-                                email: userResponse.data.email
-                            };
-                        });
-    
-                        const updatedRequests = await Promise.all(requestsPromises);
-                        setRequests([...requests, ...updatedRequests]);
-                    }
-    
                 } catch (error) {
                     console.error(error);
-                } finally {
+                } finally { 
                     setIsLoading(false);
                 }
             }
@@ -70,15 +75,10 @@ const Order = () => {
         fetchData();
     }, [id]);
 
-    console.log(order);
     const goBackHandler = () => {
-        router.push("/my-orders")
+        router.push("/my-orders?mode=" + mode)
     }
 
-    const modalOpenHandler = () => {
-        setModal(true)
-    }
-    
     const trackcodeAcceptHandler = () => {
         let body = {
             individualCode: order?.individualCode,
@@ -191,39 +191,56 @@ const Order = () => {
                     ← Вернуться к заказам
                 </div>
                 <div className='d-md-flex d-block gap-2'>
-                    <RequestDetails  details={order}/>
-                    <div className={styles.order__requests}>
-                        <div className={styles.order__title}>
-                            Предложение
-                        </div>
-                        <Table  
-                            columns={columns}
-                            dataSource={requests}
-                            bordered={true}
-                            pagination={{
-                                pageSize: 5,
-                                
-                            }} 
-                        style={{width: '100%'}}/>
-                    </div>
-                </div>
-
-                <div className={styles.tracking__link} onClick={ () => showDeleteConfirm(order?._id)}>
-                    Удалить заказ
-                    {/* {
-                        !order?.trackCode ? 
-                        <div onClick={showErrorTrackCode} >
-                            Отследить заказ
-                        </div>
+                    {
+                        order && (
+                            mode === "calculator" ?
+                            <OrderDetails details={order} />  
                         :
-                        <Link href={{
-                            pathname: '/tracking',
-                            query: {trackCode: order?.trackCode}
-                           }}>
-                            Отследить заказ
-                        </Link>                    
-                    } */}
+                            <RequestDetails details={order}/>
+                        )
+                    }
+                    {mode === "marketplace" && (
+                        <div className={styles.order__requests}>
+                            <div className={styles.order__title}>
+                                Предложение
+                            </div>
+                            <Table  
+                                columns={columns}
+                                dataSource={requests}
+                                bordered={true}
+                                pagination={{
+                                    pageSize: 5,
+                                    
+                                }} 
+                            style={{width: '100%'}}/>
+                        </div>
+                    )}
                 </div>
+                
+                {
+                    mode === "marketplace" ? 
+                    <div className={styles.tracking__link} onClick={ () => showDeleteConfirm(order?._id)}>
+                        Удалить заказ
+                    </div>
+                    :
+                    <div className={styles.tracking__link}>
+                        {
+                            !order?.trackCode ? 
+                            <div onClick={showErrorTrackCode} >
+                                Отследить заказ
+                            </div>
+                            :
+                            <Link href={{
+                                pathname: '/tracking',
+                                query: {trackCode: order?.trackCode}
+                            }}>
+                                Отследить заказ
+                            </Link>                    
+                        }
+                    </div>
+                }
+
+                
             </div>
         </div>
     )
