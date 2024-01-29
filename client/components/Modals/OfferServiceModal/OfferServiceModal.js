@@ -5,17 +5,18 @@ import {
   createMarketplaceRequest,
 } from "../../../http/marketplace"
 import { notification } from "antd"
-import { FaAngleDown } from "react-icons/fa"
+import Select from "react-select"
 
 const offerService = ({ onCancel, getCurrentId }) => {
   const [selectedTypeIndex, setSelectedTypeIndex] = useState(null)
   const [typeOfDeliveries, setTypeOfDeliveries] = useState([
-    "Ж/Д (10-15 дней)",
     "Авто (10-15 дней)",
+    "Ж/Д (25-35 дней)",
   ])
   const [currency, setCurrency] = useState([])
   const [orderId, setOrderId] = useState(null)
-  const [isSuggestionsVisible, setIsSuggestionsVisible] = useState(false)
+  const [isWarning, setIsWarning] = useState(false)
+
   const [typeOfDelivery, setTypeOfDelivery] = useState()
   const [daysOfDelivery, setDaysOfDelivery] = useState()
   const [priceOfDelivery, setPriceOfDelivery] = useState()
@@ -46,8 +47,6 @@ const offerService = ({ onCancel, getCurrentId }) => {
       if (refMyForm.current && !refMyForm.current.contains(event.target)) {
         refMyForm.current.reset()
         onCancel()
-      } else if (!event.target.classList.contains(styles.money__suggestion)) {
-        setIsSuggestionsVisible(false)
       }
     }
     document.addEventListener("mousedown", handleClickOutside)
@@ -65,36 +64,39 @@ const offerService = ({ onCancel, getCurrentId }) => {
       (el) => el.symbol === selectedCurrency
     )[0]._id
     if (
-      orderId &&
-      typeOfDelivery &&
-      daysOfDelivery &&
-      priceOfDelivery &&
-      currencyId
+      !orderId ||
+      !typeOfDelivery ||
+      !daysOfDelivery ||
+      !priceOfDelivery ||
+      !currencyId
     ) {
-      const data = {
-        orderId,
-        typeOfDelivery,
-        daysOfDelivery,
-        priceOfDelivery,
-        currencyId,
-      }
+      openNotification("error", "Заполните все поля")
+      return
+    }
 
-      const user =
-        (typeof window !== "undefined" &&
-          JSON.parse(localStorage.getItem("user"))) ||
-        null
-      if (user) {
-				openNotification("success", "Предложение успечно отправлено")
-        createMarketplaceRequest(data, user?.token)
-          .then((res) => {
-            onCancel()
-            openNotification("success", "Предложение успечно отправлено")
-          })
-          .catch((error) => {
-            openNotification("error", error)
-          })
-      }
-    } else openNotification("error", "Заполните все поля")
+    const data = {
+      orderId,
+      typeOfDelivery,
+      daysOfDelivery,
+      priceOfDelivery,
+      currencyId,
+    }
+
+    const user =
+      (typeof window !== "undefined" &&
+        JSON.parse(localStorage.getItem("user"))) ||
+      null
+    if (user) {
+      openNotification("success", "Предложение успечно отправлено")
+      createMarketplaceRequest(data, user?.token)
+        .then((res) => {
+          onCancel()
+          openNotification("success", "Предложение успечно отправлено")
+        })
+        .catch((error) => {
+          openNotification("error", error)
+        })
+    }
   }
 
   const openNotification = (type = "error", info = "") => {
@@ -105,10 +107,6 @@ const offerService = ({ onCancel, getCurrentId }) => {
     notification[type]({
       message: info,
     })
-  }
-
-  const toogleIsSuggestionsVisible = () => {
-    setIsSuggestionsVisible(!isSuggestionsVisible)
   }
 
   return (
@@ -125,7 +123,7 @@ const offerService = ({ onCancel, getCurrentId }) => {
                 <label
                   className={`${styles.form__label} ${
                     selectedTypeIndex === index ? styles.checked : ""
-                  }`}
+                  } ${isWarning && !typeOfDelivery ? styles.error : ""}`}
                   key={index}
                   htmlFor={`offerModalFormType${index}`}
                 >
@@ -145,6 +143,7 @@ const offerService = ({ onCancel, getCurrentId }) => {
           <div className={styles.form__property}>
             <p>За сколько дней готовы выполнить заказ? </p>
             <input
+              className={isWarning && !daysOfDelivery ? styles.error : ""}
               value={daysOfDelivery !== 0 ? daysOfDelivery : ""}
               placeholder="Количество дней"
               onChange={(el) => {
@@ -161,6 +160,7 @@ const offerService = ({ onCancel, getCurrentId }) => {
             <p>Предложите вашу цену</p>
             <div className={styles.form__cost}>
               <input
+                className={isWarning && !priceOfDelivery ? styles.error : ""}
                 value={priceOfDelivery !== 0 ? priceOfDelivery : ""}
                 placeholder="Цена"
                 onChange={(el) => {
@@ -172,39 +172,56 @@ const offerService = ({ onCancel, getCurrentId }) => {
                   }
                 }}
               />
-              <div className={styles.form__money}>
-                <input
-                  readOnly
-                  value={selectedCurrency}
-                  className={styles.money__input}
-                  onClick={() => toogleIsSuggestionsVisible()}
-                />
-                <FaAngleDown className={styles.money__icon} />
-                <ul
-                  className={`${styles.money__suggestions} ${
-                    isSuggestionsVisible ? styles.visible : ""
-                  }`}
-                >
-                  {currency.map((moneyBadge) => (
-                    <li
-                      key={moneyBadge.id}
-                      className={styles.money__suggestion}
-                      onClick={() => {
-                        setSelectedCurrency(moneyBadge.symbol)
-                      }}
-                    >
-                      {moneyBadge.symbol}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <Select
+                placeholder=""
+                options={currency.map(({ type, symbol }) => ({
+                  value: type,
+                  label: symbol,
+                }))}
+                onChange={(el) => {
+                  setSelectedCurrency(el.label)
+                }}
+                defaultValue={{
+                  label: selectedCurrency,
+                }}
+                styles={{
+                  control: (baseStyles, state) => ({
+                    ...baseStyles,
+                    background: "#f0f0f0",
+                    borderWidth: "2px",
+                    borderColor: state.isFocused ? "#ffad32" : "#f0f0f0",
+                    cursor: "pointer",
+                    "&:hover": {
+                      borderColor: "",
+                    },
+                    width: "100px",
+                  }),
+                  option: (baseStyles, state) => ({
+                    ...baseStyles,
+                    cursor: "pointer",
+                  }),
+                }}
+                theme={(theme) => ({
+                  ...theme,
+                  borderRadius: "8px",
+                  borderColor: "#f0f0f0",
+                  colors: {
+                    ...theme.colors,
+                    primary25: "#f0f0f0",
+                    primary: "#ffad32",
+                  },
+                })}
+              />
             </div>
           </div>
         </div>
         <button
           className={styles.form__button}
           type="button"
-          onClick={() => sendOffer()}
+          onClick={() => {
+            setIsWarning(true)
+            sendOffer()
+          }}
         >
           Предложить
         </button>
