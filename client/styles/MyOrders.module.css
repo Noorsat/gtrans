@@ -21,10 +21,16 @@
     margin-bottom: 47px;
 }
 .my__orders_items{
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap:7px;
+    display: grid;
+    justify-content: space-between;
+    grid-template-columns: repeat(3,1fr);
+    gap: 7px;
+}
+@media (max-width: 600px){
+    
+    .my__orders_items{
+        grid-template-columns: repeat(2,1fr);
+    }
 }
 
 .my__orders_item{

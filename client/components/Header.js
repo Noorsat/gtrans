@@ -122,8 +122,8 @@ const Header = ({user, openDrawer, closeDrawer, drawer}) => {
         </div>
         </div>
         {
-          !drawer && <div className={`d-flex justify-content-center d-md-none border-bottom ${styles.mobile__items}`}>
-            <div className={styles.mobile__links}>
+          !drawer && <div className={`d-flex justify-content-start d-md-none border-bottom`}>
+            {/* <div className={styles.mobile__links}>
               <Link href="/marketplace">Биржа</Link>
             </div>
             <div className={styles.mobile__links}>
@@ -134,7 +134,8 @@ const Header = ({user, openDrawer, closeDrawer, drawer}) => {
             </div>
             <div className={styles.mobile__links}>
               <Link href="/tracking">Трекинг</Link>
-            </div>
+            </div> */}
+            <Menu items={menu} mode='horizontal' onClick={onClick} />
           </div>
         }
         <div className={`position-relative border-bottom border-top d-md-block d-none ${styles.nav}`}>

@@ -416,7 +416,7 @@ const myRequestsColumn = [
                 <div className={styles.my__orders_items}>
                   {
                     orders?.map(item => (
-                      <div className={styles.my__orders_item} onClick={() => openOrderDetail(item?._id)}>
+                      <div key={item?._id} className={styles.my__orders_item} onClick={() => openOrderDetail(item?._id)}>
                       <div className={styles.my__orders_item_title}>
                         {item.type}
                       </div>
