@@ -67,6 +67,7 @@
 }
 
 .closeButton {
+	display: none;
   position: relative;
   margin-top: auto;
   background: var(--main-color-darker);
@@ -79,10 +80,16 @@
 	.addButton{
 		display: none;
 	}
+	.closeButton {
+		display: initial;
+	}
 }
 
 @media only screen and (min-width: 601px) and (max-width: 869px) {
 	.addButton{
 		display: none;
+	}
+	.closeButton {
+		display: initial;
 	}
 }
