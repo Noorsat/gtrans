@@ -1,19 +1,20 @@
 import { useEffect, useRef, useState } from "react"
 import styles from "./OfferServiceModal.module.css"
-import {
-  getCurrency,
-  createMarketplaceRequest,
-} from "../../../http/marketplace"
-import { notification } from "antd"
+import { createMarketplaceRequest } from "../../../http/marketplace"
 import Select from "react-select"
 
-const offerService = ({ onCancel, getCurrentId }) => {
+const offerService = ({
+  onCancel,
+  getCurrentId,
+  user,
+  currency,
+  openNotification,
+}) => {
   const [selectedTypeIndex, setSelectedTypeIndex] = useState(null)
   const [typeOfDeliveries, setTypeOfDeliveries] = useState([
     "Авто (10-15 дней)",
     "Ж/Д (25-35 дней)",
   ])
-  const [currency, setCurrency] = useState([])
   const [orderId, setOrderId] = useState(null)
   const [isWarning, setIsWarning] = useState(false)
 
@@ -23,16 +24,6 @@ const offerService = ({ onCancel, getCurrentId }) => {
   const [selectedCurrency, setSelectedCurrency] = useState("₸")
 
   const refMyForm = useRef(null)
-
-  useEffect(() => {
-    getCurrency()
-      .then((res) => {
-        setCurrency(res.data.data)
-      })
-      .catch((error) => {
-        openNotification("error", error)
-      })
-  }, [])
 
   useEffect(() => {
     setOrderId(() => getCurrentId())
@@ -82,12 +73,7 @@ const offerService = ({ onCancel, getCurrentId }) => {
       currencyId,
     }
 
-    const user =
-      (typeof window !== "undefined" &&
-        JSON.parse(localStorage.getItem("user"))) ||
-      null
     if (user) {
-      openNotification("success", "Предложение успечно отправлено")
       createMarketplaceRequest(data, user?.token)
         .then((res) => {
           onCancel()
@@ -97,16 +83,6 @@ const offerService = ({ onCancel, getCurrentId }) => {
           openNotification("error", error)
         })
     }
-  }
-
-  const openNotification = (type = "error", info = "") => {
-    notification.config({
-      duration: 2,
-    })
-
-    notification[type]({
-      message: info,
-    })
   }
 
   return (
@@ -194,7 +170,7 @@ const offerService = ({ onCancel, getCurrentId }) => {
                     "&:hover": {
                       borderColor: "",
                     },
-                    width: "100px",
+                    width: "100%",
                   }),
                   option: (baseStyles, state) => ({
                     ...baseStyles,

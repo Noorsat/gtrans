@@ -8,6 +8,7 @@ const MarketplaceFilters = ({
   paramsSliderHandler,
   filtersSaveHandler,
   setIsModalVisible,
+	closeFilter,
 }) => {
   const checkboxHandler = (title, item) => {
     return params
@@ -22,12 +23,16 @@ const MarketplaceFilters = ({
 
   return (
     <div className={styles.filters}>
-      <button className={styles.button} onClick={() => setIsModalVisible(true)}>
+      <h1 className={styles.title}>Фильтры</h1>
+      <button
+        className={`${styles.button} ${styles.addButton}`}
+        onClick={() => setIsModalVisible(true)}
+      >
         Добавить заказ
       </button>
       {details?.map((detail) => (
         <div className={styles.filter}>
-          <div className={styles.title}>{detail?.title}</div>
+          <div className={styles.miniTitle}>{detail?.title}</div>
           <div>
             {Array.isArray(detail?.items) ? (
               console.log("object")
@@ -58,9 +63,10 @@ const MarketplaceFilters = ({
           </div>
         </div>
       ))}
-      <div className={styles.button} onClick={filtersSaveHandler}>
+      <button className={styles.button} onClick={filtersSaveHandler}>
         Применить
-      </div>
+      </button>
+      <button className={`${styles.button} ${styles.closeButton}`} onClick={closeFilter}>Закрыть</button>
     </div>
   )
 }

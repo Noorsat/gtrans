@@ -1,11 +1,21 @@
 .order {
-  min-width: 400px;
+	--horizontal-gap: 20px;
+  --vertical-gap: 16px;
+  --main-color2: #fff;
+  --main-color: #f0f0f0;
+  --main-color-hover: #e7e7e7;
+  --accent-color: #ffad32;
+  --accent-color-hover: #ffbe5e;
+  --accent-color2: #333333;
+
+  min-width: 280px;
+	max-width: 600px;
   background: #f0f0f0;
-  padding: 15px 2%;
+  padding: var(--vertical-gap) var(--horizontal-gap);
   border-radius: 8px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: var(--vertical-gap);
   color: #333333;
   font-weight: 500;
 }
@@ -41,7 +51,6 @@
   border: 2px solid #ffad32;
   border-radius: 4px;
   padding: 5px 10px;
-  /* background: #ffad327f; */
 }
 
 .order__offerPrice {

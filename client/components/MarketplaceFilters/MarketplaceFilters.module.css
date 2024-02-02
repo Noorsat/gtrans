@@ -1,15 +1,40 @@
 .filters {
+  --horizontal-gap: 20px;
+  --vertical-gap: 16px;
+  --border-radius: 8px;
+  --button-border-radius: 20px;
+  --one-item-height: 40px;
+  --main-color: #f0f0f0;
+  --main-color-darker: #e4e4e4;
+  --main-color-hover: #e7e7e7;
   --accent-color: #ffad32;
   --accent-color-hover: #ffbe5e;
   --accent-color2: #333333;
+  --addButton-bg: #fefefe;
 
-  margin-top: 32px;
   color: var(--accent-color2);
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  gap: var(--vertical-gap);
+  height: 100%;
 }
 
 .title {
-  font-weight: 700;
-  font-size: 18px;
+  font-weight: 600;
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.filter {
+  text-align: start;
+  padding: 0;
+  margin: 0;
+}
+
+.miniTitle {
+  font-size: 1rem;
+  font-weight: 600;
 }
 
 .item {
@@ -19,33 +44,45 @@
   cursor: pointer;
 }
 
-.filter {
-  margin-bottom: 16px;
-}
-
-.slider {
-  margin-right: 24px;
-}
-
 .button {
   position: relative;
-  left: 45%;
-  transform: translateX(-50%);
-  width: 80%;
-  /* color: #000; */
   text-align: center;
-  font-size: 14px;
   font-weight: 500;
-  border-radius: 20px;
+  border-radius: var(--button-border-radius);
   background: var(--accent-color);
   font-weight: 700;
   padding: 8px 0;
   cursor: pointer;
-  /* margin-right: 24px; */
-  min-width: 150px;
   border: none;
-  margin-bottom: 16px;
 }
 .button:hover {
   background: var(--accent-color-hover);
+}
+
+.addButton {
+  background: #ffcf72;
+}
+.addButton:hover {
+  background: var(--accent-color-hover);
+}
+
+.closeButton {
+  position: relative;
+  margin-top: auto;
+  background: var(--main-color-darker);
+}
+.closeButton:hover {
+  background: var(--main-color);
+}
+
+@media only screen and (max-width: 600px) {
+	.addButton{
+		display: none;
+	}
+}
+
+@media only screen and (min-width: 601px) and (max-width: 869px) {
+	.addButton{
+		display: none;
+	}
 }
