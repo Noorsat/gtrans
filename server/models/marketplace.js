@@ -9,11 +9,7 @@ const marketplaceSchema = mongoose.Schema({
     to: {
         type: String,
         required: true
-    },
-    type: {
-        type: String,
-        required: true
-    },
+    },  
     length: {
         type: Number,
         required: true
@@ -49,7 +45,15 @@ const marketplaceSchema = mongoose.Schema({
     userId: {
         type: ObjectId,
         required: true
-    }
+    },
+    productTypeId: {
+        type: ObjectId,
+        required: true 
+    },
+    deliveryTypeId: [{
+        type: ObjectId,
+        required: false
+    }]
 }, { timestamps: true })
 
 const Request = mongoose.model("MarketplaceSchema", marketplaceSchema)
