@@ -9,12 +9,9 @@ const offerService = ({
   user,
   currency,
   openNotification,
+  deliveryTypes,
 }) => {
   const [selectedTypeIndex, setSelectedTypeIndex] = useState(null)
-  const [typeOfDeliveries, setTypeOfDeliveries] = useState([
-    "Авто (10-15 дней)",
-    "Ж/Д (25-35 дней)",
-  ])
   const [orderId, setOrderId] = useState(null)
   const [isWarning, setIsWarning] = useState(false)
 
@@ -30,7 +27,7 @@ const offerService = ({
   }, [getCurrentId])
 
   useEffect(() => {
-    setTypeOfDelivery(typeOfDeliveries[selectedTypeIndex])
+    setTypeOfDelivery(deliveryTypes[selectedTypeIndex]?._id)
   }, [selectedTypeIndex])
 
   useEffect(() => {
@@ -64,7 +61,6 @@ const offerService = ({
       openNotification("error", "Заполните все поля")
       return
     }
-
     const data = {
       orderId,
       typeOfDelivery,
@@ -74,6 +70,7 @@ const offerService = ({
     }
 
     if (user) {
+      b
       createMarketplaceRequest(data, user?.token)
         .then((res) => {
           onCancel()
@@ -89,31 +86,34 @@ const offerService = ({
     <div className={styles.modal}>
       <form ref={refMyForm} className={styles.form}>
         <div className={styles.form__header}>
-          <h2 className={styles.form__title}>Предложить</h2>
+          <h2 className={styles.form__title}>Откликнуться</h2>
           <span onClick={() => onCancel()}>X</span>
         </div>
-        <div className={styles.form__typeContainer}>
-          {typeOfDeliveries &&
-            typeOfDeliveries.map((el, index) => {
+        <div className={styles.form__deliveryContainer}>
+          <p>Выберите тип доставки</p>
+          <div className={styles.form__deliveries}>
+            {deliveryTypes?.map((item, index) => {
               return (
                 <label
-                  className={`${styles.form__label} ${
+                  className={`${styles.form__delivery} ${
                     selectedTypeIndex === index ? styles.checked : ""
                   } ${isWarning && !typeOfDelivery ? styles.error : ""}`}
-                  key={index}
-                  htmlFor={`offerModalFormType${index}`}
+                  key={item._id}
+                  htmlFor={item._id}
                 >
                   <input
-                    id={`offerModalFormType${index}`}
+                    id={item._id}
                     type="radio"
                     name="deliveryType"
                     checked={selectedTypeIndex === index}
                     onChange={() => handleTypeChange(index)}
                   />
-                  <span>{el}</span>
+                  <span>{item.type}</span>
+                  <span>{` (${item.minDays}-${item.maxDays} дней)`}</span>
                 </label>
               )
             })}
+          </div>
         </div>
         <div className={styles.form__properties}>
           <div className={styles.form__property}>
@@ -199,7 +199,7 @@ const offerService = ({
             sendOffer()
           }}
         >
-          Предложить
+          Откликнуться
         </button>
       </form>
     </div>

@@ -11,7 +11,7 @@ const AddNewMarketOrderModal = ({
   storeHousesFromArray,
   storeHouseToArray,
   productTypes,
-  preferredDeliveryTypesArray,
+  deliveryTypes,
   user,
   openNotification,
 }) => {
@@ -23,7 +23,7 @@ const AddNewMarketOrderModal = ({
   ]
   const [loading, setLoading] = useState()
 
-  const [productType, setProductType] = useState()
+  const [productTypeId, setProductTypeId] = useState()
   const [selectedDeliveryTypes, setSelectedDeliveryTypes] = useState([])
   const [properties, setProperties] = useState({
     length: 0,
@@ -94,7 +94,7 @@ const AddNewMarketOrderModal = ({
 
   const onAdd = () => {
     if (
-      !productType ||
+      !productTypeId ||
       !properties.length ||
       !properties.width ||
       !properties.height ||
@@ -102,7 +102,7 @@ const AddNewMarketOrderModal = ({
       !count ||
       !volume ||
       !totalVolume ||
-      !totalWeight > 50 ||
+      !totalWeight ||
       !storeHouse.from ||
       !storeHouse.to ||
       selectedDeliveryTypes.length <= 0
@@ -110,12 +110,13 @@ const AddNewMarketOrderModal = ({
       openNotification("error", "Заполните все поля")
       return
     }
-    if (totalWeight < 50) {
-      openNotification("warning", "Общий вес меньше 50кг")
+    if (totalWeight < 51) {
+      openNotification("warning", "Общий вес меньше 51кг")
       return
     }
     const data = {
-      type: productType,
+      productTypeId,
+      deliveryTypeId: selectedDeliveryTypes,
       length: properties.length,
       width: properties.width,
       height: properties.height,
@@ -126,10 +127,7 @@ const AddNewMarketOrderModal = ({
       totalWeight,
       from: storeHouse.from,
       to: storeHouse.to,
-      selectedDeliveryTypes,
     }
-
-    // return
 
     if (user) {
       setLoading(true)
@@ -142,6 +140,10 @@ const AddNewMarketOrderModal = ({
         })
         .catch((res) => {
           console.error(res)
+          openNotification(
+            "error",
+            `Ошибка при создании нового заказа: ${error}`
+          )
         })
     }
   }
@@ -163,334 +165,342 @@ const AddNewMarketOrderModal = ({
           <Spin size="large" />
         </div>
       )}
-      <form ref={refMyForm} className={styles.form}>
-        <div className={styles.header}>
-          <h1 className={`${styles.header__title} ${styles.h1}`}>
-            Добавить заказ
-          </h1>
-          <span className={styles.header__closeModal} onClick={onCancel}>
-            X
-          </span>
-        </div>
+      <div className={styles.modal__item}>
+        <form ref={refMyForm} className={styles.form}>
+          <div className={styles.header}>
+            <h1 className={`${styles.header__title} ${styles.h1}`}>
+              Добавить заказ
+            </h1>
+            <span className={styles.header__closeModal} onClick={onCancel}>
+              X
+            </span>
+          </div>
 
-        <Select
-          placeholder="Выберите тип продукта"
-          className={styles.search}
-          options={productTypes.map((option) => ({
-            value: option,
-            label: option,
-          }))}
-          onChange={(el) => setProductType(el.value)}
-          styles={{
-            control: (baseStyles, state) => ({
-              ...baseStyles,
-              background: color,
-              borderWidth: "2px",
-              borderColor:
-                check && !productType
-                  ? errorColor
-                  : state.isFocused
-                  ? accentColor
-                  : color,
-              cursor: "pointer",
-              height: "100%",
-              "&:hover": {
-                borderColor: accentColor,
+          <Select
+            placeholder="Выберите тип продукта"
+            className={styles.search}
+            options={productTypes.map((option) => ({
+              value: option._id,
+              label: option.type,
+            }))}
+            onChange={(el) => setProductTypeId(el.value)}
+            styles={{
+              control: (baseStyles, state) => ({
+                ...baseStyles,
+                background: color,
+                borderWidth: "2px",
+                borderColor:
+                  check && !productTypeId
+                    ? errorColor
+                    : state.isFocused
+                    ? accentColor
+                    : color,
+                cursor: "pointer",
+                height: "100%",
+                "&:hover": {
+                  borderColor: accentColor,
+                },
+              }),
+              option: (baseStyles, state) => ({
+                ...baseStyles,
+                cursor: "pointer",
+              }),
+            }}
+            theme={(theme) => ({
+              ...theme,
+              borderRadius: "8px",
+              borderColor: color,
+              colors: {
+                ...theme.colors,
+                primary25: color,
+                primary: accentColor,
               },
-            }),
-            option: (baseStyles, state) => ({
-              ...baseStyles,
-              cursor: "pointer",
-            }),
-          }}
-          theme={(theme) => ({
-            ...theme,
-            borderRadius: "8px",
-            borderColor: color,
-            colors: {
-              ...theme.colors,
-              primary25: color,
-              primary: accentColor,
-            },
-          })}
-        />
-
-        <div className={styles.prefer}>
-          <h2 className={styles.h2}>Выберите желаемые типы доставок</h2>
-          <ul className={styles.prefer__container}>
-            {preferredDeliveryTypesArray.map((deliveryType) => {
-              const isSelected = selectedDeliveryTypes.includes(deliveryType)
-
-              return (
-                <li
-                  key={deliveryType}
-                  className={`${styles.prefer__item} ${
-                    isSelected ? styles.selected : ""
-                  } ${
-                    check && selectedDeliveryTypes.length === 0
-                      ? styles.error
-                      : ""
-                  }`}
-                  onClick={() => {
-                    toggleDeliveryType(deliveryType)
-                  }}
-                >
-                  {deliveryType}
-                </li>
-              )
             })}
-          </ul>
-        </div>
+          />
 
-        <div className={styles.miniTitle}>
-          <h2 className={styles.h2}>Параметры одного места</h2>
-          <div className={styles.miniTitle__hintContainer}>
-            <div className={styles.miniTitle__iconContainer}></div>
-            <p className={styles.miniTitle__hint}>
-              Укажите габариты и вес одного места (груза). Если груз однотипный,
-              укажите его количество ниже.
-            </p>
-            <FaQuestionCircle className={styles.miniTitle__icon} />
+          <div className={styles.prefer}>
+            <h2 className={styles.h2}>Выберите желаемые типы доставок</h2>
+            <ul className={styles.prefer__container}>
+              {deliveryTypes.map((type) => {
+                const isSelected = selectedDeliveryTypes.includes(type?._id)
+                return (
+                  <li
+                    key={type?._id}
+                    className={`${styles.prefer__item} ${
+                      isSelected ? styles.selected : ""
+                    } ${
+                      check && selectedDeliveryTypes.length === 0
+                        ? styles.error
+                        : ""
+                    }`}
+                    onClick={() => {
+                      toggleDeliveryType(type?._id)
+                    }}
+                  >
+                    <span>{type?.type}</span>
+                    <span>{`(${type?.minDays}-${type?.maxDays} дней)`}</span>
+                  </li>
+                )
+              })}
+            </ul>
           </div>
-        </div>
 
-        <div className={styles.properties}>
-          <div className={`${styles.properties__length} ${styles.property}`}>
-            <p className={styles.p}>Длина</p>
-            <input
-              value={properties.length !== 0 ? properties.length : ""}
-              className={check && !properties.length ? styles.error : ""}
-              placeholder="см"
-              onChange={(el) => {
-                const inputValue = el.target.value
-                if (/^\d*$/.test(inputValue)) {
-                  const numericNumber = parseInt(inputValue, 10)
-                  if (!isNaN(numericNumber))
-                    handleInputChange("length", numericNumber)
-                  else handleInputChange("length", 0)
-                }
-              }}
-            />
+          <div className={styles.miniTitle}>
+            <h2 className={styles.h2}>Параметры одного места</h2>
+            <div className={styles.miniTitle__hintContainer}>
+              <div className={styles.miniTitle__iconContainer}></div>
+              <p className={styles.miniTitle__hint}>
+                Укажите габариты и вес одного места (груза). Если груз
+                однотипный, укажите его количество ниже.
+              </p>
+              <FaQuestionCircle className={styles.miniTitle__icon} />
+            </div>
           </div>
-          <div className={`${styles.properties__width} ${styles.property}`}>
-            <p className={styles.p}>Ширина</p>
-            <input
-              value={properties.width !== 0 ? properties.width : ""}
-              className={check && !properties.length ? styles.error : ""}
-              placeholder="см"
-              onChange={(el) => {
-                const inputValue = el.target.value
-                if (/^\d*$/.test(inputValue)) {
-                  const numericNumber = parseInt(inputValue, 10)
-                  if (!isNaN(numericNumber))
-                    handleInputChange("width", numericNumber)
-                  else handleInputChange("width", 0)
-                }
-              }}
-            />
-          </div>
-          <div className={`${styles.properties__height} ${styles.property}`}>
-            <p className={styles.p}>Высота</p>
-            <input
-              value={properties.height !== 0 ? properties.height : ""}
-              className={check && !properties.height ? styles.error : ""}
-              placeholder="см"
-              onChange={(el) => {
-                const inputValue = el.target.value
-                if (/^\d*$/.test(inputValue)) {
-                  const numericNumber = parseInt(inputValue, 10)
-                  if (!isNaN(numericNumber))
-                    handleInputChange("height", numericNumber)
-                  else handleInputChange("height", 0)
-                }
-              }}
-            />
-          </div>
-          <div className={`${styles.properties__weight} ${styles.property}`}>
-            <p className={styles.p}>Вес</p>
-            <input
-              value={properties.weight !== 0 ? properties.weight : ""}
-              className={check && !properties.weight ? styles.error : ""}
-              placeholder="кг"
-              onChange={(el) => {
-                const inputValue = el.target.value
-                if (/^\d*$/.test(inputValue)) {
-                  const numericNumber = parseInt(inputValue, 10)
-                  if (!isNaN(numericNumber))
-                    handleInputChange("weight", numericNumber)
-                  else handleInputChange("weight", 0)
-                }
-              }}
-            />
-          </div>
-        </div>
 
-        <div className={styles.volume}>
-          <h4 className={styles.h4}>
-            Объём: <b>{volume} м³</b>
-          </h4>
-        </div>
-
-        <div className={styles.product}>
-          <p className={styles.p}>Количество</p>
-          <div className={styles.product__countContainer}>
-            <div className={styles.product__count}>
-              <button
-                className={styles.product__button_decrease}
-                type="button"
-                onClick={() => count > 0 && setCount(count - 1)}
-              >
-                -
-              </button>
+          <div className={styles.properties}>
+            <div className={`${styles.properties__length} ${styles.property}`}>
+              <p className={styles.p}>Длина</p>
               <input
-                value={count !== 0 ? count : ""}
-                className={check && !count ? styles.error : ""}
-                placeholder="0"
+                maxLength={4}
+                value={properties.length !== 0 ? properties.length : ""}
+                className={check && !properties.length ? styles.error : ""}
+                placeholder="см"
                 onChange={(el) => {
-                  const inputValue = parseInt(el.target.value, 10)
-                  if (!isNaN(inputValue)) setCount(inputValue)
-                  else {
-                    setCount(0)
+                  const inputValue = el.target.value
+                  if (/^\d*$/.test(inputValue)) {
+                    const numericNumber = parseInt(inputValue, 10)
+                    if (!isNaN(numericNumber))
+                      handleInputChange("length", numericNumber)
+                    else handleInputChange("length", 0)
                   }
                 }}
               />
-              <button
-                className={styles.product__button_increase}
-                type="button"
-                onClick={() => setCount(count + 1)}
-              >
-                +
-              </button>
             </div>
+            <div className={`${styles.properties__width} ${styles.property}`}>
+              <p className={styles.p}>Ширина</p>
+              <input
+                maxLength={4}
+                value={properties.width !== 0 ? properties.width : ""}
+                className={check && !properties.length ? styles.error : ""}
+                placeholder="см"
+                onChange={(el) => {
+                  const inputValue = el.target.value
+                  if (/^\d*$/.test(inputValue)) {
+                    const numericNumber = parseInt(inputValue, 10)
+                    if (!isNaN(numericNumber))
+                      handleInputChange("width", numericNumber)
+                    else handleInputChange("width", 0)
+                  }
+                }}
+              />
+            </div>
+            <div className={`${styles.properties__height} ${styles.property}`}>
+              <p className={styles.p}>Высота</p>
+              <input
+                maxLength={4}
+                value={properties.height !== 0 ? properties.height : ""}
+                className={check && !properties.height ? styles.error : ""}
+                placeholder="см"
+                onChange={(el) => {
+                  const inputValue = el.target.value
+                  if (/^\d*$/.test(inputValue)) {
+                    const numericNumber = parseInt(inputValue, 10)
+                    if (!isNaN(numericNumber))
+                      handleInputChange("height", numericNumber)
+                    else handleInputChange("height", 0)
+                  }
+                }}
+              />
+            </div>
+            <div className={`${styles.properties__weight} ${styles.property}`}>
+              <p className={styles.p}>Вес</p>
+              <input
+                maxLength={4}
+                value={properties.weight !== 0 ? properties.weight : ""}
+                className={check && !properties.weight ? styles.error : ""}
+                placeholder="кг"
+                onChange={(el) => {
+                  const inputValue = el.target.value
+                  if (/^\d*$/.test(inputValue)) {
+                    const numericNumber = parseInt(inputValue, 10)
+                    if (!isNaN(numericNumber))
+                      handleInputChange("weight", numericNumber)
+                    else handleInputChange("weight", 0)
+                  }
+                }}
+              />
+            </div>
+          </div>
 
+          <div className={styles.volume}>
             <h4 className={styles.h4}>
-              Общий объем: <b>{totalVolume} м³</b>
-            </h4>
-            <h4 className={styles.h4}>
-              Общий вес:{" "}
-              <b className={check && totalWeight < 50 ? styles.textError : ""}>
-                {totalWeight} кг
-              </b>
+              Объём: <b>{volume} м³</b>
             </h4>
           </div>
-        </div>
 
-        <div className={styles.storeHouses}>
-          <div className={styles.storeHouse__fromContainer}>
-            <p className={styles.p}>Выберите склад</p>
-            <Select
-              className={styles.storeHouse}
-              placeholder="откуда"
-              options={storeHousesFromArray.map((option) => ({
-                value: option,
-                label: option,
-              }))}
-              onChange={(el) =>
-                setStoreHouse((prev) => ({ ...prev, from: el.value }))
-              }
-              styles={{
-                control: (baseStyles, state) => ({
-                  ...baseStyles,
-                  background: "#f0f0f0",
-                  borderWidth: "2px",
-                  borderColor:
-                    check && !storeHouse.from
-                      ? errorColor
-                      : state.isFocused
-                      ? accentColor
-                      : color,
-                  cursor: "pointer",
-                  height: "100%",
-                  "&:hover": {
-                    borderColor: accentColor,
-                  },
-                }),
-                option: (baseStyles, state) => ({
-                  ...baseStyles,
-                  cursor: "pointer",
-                }),
-              }}
-              theme={(theme) => ({
-                ...theme,
-                borderRadius: "8px",
-                borderColor: color,
-                colors: {
-                  ...theme.colors,
-                  primary25: color,
-                  primary: accentColor,
-                },
-              })}
-            />
+          <div className={styles.product}>
+            <p className={styles.p}>Количество</p>
+            <div className={styles.product__countContainer}>
+              <div className={styles.product__count}>
+                <button
+                  className={styles.product__button_decrease}
+                  type="button"
+                  onClick={() => count > 0 && setCount(count - 1)}
+                >
+                  -
+                </button>
+                <input
+                  value={count !== 0 ? count : ""}
+                  className={check && !count ? styles.error : ""}
+                  placeholder="0"
+                  onChange={(el) => {
+                    const inputValue = parseInt(el.target.value, 10)
+                    if (!isNaN(inputValue)) setCount(inputValue)
+                    else {
+                      setCount(0)
+                    }
+                  }}
+                />
+                <button
+                  className={styles.product__button_increase}
+                  type="button"
+                  onClick={() => setCount(count + 1)}
+                >
+                  +
+                </button>
+              </div>
+
+              <h4 className={styles.h4}>
+                Общий объем: <b>{totalVolume} м³</b>
+              </h4>
+              <h4 className={styles.h4}>
+                Общий вес:{" "}
+                <b
+                  className={check && totalWeight < 50 ? styles.textError : ""}
+                >
+                  {totalWeight} кг
+                </b>
+              </h4>
+            </div>
           </div>
-          <div className={styles.storeHouse__toContainer}>
-            <p className={styles.p}>Выберите склад</p>
-            <Select
-              className={styles.storeHouse}
-              placeholder="куда"
-              options={storeHouseToArray.map((option) => ({
-                value: option,
-                label: option,
-              }))}
-              onChange={(el) =>
-                setStoreHouse((prev) => ({ ...prev, to: el.value }))
-              }
-              styles={{
-                control: (baseStyles, state) => ({
-                  ...baseStyles,
-                  background: "#f0f0f0",
-                  borderWidth: "2px",
-                  borderColor:
-                    check && !storeHouse.to
-                      ? errorColor
-                      : state.isFocused
-                      ? accentColor
-                      : color,
-                  cursor: "pointer",
-                  height: "100%",
-                  "&:hover": {
-                    borderColor: accentColor,
+
+          <div className={styles.storeHouses}>
+            <div className={styles.storeHouse__fromContainer}>
+              <p className={styles.p}>Выберите склад</p>
+              <Select
+                className={styles.storeHouse}
+                placeholder="откуда"
+                options={storeHousesFromArray.map((option) => ({
+                  value: option,
+                  label: option,
+                }))}
+                onChange={(el) =>
+                  setStoreHouse((prev) => ({ ...prev, from: el.value }))
+                }
+                styles={{
+                  control: (baseStyles, state) => ({
+                    ...baseStyles,
+                    background: "#f0f0f0",
+                    borderWidth: "2px",
+                    borderColor:
+                      check && !storeHouse.from
+                        ? errorColor
+                        : state.isFocused
+                        ? accentColor
+                        : color,
+                    cursor: "pointer",
+                    height: "100%",
+                    "&:hover": {
+                      borderColor: accentColor,
+                    },
+                  }),
+                  option: (baseStyles, state) => ({
+                    ...baseStyles,
+                    cursor: "pointer",
+                  }),
+                }}
+                theme={(theme) => ({
+                  ...theme,
+                  borderRadius: "8px",
+                  borderColor: color,
+                  colors: {
+                    ...theme.colors,
+                    primary25: color,
+                    primary: accentColor,
                   },
-                }),
-                option: (baseStyles, state) => ({
-                  ...baseStyles,
-                  cursor: "pointer",
-                }),
-              }}
-              theme={(theme) => ({
-                ...theme,
-                borderRadius: "8px",
-                borderColor: color,
-                colors: {
-                  ...theme.colors,
-                  primary25: color,
-                  primary: accentColor,
-                },
-              })}
-            />
+                })}
+              />
+            </div>
+            <div className={styles.storeHouse__toContainer}>
+              <p className={styles.p}>Выберите склад</p>
+              <Select
+                className={styles.storeHouse}
+                placeholder="куда"
+                options={storeHouseToArray.map((option) => ({
+                  value: option,
+                  label: option,
+                }))}
+                onChange={(el) =>
+                  setStoreHouse((prev) => ({ ...prev, to: el.value }))
+                }
+                styles={{
+                  control: (baseStyles, state) => ({
+                    ...baseStyles,
+                    background: "#f0f0f0",
+                    borderWidth: "2px",
+                    borderColor:
+                      check && !storeHouse.to
+                        ? errorColor
+                        : state.isFocused
+                        ? accentColor
+                        : color,
+                    cursor: "pointer",
+                    height: "100%",
+                    "&:hover": {
+                      borderColor: accentColor,
+                    },
+                  }),
+                  option: (baseStyles, state) => ({
+                    ...baseStyles,
+                    cursor: "pointer",
+                  }),
+                }}
+                theme={(theme) => ({
+                  ...theme,
+                  borderRadius: "8px",
+                  borderColor: color,
+                  colors: {
+                    ...theme.colors,
+                    primary25: color,
+                    primary: accentColor,
+                  },
+                })}
+              />
+            </div>
           </div>
-        </div>
 
-        <button
-          type="button"
-          className={`${styles.closeButton} ${styles.button}`}
-          onClick={() => {
-            onCancel()
-          }}
-        >
-          Отменить
-        </button>
+          <button
+            type="button"
+            className={`${styles.closeButton} ${styles.button}`}
+            onClick={() => {
+              onCancel()
+            }}
+          >
+            Отменить
+          </button>
 
-        <button
-          type="button"
-          className={`${styles.addButton} ${styles.button}`}
-          onClick={() => {
-            setCheck(true)
-            onAdd()
-          }}
-        >
-          Добавить новый заказ
-        </button>
-      </form>
+          <button
+            type="button"
+            className={`${styles.addButton} ${styles.button}`}
+            onClick={() => {
+              setCheck(true)
+              onAdd()
+            }}
+          >
+            Добавить новый заказ
+          </button>
+        </form>
+      </div>
     </div>
   )
 }
