@@ -59,7 +59,7 @@ const MarketplaceOrder = ({
         </div>
       </div>
       <div className={`${styles.order__deliveryContainer}`}>
-        <h3>Предпочитаемы типы доставок</h3>
+        <h3>Предпочитаемые типы доставок</h3>
         <div className={styles.order__deliveries}>
           {delivery?.map((item) => (
             <div
@@ -76,7 +76,7 @@ const MarketplaceOrder = ({
           offerModalVisible()
         }}
       >
-        Откликнуться
+        Предложить
       </button>
     </div>
   )

@@ -86,7 +86,7 @@ const offerService = ({
     <div className={styles.modal}>
       <form ref={refMyForm} className={styles.form}>
         <div className={styles.form__header}>
-          <h2 className={styles.form__title}>Откликнуться</h2>
+          <h2 className={styles.form__title}>Предложить</h2>
           <span onClick={() => onCancel()}>X</span>
         </div>
         <div className={styles.form__deliveryContainer}>
