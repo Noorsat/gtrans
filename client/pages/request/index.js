@@ -149,7 +149,7 @@ const Request = ({order, setOrder}) => {
          switch: false
         } 
        ])
-      router.push("/my-orders")
+      router.push("/my-orders?mode=calculator")
      }
 
     
