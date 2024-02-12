@@ -1,13 +1,13 @@
-import React from "react"
-import "bootstrap/dist/css/bootstrap.min.css"
-import "antd/dist/antd.css"
-import Link from "next/link"
-import styles from "./../styles/Layout.module.css"
-import { ConfigProvider, Menu } from "antd"
-import { useRouter } from "next/router"
+import React from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "antd/dist/antd.css";
+import Link from "next/link";
+import styles from "./../styles/Layout.module.css";
+import { ConfigProvider, Menu } from "antd";
+import { useRouter } from "next/router";
 
 const Header = ({ user, openDrawer, closeDrawer, drawer }) => {
-  const router = useRouter()
+  const router = useRouter();
 
   const menu = [
     {
@@ -46,7 +46,7 @@ const Header = ({ user, openDrawer, closeDrawer, drawer }) => {
     //   label:"Dashboard",
     //   key:"dashboard"
     // } : {}
-  ]
+  ];
 
   const onClick = (e) => {
     router.push("/" + e.key)
@@ -91,26 +91,21 @@ const Header = ({ user, openDrawer, closeDrawer, drawer }) => {
               <img src="/./logo.svg" width={80} />
             </div>
             <div className="d-flex align-items-center">
-              {!drawer && (
-                <div
-                  className={styles.buttons}
-                  style={{ paddingTop: user && 6 }}
-                >
-                  <div className={styles.account__link}>
-                    {user ? (
-                      <Link href="/account">Личный кабинет</Link>
-                    ) : (
-                      <Link href="/login">Войти в личный кабинет</Link>
-                    )}
-                  </div>
-                  {!user && (
-                    <div className={styles.register__link_mobile}>
-                      <Link href="/register">Зарегистрироваться</Link>
-                    </div>
-                  )}
-                </div>
-              )}
-
+              {/* {
+            !drawer && <div className={styles.buttons} style={{paddingTop: user && 6}}>
+            <div className={styles.account__link}>
+              {
+                user ? 
+                <Link href="/account">Личный кабинет</Link> 
+                :
+                <Link href="/login">Войти в личный кабинет</Link> 
+              }
+            </div>
+              {
+                  !user && <div className={styles.register__link_mobile}><Link href="/register">Зарегистрироваться</Link></div>
+                }
+          </div> 
+          } */}
               <div
                 style={{ marginRight: 6, position: "relative" }}
                 onClick={drawer ? closeDrawer : openDrawer}
@@ -121,23 +116,24 @@ const Header = ({ user, openDrawer, closeDrawer, drawer }) => {
           </div>
         </div>
       </div>
-
       {!drawer && (
         <div
-          className={`d-flex justify-content-center d-md-none border-bottom ${styles.mobile__items}`}
+          className={`d-flex justify-content-center d-md-none border-bottom`}
         >
-          <div className={styles.mobile__links}>
-            <Link href="/marketplace">Биржа</Link>
-          </div>
-          <div className={styles.mobile__links}>
-            <Link href="/request">Калькулятор</Link>
-          </div>
-          <div className={styles.mobile__links}>
-            <Link href="/my-orders">Мои заказы</Link>
-          </div>
-          <div className={styles.mobile__links}>
-            <Link href="/tracking">Трекинг</Link>
-          </div>
+          {/* <div className={styles.mobile__links}>
+              <Link href="/marketplace">Биржа</Link>
+            </div>
+            <div className={styles.mobile__links}>
+              <Link href="/request">Калькулятор</Link>
+            </div>
+            <div className={styles.mobile__links}>
+              <Link href="/my-orders">Мои заказы</Link>
+            </div>
+            <div className={styles.mobile__links}>
+              <Link href="/tracking">Трекинг</Link>
+            </div> */}
+          <Menu items={menu} mode="horizontal" onClick={onClick} />
+
         </div>
       )}
       <div
@@ -174,6 +170,7 @@ const Header = ({ user, openDrawer, closeDrawer, drawer }) => {
         </div>
       </div>
     </div>
-  )
-}
-export default Header
+  );
+};
+export default Header;
+

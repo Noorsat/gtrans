@@ -59,10 +59,10 @@ const OrderDetails = ({ details }) => {
             <div className={styles.request__items}>
                 <div className={styles.request__item}>
                     <div className={styles.request__item_title}>
-                        Общий Объем (м3)
+                        Общий Объем 
                     </div>
                     <div className={styles.request__item_value}>
-                        {details.volume}
+                        {details.volume} (м3)
                     </div>
                 </div>
                 <div className={styles.request__item}>
@@ -89,9 +89,9 @@ const OrderDetails = ({ details }) => {
                     </div>
                     <div className={styles.request__item_value}>
                         {details.trackCode ? details.trackCode :
-                         <Button type='primary' className='mt-3'>
+                         <button className={styles.request__button}>
                             Добавить треккод   
-                         </Button>
+                         </button>
                         }
                     </div>
                 </div>

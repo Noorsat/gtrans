@@ -36,24 +36,27 @@ const MyOrders = ( ) => {
       setIsLoading(true);
       const user = JSON.parse(localStorage.getItem("user"))
       if (user){
-          var decoded = jwt_decode(user?.token);
           if (mode == "marketplace"){
             getMarketplaceMyOrders(user?.token).then((res) => {
               setOrders(res.data.data)
+            }).catch((error)=>{
+              console.error(error);
             })
-          }else{
+
+            getMarketplaceRequestsByUserId(user?.token).then((res)=>{
+              setMyRequests(res.data.data)
+              setIsLoading(false);
+            }).catch((res)=>{
+              console.error(res);
+            })
+          }else if(mode == "calculator"){
             getMyOrders(user?.token).then((res) => {
               setOrders(res.data.data)
+              setIsLoading(false);
+            }).catch((error) => {
+              console.error(error);
             })
           }
-          
-          decoded && setUser(decoded);
-          getMarketplaceRequestsByUserId(user?.token).then((res)=>{
-            setMyRequests(res.data.data)
-            setIsLoading(false);
-          }).catch((res)=>{
-            console.error(res);
-          })
       }else{
           router.push("/login")
       }
@@ -416,7 +419,7 @@ const myRequestsColumn = [
                 <div className={styles.my__orders_items}>
                   {
                     orders?.map(item => (
-                      <div className={styles.my__orders_item} onClick={() => openOrderDetail(item?._id)}>
+                      <div key={item?._id} className={styles.my__orders_item} onClick={() => openOrderDetail(item?._id)}>
                       <div className={styles.my__orders_item_title}>
                         {item.type}
                       </div>

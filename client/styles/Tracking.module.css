@@ -166,3 +166,10 @@
         margin:0 auto;
     }
 }
+@media (max-width:557px){
+    .tracking__left{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+}
