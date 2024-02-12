@@ -49,8 +49,8 @@ const Header = ({ user, openDrawer, closeDrawer, drawer }) => {
   ];
 
   const onClick = (e) => {
-    router.push("/" + e.key);
-  };
+    router.push("/" + e.key)
+  }
 
   return (
     <div className="layout">
@@ -106,7 +106,6 @@ const Header = ({ user, openDrawer, closeDrawer, drawer }) => {
                 }
           </div> 
           } */}
-
               <div
                 style={{ marginRight: 6, position: "relative" }}
                 onClick={drawer ? closeDrawer : openDrawer}
@@ -134,6 +133,7 @@ const Header = ({ user, openDrawer, closeDrawer, drawer }) => {
               <Link href="/tracking">Трекинг</Link>
             </div> */}
           <Menu items={menu} mode="horizontal" onClick={onClick} />
+
         </div>
       )}
       <div
@@ -173,3 +173,4 @@ const Header = ({ user, openDrawer, closeDrawer, drawer }) => {
   );
 };
 export default Header;
+

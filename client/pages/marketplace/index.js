@@ -1,190 +1,193 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import axios from "axios"
-import { Spin } from "antd"
+import { Spin, notification } from "antd"
 import styles from "./Marketplace.module.css"
-import { getMarketplaceOrders } from "./../../http/marketplace"
-import { getDetails } from "./../../http/orders"
+import {
+  getMarketplaceOrders,
+  getCurrency,
+  getMarketplaceDetails,
+} from "./../../http/marketplace"
 import MarketplaceOrder from "../../components/MarketplaceOrder/MarketplaceOrder"
 import MarketplaceFilters from "../../components/MarketplaceFilters/MarketplaceFilters"
 import AddNewMarketOrderModal from "../../components/Modals/AddNewMarketOrderModal/AddNewMarketOrderModal"
 import OfferServiceModal from "../../components/Modals/OfferServiceModal/OfferServiceModal"
-import Order from "../../components/Order/Order"
 import jwt_decode from "jwt-decode"
-import { createMarketplaceRequest } from '../../http/marketplace'
+import { createMarketplaceRequest } from "../../http/marketplace"
+import { IoEllipsisHorizontalSharp, IoClose, IoFilter } from "react-icons/io5"
 
 const Marketplace = () => {
-  const [orders, setOrders] = useState()
-  const [details, setDetails] = useState()
+  const [user, setUser] = useState(null)
+  const [marketplaceOrders, setMarketplaceOrders] = useState()
   const [isLoading, setIsLoading] = useState(false)
   const [isAddOrderModalVisible, setIsAddOrderModalVisible] = useState(false)
   const [isOfferModalVisible, setIsOfferModalVisible] = useState(false)
+  const [isFilterMenuVisible, setIsFilterMenuVisible] = useState(false)
+  const [isBurgerMenuVisible, setIsBurgerMenuVisible] = useState(false)
   const [currentMarketplaceOrderId, setCurrentMarketplaceOrderId] =
     useState(null)
-  const [params, setParams] = useState([
-    {
-      title: "Вес",
-      name: "weight",
-      min: 0,
-      max: 0,
-    },
-    {
-      title: "Объем",
-      name: "volume",
-      min: 0,
-      max: 0,
-    },
+  const [details, setDetails] = useState()
+  const [storeHousesFromArray, setStoreHousesFromArray] = useState([
+    "Beijing",
+    "Shanghai",
   ])
-    // useEffect(() => {
-  //   console.log(currentMarketplaceOrderId)
-  // }, [currentMarketplaceOrderId])
+  const [storeHouseToArray, setStoreHouseToArray] = useState([
+    "Almaty",
+    "Astana",
+  ])
+  const [currency, setCurrency] = useState([])
+
+  const burgerMenuRef = useRef(null)
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        burgerMenuRef.current &&
+        !burgerMenuRef.current.contains(event.target)
+      ) {
+        setIsBurgerMenuVisible(false)
+      }
+    }
+    document.addEventListener("click", handleClickOutside)
+    return () => {
+      document.removeEventListener("click", handleClickOutside)
+    }
+  }, [])
+
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem("user"))
+    if (storedUser) {
+      setUser(storedUser)
+    }
+  }, [])
 
   useEffect(() => {
     setIsLoading(true)
     axios
       .all([
-        // getOrders().then((res) => {
-        //   setOrders(res.data)
-        // }),
-        getDetails().then((res) => {
-          setDetails(() => {
-            const data = res.data.filter(
-              (e) => e.title !== "Название груза" && e.title !== "Тип доставки"
-            )
-            return data
+        getMarketplaceDetails()
+          .then((res) => {
+            const data = res.data
+            setDetails(data)
           })
-          setParams(
-            params.map((param) => {
-              if (param?.title === "Вес" || param?.title === "Объем") {
-                param.min = res.data?.filter(
-                  (item) => item.title === param?.title
-                )[0]?.items?.min
-                param.max = res.data?.filter(
-                  (item) => item.title === param?.title
-                )[0]?.items?.max
-              }
-              return param
-            })
-          )
-        }),
+          .catch((error) => {
+            openNotification(
+              "error",
+              `Ошибка при загрузке деталей: ${error.message}`
+            )
+          }),
+        getCurrency()
+          .then((res) => {
+            setCurrency(res.data.data)
+          })
+          .catch((error) => {
+            openNotification(
+              "error",
+              `Ошибка при загрузке валют: ${error.message}`
+            )
+          }),
       ])
       .then(
         axios.spread((data1, data2) => {
           setIsLoading(false)
         })
       )
+      .catch((error) => {
+        setIsLoading(false)
+        openNotification(
+          "error",
+          `Ошибка при выполнении запросов: ${error.message}`
+        )
+      })
   }, [])
-
-  const user =
-    (typeof window !== "undefined" &&
-      JSON.parse(localStorage.getItem("user"))) ||
-    null
 
   useEffect(() => {
     if (user) {
       setIsLoading(true)
-
-      getMarketplaceOrders(user.token)
+      getMarketplaceOrders()
         .then((res) => {
-          setOrders(res.data.data)
+          setMarketplaceOrders(res.data.data)
           setIsLoading(false)
         })
         .catch((error) => {
-          console.error("Ошибка при получении данных о заказах:", error)
+          openNotification(
+            "error",
+            `Ошибка при получении данных о заказах: ${error}`
+          )
           setIsLoading(false)
         })
     }
   }, [user?.token])
 
-  const paramsSelectHandler = (title, item) => {
-    setParams(
-      params.map((param) => {
-        if (title === param.title) {
-          if (param?.items?.includes(item)) {
-            param.items = param.items.filter((i) => i !== item)
-          } else {
-            param.items = [...param.items, item]
-          }
-        }
-        return param
+  const getFilteredOrders = (route) => {
+		setIsLoading(true)
+    getMarketplaceOrders(route)
+      .then((res) => {
+        setMarketplaceOrders(res.data.data)
+        setIsLoading(false)
       })
-    )
-  }
-
-  const paramsSliderHandler = (title, value) => {
-    setParams(
-      params.map((param) => {
-        if (param.title === title) {
-          param.min = value[0]
-          param.max = value[1]
-        }
-        return param
+      .catch((error) => {
+        openNotification(
+          "error",
+          `Ошибка при получении данных о заказах: ${error}`
+        )
+        setIsLoading(false)
       })
-    )
-  }
-
-  const filtersSaveHandler = () => {
-    setIsLoading(true)
-
-    let route = "?"
-
-    params &&
-      params.map((param) => {
-        if (param.name === "type" || param.name === "deliveryType") {
-          let link = param.name + "="
-          if (param.items.length > 0) {
-            param.items.map((item, index) => {
-              link += item + (index !== param.items.length - 1 ? "," : "")
-            })
-          }
-          route += link + "&"
-        } else if (param.name === "weight") {
-          const weight = params.filter((param) => param.name === "weight")[0]
-          route += `minWeight=${weight?.min}&maxWeight=${weight?.max}&`
-        } else if (param.name === "volume") {
-          const volume = params.filter((param) => param.name === "volume")[0]
-          route += `minVolume=${volume?.min}&maxVolume=${volume?.max}`
-        }
-      })
-
-    // getOrders(route).then((res) => {
-    //   setOrders(res.data)
-    //   setIsLoading(false)
-    // })
   }
 
   const getCurrentId = () => {
     return currentMarketplaceOrderId
   }
 
+  const toggleFilterMenu = () => {
+    setIsFilterMenuVisible(!isFilterMenuVisible)
+  }
+  const toggleBurgerMenu = () => {
+    setIsBurgerMenuVisible(!isBurgerMenuVisible)
+  }
+
   const updateMarketplaceOrders = (token) => {
-    getMarketplaceOrders(token)
+    setIsLoading(true)
+    getMarketplaceOrders()
       .then((res) => {
-        setOrders(res.data.data)
+        setMarketplaceOrders(res.data.data)
         setIsLoading(false)
       })
       .catch((error) => {
-        console.error("Ошибка при получении данных о заказах:", error)
+        openNotification(
+          "error",
+          `Ошибка при получении данных о заказах ${error}`
+        )
         setIsLoading(false)
       })
   }
 
-  const handleCreateRequest = (newData) =>{
-    const user = JSON.parse(localStorage.getItem('user') || null)
-    if(user){
+  const handleCreateRequest = (newData) => {
+    if (user) {
       var decoded = user && jwt_decode(user?.token)
       decoded && setUser(decoded)
-      createMarketplaceRequest(newData,user?.token).then((res)=>{
-          if(res?.status === 201){
+      createMarketplaceRequest(newData, user?.token)
+        .then((res) => {
+          if (res?.status === 201) {
             setIsModalVisible(false)
           }
-      }).catch((res)=>{
-        if (res.response.status === 404){
-          notification["error"]({
-              message:res.response.data.message
-          })
-      }
-      })
+        })
+        .catch((res) => {
+          if (res.response.status === 404) {
+            openNotification("error", res.response.data.message)
+          }
+        })
     }
+  }
+
+  const openNotification = (type = "error", info = "") => {
+    notification.config({
+      duration: 1,
+      closeIcon: true,
+    })
+
+    notification[type]({
+      message: info,
+    })
   }
 
   return (
@@ -201,30 +204,84 @@ const Marketplace = () => {
             updateMarketplaceOrders(token)
           }}
           onCancel={() => setIsAddOrderModalVisible(false)}
+          openNotification={openNotification}
+          storeHouseToArray={storeHouseToArray}
+          storeHousesFromArray={storeHousesFromArray}
+          productTypes={
+            details?.filter((item) => item.title === "Тип груза")[0]?.items
+          }
+          deliveryTypes={
+            details?.filter((item) => item.title === "Тип доставки")[0]?.items
+          }
+          user={user}
         />
       )}
       {isOfferModalVisible && (
         <OfferServiceModal
           getCurrentId={() => getCurrentId()}
           onCancel={() => setIsOfferModalVisible(false)}
+          openNotification={openNotification}
+          user={user}
+          currency={currency}
+          deliveryTypes={
+            details?.filter((item) => item.title === "Тип доставки")[0]?.items
+          }
         />
       )}
-      <div className={styles.marketplace__filters}>
+      <div className={styles.moreOption} ref={burgerMenuRef}>
+        <div className={styles.moreOption__main} onClick={toggleBurgerMenu}>
+          {isBurgerMenuVisible ? (
+            <IoClose className={styles.moreOption__icon} />
+          ) : (
+            <IoEllipsisHorizontalSharp className={styles.moreOption__icon} />
+          )}
+        </div>
+        <div
+          className={`${styles.moreOption__buttons} ${
+            isBurgerMenuVisible ? styles.show : ""
+          }`}
+        >
+          <button
+            className={styles.moreOption__addOrder}
+            onClick={() => {
+              toggleBurgerMenu()
+              setIsAddOrderModalVisible(true)
+            }}
+          >
+            +
+          </button>
+          <div
+            className={styles.moreOption__filter}
+            onClick={() => {
+              toggleBurgerMenu()
+              toggleFilterMenu()
+            }}
+          >
+            <IoFilter className={styles.moreOption__filterIcon} />
+          </div>
+        </div>
+        <div></div>
+      </div>
+      <div
+        className={`${styles.marketplace__filters} ${
+          isFilterMenuVisible ? styles.visible : ""
+        }`}
+      >
         <MarketplaceFilters
           details={details}
-          params={params}
-          paramsSelectHandler={paramsSelectHandler}
-          paramsSliderHandler={paramsSliderHandler}
-          filtersSaveHandler={filtersSaveHandler}
           setIsModalVisible={setIsAddOrderModalVisible}
+          closeFilter={toggleFilterMenu}
+					getFilteredOrders={getFilteredOrders}
         />
       </div>
       <div className={styles.marketplace__wrapper}>
-        {orders?.map((order) => (
+        {marketplaceOrders?.map((order) => (
           <MarketplaceOrder
+            key={order?._id}
             offerModalVisible={() => setIsOfferModalVisible(true)}
             giveMarketlaceOrderId={(id) => setCurrentMarketplaceOrderId(id)}
             id={order?._id}
+            product={order?.product}
             length={order?.length}
             width={order?.width}
             height={order?.height}
@@ -236,7 +293,9 @@ const Marketplace = () => {
             from={order?.from}
             to={order?.to}
             price={order?.price}
+            delivery={order?.delivery}
             onCreateRequest={handleCreateRequest}
+            user={user}
           />
         ))}
       </div>
