@@ -1,7 +1,7 @@
 import myAxios from "./axios"
 
-export const getMarketplaceOrders = async () => {
-  const response = await myAxios.get("/marketplace")
+export const getMarketplaceOrders = async (route = "") => {
+  const response = await myAxios.get("/marketplace" + (route ? route : ""))
   return response
 }
 
@@ -56,11 +56,16 @@ export const getCurrency = async () => {
   return response
 }
 
-export const deleteMarketplaceOrder = async (id,token) => {
-    const response = await myAxios.delete(`/marketplace/${id}`,{
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    });
-    return response;
+export const deleteMarketplaceOrder = async (id, token) => {
+  const response = await myAxios.delete(`/marketplace/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+  return response
+}
+
+export const getMarketplaceDetails = async () => {
+  const response = await myAxios.get("/marketplace/details")
+  return response
 }

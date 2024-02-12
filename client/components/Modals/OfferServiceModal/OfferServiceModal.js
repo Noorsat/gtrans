@@ -1,19 +1,17 @@
 import { useEffect, useRef, useState } from "react"
 import styles from "./OfferServiceModal.module.css"
-import {
-  getCurrency,
-  createMarketplaceRequest,
-} from "../../../http/marketplace"
-import { notification } from "antd"
+import { createMarketplaceRequest } from "../../../http/marketplace"
 import Select from "react-select"
 
-const offerService = ({ onCancel, getCurrentId }) => {
+const offerService = ({
+  onCancel,
+  getCurrentId,
+  user,
+  currency,
+  openNotification,
+  deliveryTypes,
+}) => {
   const [selectedTypeIndex, setSelectedTypeIndex] = useState(null)
-  const [typeOfDeliveries, setTypeOfDeliveries] = useState([
-    "Авто (10-15 дней)",
-    "Ж/Д (25-35 дней)",
-  ])
-  const [currency, setCurrency] = useState([])
   const [orderId, setOrderId] = useState(null)
   const [isWarning, setIsWarning] = useState(false)
 
@@ -25,21 +23,11 @@ const offerService = ({ onCancel, getCurrentId }) => {
   const refMyForm = useRef(null)
 
   useEffect(() => {
-    getCurrency()
-      .then((res) => {
-        setCurrency(res.data.data)
-      })
-      .catch((error) => {
-        openNotification("error", error)
-      })
-  }, [])
-
-  useEffect(() => {
     setOrderId(() => getCurrentId())
   }, [getCurrentId])
 
   useEffect(() => {
-    setTypeOfDelivery(typeOfDeliveries[selectedTypeIndex])
+    setTypeOfDelivery(deliveryTypes[selectedTypeIndex]?._id)
   }, [selectedTypeIndex])
 
   useEffect(() => {
@@ -73,7 +61,6 @@ const offerService = ({ onCancel, getCurrentId }) => {
       openNotification("error", "Заполните все поля")
       return
     }
-
     const data = {
       orderId,
       typeOfDelivery,
@@ -82,12 +69,8 @@ const offerService = ({ onCancel, getCurrentId }) => {
       currencyId,
     }
 
-    const user =
-      (typeof window !== "undefined" &&
-        JSON.parse(localStorage.getItem("user"))) ||
-      null
     if (user) {
-      openNotification("success", "Предложение успечно отправлено")
+      b
       createMarketplaceRequest(data, user?.token)
         .then((res) => {
           onCancel()
@@ -99,16 +82,6 @@ const offerService = ({ onCancel, getCurrentId }) => {
     }
   }
 
-  const openNotification = (type = "error", info = "") => {
-    notification.config({
-      duration: 2,
-    })
-
-    notification[type]({
-      message: info,
-    })
-  }
-
   return (
     <div className={styles.modal}>
       <form ref={refMyForm} className={styles.form}>
@@ -116,28 +89,31 @@ const offerService = ({ onCancel, getCurrentId }) => {
           <h2 className={styles.form__title}>Предложить</h2>
           <span onClick={() => onCancel()}>X</span>
         </div>
-        <div className={styles.form__typeContainer}>
-          {typeOfDeliveries &&
-            typeOfDeliveries.map((el, index) => {
+        <div className={styles.form__deliveryContainer}>
+          <p>Выберите тип доставки</p>
+          <div className={styles.form__deliveries}>
+            {deliveryTypes?.map((item, index) => {
               return (
                 <label
-                  className={`${styles.form__label} ${
+                  className={`${styles.form__delivery} ${
                     selectedTypeIndex === index ? styles.checked : ""
                   } ${isWarning && !typeOfDelivery ? styles.error : ""}`}
-                  key={index}
-                  htmlFor={`offerModalFormType${index}`}
+                  key={item._id}
+                  htmlFor={item._id}
                 >
                   <input
-                    id={`offerModalFormType${index}`}
+                    id={item._id}
                     type="radio"
                     name="deliveryType"
                     checked={selectedTypeIndex === index}
                     onChange={() => handleTypeChange(index)}
                   />
-                  <span>{el}</span>
+                  <span>{item.type}</span>
+                  <span>{` (${item.minDays}-${item.maxDays} дней)`}</span>
                 </label>
               )
             })}
+          </div>
         </div>
         <div className={styles.form__properties}>
           <div className={styles.form__property}>
@@ -194,7 +170,7 @@ const offerService = ({ onCancel, getCurrentId }) => {
                     "&:hover": {
                       borderColor: "",
                     },
-                    width: "100px",
+                    width: "100%",
                   }),
                   option: (baseStyles, state) => ({
                     ...baseStyles,
@@ -223,7 +199,7 @@ const offerService = ({ onCancel, getCurrentId }) => {
             sendOffer()
           }}
         >
-          Предложить
+          Откликнуться
         </button>
       </form>
     </div>
